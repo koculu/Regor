@@ -82,6 +82,27 @@ HTML:
 </div>
 ```
 
+define composables:
+
+```ts
+import { ref, onMounted, onUnmounted, type Ref } from 'regor'
+
+export const useMouse = (): { x: Ref<number>; y: Ref<number> } => {
+  const x = ref(0)
+  const y = ref(0)
+
+  const update = (event: MouseEvent): void => {
+    x(event.pageX)
+    y(event.pageY)
+  }
+
+  onMounted(() => window.addEventListener('mousemove', update))
+  onUnmounted(() => window.removeEventListener('mousemove', update))
+
+  return { x, y }
+}
+```
+
 ## Installation
 
 `yarn add regor`
