@@ -1,7 +1,7 @@
 {
   "name": "regor",
-  "version": "1.0.0",
-  "description": "The JavaScript framework for building modern web UI.",
+  "version": "1.0.1",
+  "description": "A modern UI framework for web and desktop applications, inspired by Vue's concepts and powered by simplicity and flexibility.",
   "author": "Ahmed Yasin Koculu",
   "license": "MIT",
   "main": "dist/regor.es2022.cjs.js",
