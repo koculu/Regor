@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ES2022"
+    ],
+    "newLine": "LF",
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "noImplicitAny": true,
+    "removeComments": false,
+    "sourceMap": false,
+    "isolatedModules": false,
+    "esModuleInterop": false,
+    "noEmit": true,
+    "strict": true,
+    "outDir": "dist",
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "allowJs": false,
+    "declaration": false,
+    "emitDeclarationOnly": false,
+    "stripInternal": true,
+    "allowSyntheticDefaultImports": false
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/api/types.ts",
+  ],
+  "exclude": [
+    "**/*.spec.ts"
+  ]
+}

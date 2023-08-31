@@ -1,0 +1,29 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true
+    },
+    "extends": "standard-with-typescript",
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "project": "./tsconfig.json"
+    },
+    "rules": {
+        "@typescript-eslint/indent": "off",
+        "@typescript-eslint/comma-dangle": "off",
+        "@typescript-eslint/space-before-function-paren": "off",
+        "sort-imports": "off",
+        "curly": "off",
+        "@typescript-eslint/member-delimiter-style": "off",
+        "generator-star-spacing": "off",
+        "space-in-parens": "off",
+        "@typescript-eslint/strict-boolean-expressions": "off",
+        "@typescript-eslint/no-confusing-void-expression": "off"
+    },
+    "ignorePatterns": [
+        "dist/*",
+        "scripts/*",
+        "tests/*",
+        "vitest.*"
+    ]
+}
