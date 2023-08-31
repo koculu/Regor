@@ -4,6 +4,8 @@
 
 Regor is a powerful UI framework designed to streamline the development of HTML5-based applications for both web and desktop environments. With a template syntax that closely follows Vue.js, transitioning from VueJS to Regor is seamless for developers familiar with Vue.
 
+### [![Published on npm](https://img.shields.io/npm/v/regor.svg)](https://www.npmjs.com/package/regor)
+
 ## Key Features
 
 - **Simplicity:** Develop UIs without a Virtual DOM for a more straightforward implementation and easier debugging.
