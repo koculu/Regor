@@ -26,6 +26,7 @@ To update the value of a ref object, you have two options:
 
   - Basic types such as numbers, strings, booleans, Date etc.
   - ref objects.
+  - objects
   - Array, Map, Set.
   - `null` or `undefined`.
 
@@ -38,6 +39,8 @@ The `ref` function returns a ref object representing the input value and its nes
 - Certain types such as Node, Date, RegExp, Promise, and Error are not recursively converted into ref objects. They are treated as-is and returned as the value of the ref object.
 - Arrays and objects are recursively traversed to convert their nested properties into ref objects.
 - Symbols are not converted into ref objects, and the original symbols are preserved in the resulting ref object.
+- Observers can be attached to the ref object to be notified of changes to its value.
+- Every `ref` is an `sref`, but not every `sref` is a `ref`.
 
 ## Example
 
