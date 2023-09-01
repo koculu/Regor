@@ -178,7 +178,7 @@ const handleInputAndTextArea = (
   const eventType = isLazy ? 'change' : 'input'
   const isNumber = isNumberInput(el)
   const trimmer = (): void => {
-    if (!flags.trim && !getFlags(parsedValue()[1])) return
+    if (!flags.trim && !getFlags(parsedValue()[1]).trim) return
     el.value = el.value.trim()
   }
   const onCompositionStart = (e: Event): void => {
