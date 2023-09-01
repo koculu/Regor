@@ -24,12 +24,7 @@ npm install regor
 import { createApp, ref } from 'regor'
 
 createApp({
-  setup() {
-    const message = ref('Hello world!')
-    return {
-      message,
-    }
-  },
+  message: ref('Hello world!')
 })
 ```
 
@@ -49,12 +44,7 @@ createApp({
     ref,
   } from 'https://unpkg.com/regor/dist/regor.es2022.esm.prod.js'
   createApp({
-    setup() {
-      const message = ref('Hello world!')
-      return {
-        message,
-      }
-    },
+    message: ref('Hello world!')
   })
 </script>
 ```
