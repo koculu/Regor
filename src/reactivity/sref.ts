@@ -25,17 +25,23 @@ export const batchCollector: {
 } = {}
 
 /**
- * Converts the given value to sref object and returns the sref.
- * Regor provides two options to get or update the value of a sref.
- * Getting the sref value:
- * 1. refObj.value
- * 2. refObj()
- * Setting the sref value:
- * 1. refObj.value = newValue
- * 2. refObj(newValue)
+ * Converts the given value to an sref object and returns the sref.
+ * A sref (short for "shallow ref") allows you to get or update its value.
  *
- * @param value any value
- * @returns ref
+ * Regor provides two options to get or update the value of an sref.
+ *
+ * Getting the sref value:
+ *
+ * 1. srefObj.value
+ * 2. srefObj()
+ *
+ * Setting the sref value:
+ *
+ * 1. srefObj.value = newValue
+ * 2. srefObj(newValue)
+ *
+ * @param value - Any value to be converted into an sref object.
+ * @returns An sref object representing the input value.
  */
 export const sref = <TValueType>(
   value?:

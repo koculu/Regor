@@ -15,18 +15,23 @@ import { refSymbol } from './refSymbols'
 import { isDeepRef } from './isDeepRef'
 
 /**
- * Converts the given value and it's all properties to ref objects and returns the ref.
- * The returned object's type reflects it's nested properties as well.
+ * Converts the given value and its nested properties into ref objects recursively and returns the ref.
+ * The returned object's type reflects its nested properties as well.
+ *
  * Regor provides two options to get or update the value of a ref.
+ *
  * Getting the ref value:
+ *
  * 1. refObj.value
  * 2. refObj()
+ *
  * Setting the ref value:
+ *
  * 1. refObj.value = newValue
  * 2. refObj(newValue)
  *
- * @param value any value
- * @returns ref
+ * @param value - Any value to be converted into a ref object.
+ * @returns A ref object representing the input value and its nested properties.
  */
 export const ref = <TValueType>(
   value?:
