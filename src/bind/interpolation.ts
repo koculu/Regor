@@ -29,10 +29,9 @@ const interpolateTextNode = (textNode: Node, textDirective: string): void => {
       part.startsWith('{{') &&
       part.endsWith('}}')
     ) {
-      textNode.parentElement.setAttribute(
-        textDirective,
-        part.substring(2, part.length - 2),
-      )
+      const parent = textNode.parentElement
+      parent.setAttribute(textDirective, part.substring(2, part.length - 2))
+      parent.innerText = ''
       return
     }
   }

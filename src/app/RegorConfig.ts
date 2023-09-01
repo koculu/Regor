@@ -1,3 +1,4 @@
+import { warningHandler } from '..'
 import { type Directive, type Component } from '../api/types'
 import { capitalize } from '../common/common'
 import { attrDirective } from '../directives/attr'
@@ -101,10 +102,16 @@ export class RegorConfig {
     ...components: Array<Component<TProps>>
   ): void {
     for (const component of components) {
-      if (!component.name) continue
-      this.__components.set(capitalize(component.name), component)
+      if (!component.defaultName) {
+        warningHandler.warning(
+          "Registered component's default name is not defined",
+          component,
+        )
+        continue
+      }
+      this.__components.set(capitalize(component.defaultName), component)
       this.__componentsUpperCase.set(
-        capitalize(component.name).toLocaleUpperCase(),
+        capitalize(component.defaultName).toLocaleUpperCase(),
         component,
       )
     }

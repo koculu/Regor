@@ -55,7 +55,6 @@ interface MyComponent {
 }
 
 const myComponent = createComponent<MyComponent>(
-  'MyComponent',
   (head) => ({
     message: head.props.message,
     count: ref(0),
@@ -147,7 +146,7 @@ These directives empower you to create dynamic and interactive user interfaces, 
 **App / Component Template Functions**
 
 - **createApp:** Similar to Vue's `createApp`, it initializes a Regor application instance.
-- **createComponent:** Creates a Regor component instance, akin to Vue's component creation.
+- **createComponent:** Creates a Regor component instance.
 - **toFragment:** Converts a JSON template to a DOM element fragment.
 - **toJsonTemplate:** Converts a DOM element to a JSON template.
 

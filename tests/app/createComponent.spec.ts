@@ -13,7 +13,6 @@ test('should render components with reactive properties', () => {
   const root = document.createElement('<div>')
 
   const myComponent = createComponent(
-    'MyComponent',
     () => ({
       prop1: ref('prop-1'),
       prop2: ref('prop-2'),
@@ -112,11 +111,11 @@ test('should render components with reactive properties', () => {
 test('should render empty component', () => {
   const root = document.createElement('<div>')
 
-  const myComponent = createComponent('MyComponent', () => ({}), {
+  const myComponent = createComponent(() => ({}), {
     html: html``,
   })
 
-  const app = createApp(
+  createApp(
     {
       components: { myComponent },
     },
@@ -148,7 +147,6 @@ test('should render nested component with reactive properties', () => {
   }
 
   const myComponent = createComponent<MyComponent>(
-    'MyComponent',
     (head) => ({
       item: head.props.item,
     }),
