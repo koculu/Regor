@@ -6,6 +6,8 @@ The `sref` function is a utility provided by the Regor library. It converts a gi
 
 The nested properties of an sref are not converted to refs.
 
+[**`Try It Online`**](https://stackblitz.com/edit/regor-sample-ref?file=index.ts)
+
 ## Usage
 
 ### Getting the SRef Value
