@@ -116,28 +116,28 @@ Regor provides a set of directives that allow you to enhance the behavior and ap
 
 > **Note:** The directive prefix "r-" can be customized using `RegorConfig.getDefault().setDirectives('v-')` to align with a different naming convention, such as Vue's "v-" prefix.
 
-- **r-bind:** Binds an element's attribute to a component's data, allowing dynamic updates.
-- **r-model:** Enables two-way data binding between form inputs.
-- **r-text:** Sets the element's text content to the result of an expression.
-- **r-html:** Renders the result of an expression as HTML content within the element.
-- **r-on:** Attaches event listeners to the element and invokes specified component methods.
-- **r-show:** Conditionally displays the element based on the truthiness of an expression.
-- **r-for:** Renders a set of elements based on an array and a template.
-- **r-if:** Conditionally renders the element based on the truthiness of an expression.
-- **r-else:** Provides an alternative rendering when used in conjunction with r-if.
-- **r-else-if:** Conditionally renders the element as an alternative to r-if.
-- **r-pre:** Excludes HTML element from Regor bindings.
-- **:class:** Binds one or more class names to an element based on expressions.
-- **:style:** Binds one or more inline styles to an element based on expressions.
-- **:ref:** Provides a reference to an element in the template, allowing you to interact with it programmatically.
-- **:key:** Provides a unique identifier for each item in a list, aiding efficient updates and rendering.
-- **:is:** Specifies the component to dynamically render based on a value or expression.
-- **r-teleport:** Teleports the element to anywhere in the DOM. Unlike Vue, teleport is a directive to avoid component overhead.
-- **:props:** Vue uses v-bind for component property passing. However, this can conflict with v-bind's attribute fall-through logic. Hence, Regor defines a dedicated directive to pass properties using object syntax. It enables passing properties without defining them in the component's props contract.
-- **:props-once:** Similar to :props but it doesn't observe entire reactive tree of the template expression. Tail reactivity still works.
-- **@** Shorthand for `r-on` to bind event listeners.
-- **:** Shorthand for `r-bind` to bind element attributes.
-- **.** Shorthand for `r-bind.prop` to set properties.
+- **`r-bind`** Binds an element's attribute to a component's data, allowing dynamic updates.
+- **`r-model`** Enables two-way data binding between form inputs.
+- **`r-text`** Sets the element's text content to the result of an expression.
+- **`r-html`** Renders the result of an expression as HTML content within the element.
+- **`r-on`** Attaches event listeners to the element and invokes specified component methods.
+- **`r-show`** Conditionally displays the element based on the truthiness of an expression.
+- **`r-for`** Renders a set of elements based on an array and a template.
+- **`r-if`** Conditionally renders the element based on the truthiness of an expression.
+- **`r-else`** Provides an alternative rendering when used in conjunction with r-if.
+- **`r-else-if`** Conditionally renders the element as an alternative to r-if.
+- **`r-pre`** Excludes HTML element from Regor bindings.
+- **`:class`** Binds one or more class names to an element based on expressions.
+- **`:style`** Binds one or more inline styles to an element based on expressions.
+- **`:ref`** Provides a reference to an element in the template, allowing you to interact with it programmatically.
+- **`:key`** Provides a unique identifier for each item in a list, aiding efficient updates and rendering.
+- **`:is`** Specifies the component to dynamically render based on a value or expression.
+- **`r-teleport`** Teleports the element to anywhere in the DOM. Unlike Vue, teleport is a directive to avoid component overhead.
+- **`:props`** Vue uses v-bind for component property passing. However, this can conflict with v-bind's attribute fall-through logic. Hence, Regor defines a dedicated directive to pass properties using object syntax. It enables passing properties without defining them in the component's props contract.
+- **`:props-once`** Similar to :props but it doesn't observe entire reactive tree of the template expression. Tail reactivity still works.
+- **`@`** Shorthand for `r-on` to bind event listeners.
+- **`:`** Shorthand for `r-bind` to bind element attributes.
+- **`.`** Shorthand for `r-bind.prop` to set properties.
 
 These directives empower you to create dynamic and interactive user interfaces, enhancing the user experience of your Regor-powered applications.
 
@@ -198,7 +198,7 @@ These directives empower you to create dynamic and interactive user interfaces, 
 
 **Composition Functions**
 
-- **useScope:** In a scope, you can use `onMounted` and `onUnmounted` functions. Components are always created in scope. Use the useScope for apps created by createApp. Similar to Vue's `effectScope`, useScope provides efficient cleanup of watchEffects, computed refs and enables the `onMounted` and `onUnmounted` usage.
+- **useScope:** In a scope, you can use `onMounted` and `onUnmounted` functions. Components are always created in scope. Use the useScope for apps created by createApp. Similar to Vue's `effectScope`, useScope provides efficient cleanup of watchEffects, computed refs, observers and enables the `onMounted` and `onUnmounted` calls in the scope.
 - **onMounted:** Similar to Vue's `onMounted`, it executes when the component is mounted.
 - **onUnmounted:** Similar to Vue's `onUnmounted`, it executes when the component is unmounted.
 
