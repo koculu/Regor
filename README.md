@@ -6,6 +6,8 @@ Regor is a powerful UI framework designed to streamline the development of HTML5
 
 ### [![Published on npm](https://img.shields.io/npm/v/regor.svg)](https://www.npmjs.com/package/regor)
 
+[**`Try Regor Online`**](https://stackblitz.com/edit/regor-sample-1?file=index.ts)
+
 ## Key Features
 
 - **Simplicity:** Develop UIs without a Virtual DOM for a more straightforward implementation and easier debugging.
