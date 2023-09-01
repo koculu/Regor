@@ -2,34 +2,37 @@ import { camelize, isHTMLElement } from '../common/common'
 import { isNullOrWhitespace } from '../common/is-what'
 import { type Binder } from './Binder'
 
+/**
+ * @internal
+ */
 export class DirectiveElement {
-  name: string // r-on @click @submit r-on:click.prevent @submit.prevent  @[event-name].self.camel :src :className.prop .class-name.camel r-if r-for key
+  __name: string // r-on @click @submit r-on:click.prevent @submit.prevent  @[event-name].self.camel :src :className.prop .class-name.camel r-if r-for key
 
   /** Contains: ['@', 'submit'], ['r-on', 'click'], ['@', '[dynamicKey]'] */
-  terms: string[] = []
+  __terms: string[] = []
 
   /** Contains directive flags. ['camel', 'prevent',...] */
-  flags: string[] = []
+  __flags: string[] = []
 
-  elements: HTMLElement[] = []
+  __elements: HTMLElement[] = []
 
   constructor(name: string) {
-    this.name = name
+    this.__name = name
     this.__parse()
   }
 
   __parse(): void {
-    let name = this.name
+    let name = this.__name
     const isPropShortcut = name.startsWith('.')
     if (isPropShortcut) name = ':' + name.slice(1)
     const firstFlagIndex = name.indexOf('.')
-    const terms = (this.terms = (
+    const terms = (this.__terms = (
       firstFlagIndex < 0 ? name : name.substring(0, firstFlagIndex)
     ).split(/[:@]/))
     if (isNullOrWhitespace(terms[0])) terms[0] = isPropShortcut ? '.' : name[0]
 
     if (firstFlagIndex >= 0) {
-      const flags = (this.flags = name.slice(firstFlagIndex + 1).split('.'))
+      const flags = (this.__flags = name.slice(firstFlagIndex + 1).split('.'))
       if (flags.includes('camel')) {
         const index = terms.length - 1
         terms[index] = camelize(terms[index])
@@ -66,7 +69,7 @@ export class DirectiveCollector {
       for (const name of names) {
         if (!map.has(name)) map.set(name, new DirectiveElement(name))
         const item = map.get(name) as DirectiveElement
-        item.elements.push(node)
+        item.__elements.push(node)
       }
     }
     processNode(element)

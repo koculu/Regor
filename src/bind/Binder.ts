@@ -85,14 +85,14 @@ export class Binder {
 
     const directiveMap = this.__config.__directiveMap
     for (const [attribute, item] of map.entries()) {
-      const [name, option] = item.terms
+      const [name, option] = item.__terms
       const directive = directiveMap[attribute] ?? directiveMap[name]
       if (!directive) {
         console.error('directive not found:', name)
         continue
       }
-      item.elements.forEach((el) => {
-        this.__bind(directive, el, attribute, false, option, item.flags)
+      item.__elements.forEach((el) => {
+        this.__bind(directive, el, attribute, false, option, item.__flags)
       })
     }
   }

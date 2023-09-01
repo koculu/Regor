@@ -279,9 +279,9 @@ export interface App<TRegorContext extends IRegorContext> {
 }
 
 export interface Component<TProps = Record<any, any>> {
-  name: string
+  name?: string
   context: (head: ComponentHead<TProps>) => IRegorContext
-  template: Template
+  template: Node
   inheritAttrs?: boolean
   props?: string[]
 }

@@ -54,7 +54,7 @@ export const createComponent = <TProps = Record<any, any>>(
   return {
     name,
     context,
-    template,
+    template: template.element,
     inheritAttrs: options.inheritAttrs ?? true,
     props: options.props,
   }

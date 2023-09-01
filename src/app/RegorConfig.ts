@@ -101,6 +101,7 @@ export class RegorConfig {
     ...components: Array<Component<TProps>>
   ): void {
     for (const component of components) {
+      if (!component.name) continue
       this.__components.set(capitalize(component.name), component)
       this.__componentsUpperCase.set(
         capitalize(component.name).toLocaleUpperCase(),

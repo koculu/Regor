@@ -69,7 +69,7 @@ export class ComponentBinder {
       const registeredComponent =
         contextComponent ?? registeredComponentsUpperCase.get(tagName)
       if (!registeredComponent) continue
-      const templateElement = registeredComponent.template.element
+      const templateElement = registeredComponent.template
       if (!templateElement) continue
 
       const componentParent = component.parentElement
@@ -110,7 +110,7 @@ export class ComponentBinder {
 
           const map = binder.__directiveCollector.__collect(component, false)
           for (const [attrName, item] of map.entries()) {
-            const [name, option] = item.terms
+            const [name, option] = item.__terms
             if (!option) continue
             if (!definedProps.includes(camelize(option))) continue
             if (name !== '.' && name !== ':' && name !== bindName) continue
@@ -120,7 +120,7 @@ export class ComponentBinder {
               attrName,
               true,
               option,
-              item.flags,
+              item.__flags,
             )
           }
         })
