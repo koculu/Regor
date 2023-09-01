@@ -13,6 +13,25 @@ import { isRef } from '../reactivity/isRef'
 import { pause } from '../reactivity/pause'
 import { resume } from '../reactivity/resume'
 
+/**
+ * @internal
+ */
+export const modelDirective: Directive = {
+  onChange: (el: HTMLElement, values: any[]) => {
+    updateDomElementValue(el, values[0])
+  },
+  onBind: (
+    el: HTMLElement,
+    parseResult: ParseResult,
+    _expr: string,
+    _option?: string,
+    _dynamicOption?: ParseResult,
+    flags?: string[],
+  ): Unbinder => {
+    return attachDOMChangeListener(el, parseResult, flags)
+  },
+}
+
 const updateDomElementValue = (el: HTMLElement, value: any): void => {
   const isAnInput = isInput(el)
   if (isAnInput && isCheckBox(el)) {
@@ -116,9 +135,17 @@ const isSelect = (el: HTMLElement): el is HTMLSelectElement =>
 const attachDOMChangeListener = (
   el: HTMLElement,
   parseResult: ParseResult,
+  directiveFlags?: string[],
 ): Unbinder => {
   const parsedValue = parseResult.value
-  const flags = getFlags(parsedValue()[1])
+  const f1 = getFlags(directiveFlags?.join(','))
+  const f2 = getFlags(parsedValue()[1])
+  const flags: ModelFlags = {
+    int: f1.int || f1.int,
+    lazy: f1.lazy || f2.lazy,
+    number: f1.number || f2.number,
+    trim: f1.trim || f2.trim,
+  }
   const modelRef = parseResult.refs[0]
   if (!modelRef) {
     warning(WarningType.ModelRequiresRef, el)
@@ -139,18 +166,6 @@ const attachDOMChangeListener = (
   }
 }
 
-/**
- * @internal
- */
-export const modelDirective: Directive = {
-  onChange: (el: HTMLElement, values: any[]) => {
-    updateDomElementValue(el, values[0])
-  },
-  onBind: (el: HTMLElement, parseResult: ParseResult): Unbinder => {
-    return attachDOMChangeListener(el, parseResult)
-  },
-}
-
 const decimalSeparators = /[.,' ·٫]/
 
 const handleInputAndTextArea = (
@@ -163,8 +178,7 @@ const handleInputAndTextArea = (
   const eventType = isLazy ? 'change' : 'input'
   const isNumber = isNumberInput(el)
   const trimmer = (): void => {
-    const flags = getFlags(parsedValue()[1])
-    if (!flags.trim) return
+    if (!flags.trim && !getFlags(parsedValue()[1])) return
     el.value = el.value.trim()
   }
   const onCompositionStart = (e: Event): void => {
