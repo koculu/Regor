@@ -278,12 +278,40 @@ export interface App<TRegorContext extends IRegorContext> {
   unbind: () => void
 }
 
+/**
+ * Represents a component in the Regor framework.
+ *
+ * @typeparam TProps - The type of props accepted by the component.
+ */
 export interface Component<TProps = Record<any, any>> {
-  name: string
+  /**
+   * A function that returns the Regor context associated with the component.
+   *
+   * @param head - Provides information on component mount.
+   * @returns The Regor context.
+   */
   context: (head: ComponentHead<TProps>) => IRegorContext
-  template: Template
+
+  /**
+   * The template for the component.
+   */
+  template: Node
+
+  /**
+   * Indicates whether the component'^s content should inherit attributes from its parent.
+   */
   inheritAttrs?: boolean
+
+  /**
+   * An array of prop names accepted by the component.
+   */
   props?: string[]
+
+  /**
+   * The default name of the component when registered in the RegorConfig using the addComponent method.
+   * This property is not required if the component is used through app or component context.
+   */
+  defaultName?: string
 }
 
 export type OnMounted = () => void
@@ -304,6 +332,11 @@ export interface CreateComponentOptions {
    * It is not required to define propFoo3 and propFoo4 in the props list because it uses :props binding. :props binding enables binding to any property of component regardless it is explicitly defined in props list.
    */
   props?: string[]
+
+  /** The default name of the component.
+   * It is required if the component is registered using the Regor config.addComponent method.
+   * It is not required if the component being registered in app or component scope. */
+  defaultName?: string
 }
 
 export interface Scope<TRegorContext> {

@@ -13,7 +13,6 @@ import { toJsonTemplate } from './toJsonTemplate'
 import { isHTMLElement } from '../common/common'
 
 export const createComponent = <TProps = Record<any, any>>(
-  name: string,
   context: (head: ComponentHead<TProps>) => IRegorContext,
   template: Template,
   options: CreateComponentOptions = {},
@@ -52,10 +51,10 @@ export const createComponent = <TProps = Record<any, any>>(
     template.element = toFragment(json, true, options.config)
   }
   return {
-    name,
     context,
-    template,
+    template: template.element,
     inheritAttrs: options.inheritAttrs ?? true,
     props: options.props,
+    defaultName: options.defaultName,
   }
 }
