@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `watchEffect` function is a utility provided by Regor. It allows you to create an "effect" that automatically reacts to changes in reactive data, such as ref objects or other observables. This effect is useful for handling side effects, such as updating the UI, in a reactive and efficient manner.
+The `watchEffect` function allows you to create an "effect" that automatically reacts to changes in reactive data, such as ref objects or other observables. This effect is useful for handling side effects, such as updating the UI, in a reactive and efficient manner.
 
 ## Usage
 

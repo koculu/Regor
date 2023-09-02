@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `batch` function is a utility provided by Regor. It is used to batch multiple updates to refs, which can help optimize performance by reducing the number of observer notifications and triggers during a series of updates. When multiple changes to refs are made within a `batch` block, observers are only notified once, at the end of the batch.
+The `batch` function is used to batch multiple updates to refs, which can help optimize performance by reducing the number of observer notifications and triggers during a series of updates. When multiple changes to refs are made within a `batch` block, observers are only notified once, at the end of the batch.
 
 ## Usage
 

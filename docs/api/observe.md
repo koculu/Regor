@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `observe` function is a utility provided by Regor. It allows you to create observers that react to changes in ref objects, providing a callback that triggers when the ref's value changes. This is useful for handling side effects or updating UI elements based on reactive data.
+The `observe` function allows you to create observers that react to changes in ref objects, providing a callback that triggers when the ref's value changes. This is useful for handling side effects or updating UI elements based on reactive data.
 
 [**`Try It Online`**](https://stackblitz.com/edit/regor-sample-ref?file=index.ts)
 

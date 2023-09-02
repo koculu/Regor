@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `endBatch` function is a utility provided by Regor. It is used in conjunction with the `startBatch`function to end a batch of ref updates and notify observers of the changes made during the batch. Batching ref updates using `startBatch` and `endBatch` can improve application performance by reducing the number of observer notifications and triggers during a series of updates.
+The `endBatch` function is used in conjunction with the `startBatch`function to end a batch of ref updates and notify observers of the changes made during the batch. Batching ref updates using `startBatch` and `endBatch` can improve application performance by reducing the number of observer notifications and triggers during a series of updates.
 
 ## Usage
 

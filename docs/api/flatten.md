@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `flatten` function is a utility provided by Regor. It recursively traverses a nested structure, such as an object, array, set, or map, and returns a flattened version of the structure. This means that it removes any nested references and produces a structure containing no refs.
+The `flatten` function recursively traverses a nested structure, such as an object, array, set, or map, and returns a flattened version of the structure. This means that it removes any nested references and produces a structure containing no refs.
 
 ## Usage
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `observeMany` function is a utility provided by Regor. It allows you to create observers that react to changes in multiple ref objects simultaneously. This is useful for handling side effects or updating UI elements based on changes in multiple reactive data sources.
+The `observeMany` function allows you to create observers that react to changes in multiple ref objects simultaneously. This is useful for handling side effects or updating UI elements based on changes in multiple reactive data sources.
 
 ## Usage
 

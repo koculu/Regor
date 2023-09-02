@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `startBatch` function is a utility provided by Regor. It is used in conjunction with the `batch` function to batch multiple updates to refs, optimizing performance by reducing the number of observer notifications and triggers during a series of updates. The `startBatch` function initializes a batch operation, and any ref updates made after calling `startBatch` are batched together until the `endBatch` function is called.
+The `startBatch` function is used in conjunction with the `batch` function to batch multiple updates to refs, optimizing performance by reducing the number of observer notifications and triggers during a series of updates. The `startBatch` function initializes a batch operation, and any ref updates made after calling `startBatch` are batched together until the `endBatch` function is called.
 
 ## Usage
 

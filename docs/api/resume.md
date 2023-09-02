@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `resume` function is a utility provided by Regor. It is used to resume the automatic triggering of observers for a specific ref that has previously been paused using the `pause` function. When a ref is resumed, its observers are reactivated, and changes to the ref's value will once again trigger observer callbacks.
+The `resume` function is used to resume the automatic triggering of observers for a specific ref that has previously been paused using the `pause` function. When a ref is resumed, its observers are reactivated, and changes to the ref's value will once again trigger observer callbacks.
 
 ## Usage
 

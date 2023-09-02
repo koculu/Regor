@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `onUnmounted` function is a utility provided by Regor. It allows you to register a callback function that will be executed when a component or scope is unmounted or cleaned up. This is useful for performing cleanup tasks or removing event listeners when a component becomes inactive.
+The `onUnmounted` function allows you to register a callback function that will be executed when a component or scope is unmounted or cleaned up. This is useful for performing cleanup tasks or removing event listeners when a component becomes inactive.
 
 ## Usage
 

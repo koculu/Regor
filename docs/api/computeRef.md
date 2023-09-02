@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `computeRef` function is a utility provided by Regor. It allows you to create a computed ref object that automatically computes its value based on a source ref object and a computation function. This is useful for deriving values from reactive data and ensuring that the computed ref updates whenever the source ref changes.
+The `computeRef` function allows you to create a computed ref object that automatically computes its value based on a source ref object and a computation function. This is useful for deriving values from reactive data and ensuring that the computed ref updates whenever the source ref changes.
 
 ## Usage
 

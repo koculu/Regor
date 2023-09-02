@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `markRaw` function is a utility provided by Regor. It allows you to mark a given value as "raw," indicating that it should not be converted into a deep ref when using the `ref` function. Marking a value as "raw" ensures that specific nested properties or the entire object will remain untracked and not reactive.
+The `markRaw` function allows you to mark a given value as "raw," indicating that it should not be converted into a deep ref when using the `ref` function. Marking a value as "raw" ensures that specific nested properties or the entire object will remain untracked and not reactive.
 
 ## Usage
 

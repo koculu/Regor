@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `isRef` function is a utility provided by Regor. It determines whether a given value is a ref object, indicating that it has been converted into a ref using the `ref`, `sref` or `computed` functions.
+The `isRef` function determines whether a given value is a ref object, indicating that it has been converted into a ref using the `ref`, `sref` or `computed` functions.
 
 ## Usage
 

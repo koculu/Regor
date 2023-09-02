@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `trigger` function is a utility provided by Regor. It is used to manually trigger observers and update dependent refs. This function is particularly useful when you need to manually control when ref updates and observer notifications occur.
+The `trigger` function is used to manually trigger observers and update dependent refs. This function is particularly useful when you need to manually control when ref updates and observer notifications occur.
 
 ## Usage
 

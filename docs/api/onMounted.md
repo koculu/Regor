@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `onMounted` function is a utility provided by Regor. It allows you to register a callback function that will be executed when an app or component is mounted or initialized. This is particularly useful for performing setup tasks or side effects when a component becomes active.
+The `onMounted` function allows you to register a callback function that will be executed when an app or component is mounted or initialized. This is particularly useful for performing setup tasks or side effects when a component becomes active.
 
 ## Usage
 

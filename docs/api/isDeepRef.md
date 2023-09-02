@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `isDeepRef` function is a utility provided by Regor. It determines whether a given value is a deep ref object, indicating that it has been deeply converted into a ref object using the `ref` function.
+The `isDeepRef` function determines whether a given value is a deep ref object, indicating that it has been deeply converted into a ref object using the `ref` function.
 
 ## Usage
 

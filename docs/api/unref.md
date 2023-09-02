@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `unref` function is a utility provided by Regor. It allows you to safely retrieve the original value from a ref object if the given value is a ref, or it simply returns the value itself if it's not a ref.
+The `unref` function allows you to safely retrieve the original value from a ref object if the given value is a ref, or it simply returns the value itself if it's not a ref.
 
 ## Usage
 

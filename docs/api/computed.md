@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `computed` function is a utility provided by Regor. It allows you to create a computed property that depends on reactive data and automatically updates when its dependencies change. Computed properties are useful for performing complex calculations or transformations on reactive data.
+The `computed` function allows you to create a computed property that depends on reactive data and automatically updates when its dependencies change. Computed properties are useful for performing complex calculations or transformations on reactive data.
 
 [**`Try It Online`**](https://stackblitz.com/edit/regor-sample-ref?file=index.ts)
 

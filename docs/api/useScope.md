@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `useScope` function is a utility provided by Regor. It allows you to create a scope for an app or composable, enabling you to manage initialization and cleanup tasks specific to that scope. Scopes are useful for organizing and encapsulating logic within your components.
+The `useScope` function allows you to create a scope for an app or composable, enabling you to manage initialization and cleanup tasks specific to that scope. Scopes are useful for organizing and encapsulating logic within your components.
 
 Components are always created in scope using `createComponent` function.
 

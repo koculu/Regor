@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `ref` function is a utility provided by Regor. It converts a given value and its nested properties into ref objects recursively, returning a ref object that reflects the structure of the input value.
+The `ref` function converts a given value and its nested properties into ref objects recursively, returning a ref object that reflects the structure of the input value.
 
 [**`Try It Online`**](https://stackblitz.com/edit/regor-sample-ref?file=index.ts)
 

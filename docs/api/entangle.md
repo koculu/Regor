@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `entangle` function is a utility provided by Regor. It allows you to create a bidirectional link between two refs, ensuring that changes in one ref are mirrored in the other. This bidirectional linking is particularly useful when you want two refs to always have the same value.
+The `entangle` function allows you to create a bidirectional link between two refs, ensuring that changes in one ref are mirrored in the other. This bidirectional linking is particularly useful when you want two refs to always have the same value.
 
 ## Usage
 

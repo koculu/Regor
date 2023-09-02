@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `persist` function is a utility provided by Regor. It allows you to persist the state of a ref in the browser's `localStorage` by associating it with a unique `key`. This enables you to store and retrieve the state of the ref across page reloads or even when the browser is closed and reopened.
+The `persist` function allows you to persist the state of a ref in the browser's `localStorage` by associating it with a unique `key`. This enables you to store and retrieve the state of the ref across page reloads or even when the browser is closed and reopened.
 
 ## Usage
 

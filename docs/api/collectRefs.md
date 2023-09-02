@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `collectRefs` function is a utility provided by Regor. It allows you to collect a set of reactive references (refs) within a specific scope and return both the result of an action and the collected refs. This is useful for managing and tracking the refs used within a certain code block.
+The `collectRefs` function allows you to collect a set of reactive references (refs) within a specific scope and return both the result of an action and the collected refs. This is useful for managing and tracking the refs used within a certain code block.
 
 ## Usage
 
