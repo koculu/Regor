@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `ref` function is a utility provided by the Regor library. It converts a given value and its nested properties into ref objects recursively, returning a ref object that reflects the structure of the input value.
+The `ref` function is a utility provided by Regor. It converts a given value and its nested properties into ref objects recursively, returning a ref object that reflects the structure of the input value.
 
 [**`Try It Online`**](https://stackblitz.com/edit/regor-sample-ref?file=index.ts)
 
@@ -110,4 +110,4 @@ console.log(myRef().age()) // Outputs 35
 - [`resume`](resume.md)
 - [`trigger`](trigger.md)
 
-[Back to the directives](regor-api.md)
+[Back to the API list](regor-api.md)

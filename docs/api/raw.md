@@ -4,4 +4,4 @@ We're working hard to bring you comprehensive documentation for Regor. Please ch
 
 Thank you for your patience!
 
-[Back to the directives](regor-api.md)
+[Back to the API list](regor-api.md)

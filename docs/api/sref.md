@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `sref` function is a utility provided by the Regor library. It converts a given value into an sref (short for "simple ref") object and returns the sref. An sref allows you to both retrieve and update its value.
+The `sref` function is a utility provided by Regor. It converts a given value into an sref (short for "simple ref") object and returns the sref. An sref allows you to both retrieve and update its value.
 
 The nested properties of an sref are not converted to refs.
 
@@ -92,4 +92,4 @@ console.log(mySRef().age) // Outputs 35
 - [`resume`](resume.md)
 - [`trigger`](trigger.md)
 
-[Back to the directives](regor-api.md)
+[Back to the API list](regor-api.md)

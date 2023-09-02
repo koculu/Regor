@@ -157,7 +157,7 @@ These directives empower you to create dynamic and interactive user interfaces, 
 
 - **`createApp`** Similar to Vue's `createApp`, it initializes a Regor application instance.
 - **`createComponent`** Creates a Regor component instance.
-- **`toFragment`** Converts a JSON template to a DOM element fragment.
+- **`toFragment`** Converts a JSON template to a document fragment.
 - **`toJsonTemplate`** Converts a DOM element to a JSON template.
 
 **Cleanup Functions**
