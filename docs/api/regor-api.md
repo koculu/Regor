@@ -8,6 +8,7 @@ In this section, you will find a list of Regor's API methods organized by catego
 - [`createComponent`](createComponent.md)
 - [`toFragment`](toFragment.md)
 - [`toJsonTemplate`](toJsonTemplate.md)
+- [`RegorConfig`](regorConfig.md)
 
 **Cleanup Functions:**
 
