@@ -17,8 +17,8 @@ In Regor, directives are special attributes that start with the "r-" prefix. The
 
 - [`r-for`](r-for.md) Renders a set of elements based on an array and a template.
 - [`r-if`](r-if.md) Conditionally renders the element based on the truthiness of an expression.
-- [`r-else`](r-else.md) Provides an alternative rendering when used in conjunction with `r-if`.
-- [`r-else-if`](r-else-if.md) Conditionally renders the element as an alternative to `r-if`.
+- [`r-else`](r-if.md) Provides an alternative rendering when used in conjunction with `r-if`.
+- [`r-else-if`](r-if.md) Conditionally renders the element as an alternative to `r-if`.
 
 **Utility Directives:**
 
