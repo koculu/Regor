@@ -26,7 +26,7 @@ In Regor, directives are special attributes that start with the "r-" prefix. The
 - [`:class`](class.md) Binds one or more class names to an element based on expressions.
 - [`:style`](style.md) Binds one or more inline styles to an element based on expressions.
 - [`:ref`](ref.md) Provides a reference to an element in the template, allowing you to interact with it programmatically.
-- [`:key`](key.md) Provides a unique identifier for each item in a list, aiding efficient updates and rendering.
+- [`:key`](r-for.md) Provides a unique identifier for each item in a list, aiding efficient updates and rendering.
 - [`:is`](is.md) Specifies the component to dynamically render based on a value or expression.
 - [`r-teleport`](r-teleport.md): Teleports the element to anywhere in the DOM. Unlike Vue, teleport is a directive to avoid component overhead.
 - [`:props`](props.md) Vue uses `v-bind` for component property passing. However, this can conflict with `v-bind`'s attribute fall-through logic. Hence, Regor defines a dedicated directive to pass properties using object syntax. It enables passing properties without defining them in the component's props contract.
@@ -34,12 +34,12 @@ In Regor, directives are special attributes that start with the "r-" prefix. The
 
 **Event Handling Directives:**
 
-- [`@`](at.md) Shorthand for `r-on` to bind event listeners.
+- [`@`](r-on.md) Shorthand for `r-on` to bind event listeners.
 
 **Attribute Binding Directives:**
 
-- [`:`](colon.md) Shorthand for `r-bind` to bind element attributes.
-- [`.`](dot.md) Shorthand for `r-bind.prop` to set properties.
+- [`:`](r-bind.md) Shorthand for `r-bind` to bind element attributes.
+- [`.`](r-bind.md) Shorthand for `r-bind.prop` to set properties.
 
 These directives empower you to create dynamic and interactive user interfaces, enhancing the user experience of your Regor-powered applications. Click on each directive to view its detailed documentation, including examples and usage guidelines.
 
