@@ -34,7 +34,7 @@ const myComponent = createComponent(
     // ... other context properties
   }),
   {
-    html: html`<div></div>`, // Define the component content from hrml string
+    html: html`<div></div>`, // Define the component content from html string
   },
 )
 
