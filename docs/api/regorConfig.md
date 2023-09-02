@@ -130,6 +130,6 @@ The `RegorConfig` class provides default configuration values for various proper
 - [`createApp`](createApp.md)
 - [`createComponent`](createComponent.md)
 - [`toFragment`](toFragment.md)
-- [`toJSONTemplate`](toJSONTemplate.md)
+- [`toJSONTemplate`](toJsonTemplate.md)
 
 [Back to the API list](regor-api.md)

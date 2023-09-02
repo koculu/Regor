@@ -82,6 +82,6 @@ The `createComponent` function returns a component object with the following pro
 
 - [`createApp`](createApp.md)
 - [`toFragment`](toFragment.md)
-- [`toJSONTemplate`](toJSONTemplate.md)
+- [`toJSONTemplate`](toJsonTemplate.md)
 
 [Back to the API list](regor-api.md)
