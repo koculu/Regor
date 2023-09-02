@@ -131,7 +131,7 @@ export class RegorConfig {
       ':style': styleDirective,
       [`${prefix}bind:style`]: styleDirective,
       ':class': classDirective,
-      [`${prefix}bind:class`]: styleDirective,
+      [`${prefix}bind:class`]: classDirective,
       ':ref': refDirective,
       ':value': valueDirective,
       teleport: teleportDirective,
