@@ -304,7 +304,8 @@ export class ForBinder {
       .map((key) => key.trim())
     const indexOfIndex = keys.length > 1 ? keys.length - 1 : -1
     const index =
-      indexOfIndex !== -1 && keys[indexOfIndex]?.startsWith('#')
+      indexOfIndex !== -1 &&
+      (keys[indexOfIndex] === 'index' || keys[indexOfIndex]?.startsWith('#'))
         ? keys[indexOfIndex]
         : ''
     if (index) keys.splice(indexOfIndex, 1)
@@ -331,7 +332,9 @@ export class ForBinder {
         }
         const result = { ctx, index: sref(-1) }
         if (index) {
-          result.index = ctx[index.substring(1)] = sref(i)
+          result.index = ctx[
+            index.startsWith('#') ? index.substring(1) : index
+          ] = sref(i)
         }
         return result
       },
