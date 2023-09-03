@@ -20,7 +20,7 @@ To create a Regor component, call the `createComponent` function with the follow
   - `json` (object, optional): A JSON object representing the initial structure of the component's UI.
   - `isSVG` (boolean, optional): Indicates whether the template contains SVG elements.
 
-- `options` (optional): An object that allows you to configure various options for the component, such as whether to use interpolation, props, or the component's default name.
+- `options` (optional): An array of strings that defines component properties or an object that allows you to configure various options for the component, such as whether to use interpolation, props, or the component's default name.
 
 ### Example
 
