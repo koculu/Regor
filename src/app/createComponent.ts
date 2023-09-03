@@ -24,7 +24,8 @@ export const createComponent = <TProps = Record<any, any>>(
     template.element = element
   } else if (template.selector) {
     const element = document.querySelector(template.selector)
-    if (!element) throw getError(ErrorType.ComponentTemplateNotFound, name)
+    if (!element)
+      throw getError(ErrorType.ComponentTemplateNotFound, template.selector)
     element.remove()
     template.element = element
   } else if (template.html) {
