@@ -108,7 +108,17 @@ export class DynamicBinder {
     const refresh = (): void => {
       parser.__scoped(capturedContext, () => {
         let name = value()[0] as string
-        if (isObject(name)) name = name.name
+        if (isObject(name)) {
+          if (!name.name) {
+            // provided object does not have a name.
+            // search component by instance comparison
+            name = Object.entries(parser.__getComponents()).filter(
+              (x) => x[1] === (name as unknown),
+            )[0]?.[0]
+          } else {
+            name = name.name
+          }
+        }
         if (!isString(name) || isNullOrWhitespace(name)) {
           unmount(commentBegin, commentEnd)
           return
