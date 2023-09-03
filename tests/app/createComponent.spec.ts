@@ -17,12 +17,8 @@ test('should render components with reactive properties', () => {
       prop1: ref('prop-1'),
       prop2: ref('prop-2'),
     }),
-    {
-      html: html`<div>{{ prop1 + '-' + prop2 }}</div>`,
-    },
-    {
-      props: ['prop1'],
-    },
+    html`<div>{{ prop1 + '-' + prop2 }}</div>`,
+    ['prop1'],
   )
 
   const app = createApp(
@@ -32,7 +28,7 @@ test('should render components with reactive properties', () => {
     },
     {
       element: root,
-      html: html`<div>
+      template: html`<div>
         <MyComponent prop1="My Property 1"></MyComponent>
         <MyComponent :prop1="message"></MyComponent>
         <MyComponent :prop-1="message"></MyComponent
@@ -111,9 +107,7 @@ test('should render components with reactive properties', () => {
 test('should render empty component', () => {
   const root = document.createElement('<div>')
 
-  const myComponent = createComponent(() => ({}), {
-    html: html``,
-  })
+  const myComponent = createComponent(() => ({}), html``)
 
   createApp(
     {
@@ -121,7 +115,7 @@ test('should render empty component', () => {
     },
     {
       element: root,
-      html: html`<MyComponent></MyComponent>`,
+      template: html`<MyComponent></MyComponent>`,
     },
   )
   htmlEqual(
@@ -150,12 +144,10 @@ test('should render nested component with reactive properties', () => {
     (head) => ({
       item: head.props.item,
     }),
-    {
-      html: html`<div>
-        name: {{ item.name }}
-        <MyComponent r-for="child in item.children" :item="child"></MyComponent>
-      </div>`,
-    },
+    html`<div>
+      name: {{ item.name }}
+      <MyComponent r-for="child in item.children" :item="child"></MyComponent>
+    </div>`,
     {
       props: ['item'],
     },
@@ -184,7 +176,7 @@ test('should render nested component with reactive properties', () => {
     },
     {
       element: root,
-      html: html`<MyComponent :item="treeItem"></MyComponent>`,
+      template: html`<MyComponent :item="treeItem"></MyComponent>`,
     },
   )
 

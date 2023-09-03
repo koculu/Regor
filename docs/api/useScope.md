@@ -22,9 +22,8 @@ const userRow = createComponent(() => ({
       // Perform cleanup  tasks
       console.log('Component is unmounted!')
     })
-}), {
-  html: html`<div></div>`,
-})
+}),
+html`<div></div>`)
 
 createApp(
   useScope(() => {

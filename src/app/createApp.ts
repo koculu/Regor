@@ -2,7 +2,7 @@ import { ErrorType, getError } from '../log/errors'
 import {
   type Scope,
   type IRegorContext,
-  type Template,
+  type TemplateOptions,
   type App,
 } from '../api/types'
 import { Binder } from '../bind/Binder'
@@ -17,17 +17,20 @@ import { toFragment } from './toFragment'
 import { unbind } from '../cleanup/unbind'
 import { isScope } from '../composition/useScope'
 import { isElement } from '../common/common'
+import { isString } from '../common/is-what'
 
 export const createApp = <TRegorContext extends IRegorContext>(
   context: TRegorContext | Scope<TRegorContext>,
-  template: Template = { selector: '#app' },
+  templateOptions: TemplateOptions | string = { selector: '#app' },
   config?: RegorConfig,
 ): App<TRegorContext> => {
+  if (isString(templateOptions))
+    templateOptions = { selector: '#app', template: templateOptions }
   if (isScope(context)) context = context.context
-  const root = template.element
-    ? template.element
-    : template.selector
-    ? document.querySelector(template.selector)
+  const root = templateOptions.element
+    ? templateOptions.element
+    : templateOptions.selector
+    ? document.querySelector(templateOptions.selector)
     : null
   if (!root || !isElement(root)) throw getError(ErrorType.AppRootElementMissing)
   if (!config) config = RegorConfig.getDefault()
@@ -43,15 +46,19 @@ export const createApp = <TRegorContext extends IRegorContext>(
     }
   }
 
-  if (template.html) {
+  if (templateOptions.template) {
     const element = document
       .createRange()
-      .createContextualFragment(template.html)
+      .createContextualFragment(templateOptions.template)
     cleanRoot()
     appendChildren(element.childNodes)
-    template.element = element
-  } else if (template.json) {
-    const element = toFragment(template.json, template.isSVG, config)
+    templateOptions.element = element
+  } else if (templateOptions.json) {
+    const element = toFragment(
+      templateOptions.json,
+      templateOptions.isSVG,
+      config,
+    )
     cleanRoot()
     appendChildren(element.childNodes)
   }

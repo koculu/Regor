@@ -9,7 +9,7 @@ test('hello world', () => {
     },
     {
       element: root,
-      html: html`<div>{{ message }}</div>`,
+      template: html`<div>{{ message }}</div>`,
     },
   )
 
@@ -25,7 +25,7 @@ test('click counter', () => {
     },
     {
       element: root,
-      html: html`<div>count: {{ count }}</div>
+      template: html`<div>count: {{ count }}</div>
         <button @click="count++">click me: {{ count }}</button>`,
     },
   )

@@ -62,17 +62,19 @@ interface MyComponent {
   message: Ref<string>
 }
 
+const template = html`<button @click="count++">
+  {{ message }} {{ count }}
+</button>`
+
+const props = ['message']
+
 const myComponent = createComponent<MyComponent>(
   (head) => ({
     message: head.props.message,
     count: ref(0),
   }),
-  {
-    html: html`<button @click="count++">{{ message }} {{ count }}</button>`,
-  },
-  {
-    props: ['message'],
-  },
+  template,
+  props,
 )
 
 createApp({

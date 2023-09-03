@@ -14,14 +14,13 @@ To register an `onMounted` callback, simply call the `onMounted` function and pa
 import { createApp, html, useScope, onMounted } from 'regor'
 
 const userRow = createComponent(() => ({
-    // Register an onMounted callback
-    onMounted(() => {
-      // Perform initialization tasks
-      console.log('Component is mounted!')
-    })
-}), {
-  html: html`<div></div>`,
-})
+  // Register an onMounted callback
+  onMounted(() => {
+    // Perform initialization tasks
+    console.log('Component is mounted!')
+  })
+}),
+html`<div></div>`)
 
 createApp(
   useScope(() => {

@@ -2,7 +2,7 @@ import {
   type CreateComponentOptions,
   type Component,
   type IRegorContext,
-  type Template,
+  type TemplateOptions,
 } from '../api/types'
 import { ErrorType, getError } from '../log/errors'
 import { type ComponentHead } from './ComponentHead'
@@ -11,49 +11,60 @@ import { interpolate } from '../bind/interpolation'
 import { toFragment } from './toFragment'
 import { toJsonTemplate } from './toJsonTemplate'
 import { isHTMLElement } from '../common/common'
+import { isArray, isString } from '../common/is-what'
 
 export const createComponent = <TProps = Record<any, any>>(
   context: (head: ComponentHead<TProps>) => IRegorContext,
-  template: Template,
-  options: CreateComponentOptions = {},
+  templateOptions: TemplateOptions | string,
+  options: CreateComponentOptions | string[] = {},
 ): Component<TProps> => {
+  if (isArray(options)) options = { props: options }
+  if (isString(templateOptions)) templateOptions = { template: templateOptions }
   let svgHandled = false
-  if (template.element) {
-    const element = template.element as ChildNode
+  if (templateOptions.element) {
+    const element = templateOptions.element as ChildNode
     element.remove()
-    template.element = element
-  } else if (template.selector) {
-    const element = document.querySelector(template.selector)
+    templateOptions.element = element
+  } else if (templateOptions.selector) {
+    const element = document.querySelector(templateOptions.selector)
     if (!element)
-      throw getError(ErrorType.ComponentTemplateNotFound, template.selector)
+      throw getError(
+        ErrorType.ComponentTemplateNotFound,
+        templateOptions.selector,
+      )
     element.remove()
-    template.element = element
-  } else if (template.html) {
+    templateOptions.element = element
+  } else if (templateOptions.template) {
     const element = document
       .createRange()
-      .createContextualFragment(template.html)
-    template.element = element
-  } else if (template.json) {
-    template.element = toFragment(template.json, template.isSVG, options.config)
+      .createContextualFragment(templateOptions.template)
+    templateOptions.element = element
+  } else if (templateOptions.json) {
+    templateOptions.element = toFragment(
+      templateOptions.json,
+      templateOptions.isSVG,
+      options.config,
+    )
     svgHandled = true
   }
-  if (!template.element) template.element = document.createDocumentFragment()
-  if (options.useInterpolation ?? true) interpolate(template.element)
-  const element = template.element
+  if (!templateOptions.element)
+    templateOptions.element = document.createDocumentFragment()
+  if (options.useInterpolation ?? true) interpolate(templateOptions.element)
+  const element = templateOptions.element
   if (
     !svgHandled &&
-    ((template.isSVG ??
+    ((templateOptions.isSVG ??
       (isHTMLElement(element) && element.hasAttribute?.('isSVG'))) ||
       (isHTMLElement(element) && !!element.querySelector('[isSVG]')))
   ) {
-    const content = (template.element as any).content
+    const content = (templateOptions.element as any).content
     const nodes = content ? [...content.childNodes] : [...element.childNodes]
     const json = toJsonTemplate(nodes as Element[])
-    template.element = toFragment(json, true, options.config)
+    templateOptions.element = toFragment(json, true, options.config)
   }
   return {
     context,
-    template: template.element,
+    template: templateOptions.element,
     inheritAttrs: options.inheritAttrs ?? true,
     props: options.props,
     defaultName: options.defaultName,

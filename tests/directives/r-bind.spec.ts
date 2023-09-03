@@ -14,7 +14,7 @@ test('should bind reactive attributes.', () => {
     },
     {
       element: root,
-      html: html`<div>
+      template: html`<div>
         <div class="a" :className="class1"></div>
         <img class="a" r-bind:_d_dynamic-key_d_="imgSrc" />
         <div class="a" r-bind:className="class1"></div>

@@ -20,7 +20,7 @@ test('should mount the people into reactive divs.', () => {
     },
     {
       element: root,
-      html: html`<div r-for="name, age, #i in people" :class="name">
+      template: html`<div r-for="name, age, #i in people" :class="name">
         {{ i }} - name: {{ name }} age: {{ age }}
       </div>`,
     },
@@ -65,7 +65,7 @@ test('should mount nested r-for.', () => {
     },
     {
       element: root,
-      html: html`<div r-for="#i in duplicate">
+      template: html`<div r-for="#i in duplicate">
         <div r-for="name, age, #j in people" :class="name">
           {{ j }} - name: {{ name }} age: {{ age }}
         </div>
