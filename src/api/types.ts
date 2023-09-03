@@ -152,6 +152,13 @@ export type FlattenRef<TRef> = TRef extends Array<infer V1>
       [Key in keyof TRef]: FlattenRef<TRef[Key]>
     }
 
+export type Flat<TValueType> = Equals<
+  RefParam<TValueType>,
+  FlattenRef<TValueType>
+> extends true
+  ? RefParam<TValueType>
+  : FlattenRef<TValueType>
+
 export type ObserveCallback<TValueType> = (
   newValue: TValueType,
   eventSource?: any,

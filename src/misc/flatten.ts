@@ -1,11 +1,15 @@
 import { isArray, isMap, isObject, isSet } from '../common/is-what'
-import { type FlattenRef } from '../api/types'
+import type { Ref, SRef, ComputedRef, Flat } from '../api/types'
 import { unref } from '../reactivity/unref'
 
 export const flatten = <TValueType>(
-  reference: TValueType,
-): FlattenRef<TValueType> => {
-  return flattenContent(unref(reference)) as FlattenRef<TValueType>
+  reference:
+    | TValueType
+    | Ref<TValueType>
+    | SRef<TValueType>
+    | ComputedRef<TValueType>,
+): Flat<TValueType> => {
+  return flattenContent(unref(reference))
 }
 
 const flattenContent = (value: any): any => {
