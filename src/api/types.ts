@@ -35,8 +35,8 @@ declare const RawSymbol: unique symbol
 declare const ScopeSymbol: unique symbol
 
 export type AnyRef = (
-  newValue?: unknown,
-  eventSource?: unknown,
+  newValue?: any,
+  eventSource?: any,
 ) => any & { [RefSymbol]: true }
 
 export type Ref<TValueType> = ((
@@ -45,18 +45,16 @@ export type Ref<TValueType> = ((
     | Ref<RefParam<TValueType>>
     | SRef<RefContent<TValueType>>,
   eventSource?: any,
-) => RefContent<TValueType>) &
-  AnyRef & {
-    value: RefContent<TValueType>
-  }
+) => RefContent<TValueType>) & {
+  value: RefContent<TValueType>
+}
 
 export type SRef<TValueType> = ((
   newValue?: TValueType | SRef<TValueType>,
   eventSource?: any,
-) => SRefContent<TValueType>) &
-  AnyRef & {
-    value: SRefContent<TValueType>
-  }
+) => SRefContent<TValueType>) & {
+  value: SRefContent<TValueType>
+}
 
 export type ComputedRef<TValueType> = SRef<TValueType> & {
   stop: StopObserving
