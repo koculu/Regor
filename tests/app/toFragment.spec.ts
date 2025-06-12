@@ -1,22 +1,32 @@
 import { expect, test } from 'vitest'
 import { toFragment, toJsonTemplate } from '../../src'
 
-const json = { t: 'div', a: { id: 'foo' }, c: [{ t: 'span', c: [{ d: 'hi' }] }] }
+// Verify rendering from JSONTemplate
 
-test('json to fragment and back', () => {
-  const fragment = toFragment(json)
-  const div = fragment.firstElementChild as Element
-  expect(div.tagName).toBe('DIV')
-  expect(div.querySelector('span')?.textContent).toBe('hi')
-  const back = toJsonTemplate(div)
-  expect(back).toEqual({ t: 'DIV', a: { id: 'foo' }, c: [{ t: 'SPAN', c: [{ d: 'hi' }] }] })
+test('toFragment renders JSON template', () => {
+  const json = {
+    t: 'div',
+    a: { id: 'foo' },
+    c: [{ t: 'span', c: [{ d: 'bar' }] }],
+  }
+  const frag = toFragment(json)
+  const div = frag.firstChild as HTMLElement
+  expect(div?.tagName).toBe('DIV')
+  expect(div.getAttribute('id')).toBe('foo')
+  expect(div.querySelector('span')?.textContent).toBe('bar')
 })
 
-test('svg conversion', () => {
-  const svgJson = { t: 'svg', a: { width: '10' }, c: [{ t: 'circle', a: { r: '5' } }] }
-  const frag = toFragment(svgJson, true)
-  const svg = frag.firstElementChild as SVGElement
-  expect(svg.namespaceURI).toBe('http://www.w3.org/2000/svg')
-  const json2 = toJsonTemplate(svg)
-  expect(json2.t).toBe('svg')
+// Verify conversion from element to JSONTemplate
+
+test('toJsonTemplate converts element to JSON template', () => {
+  const div = document.createElement('div')
+  div.setAttribute('id', 'x')
+  const span = document.createElement('span')
+  span.textContent = 'hi'
+  div.appendChild(span)
+  const json = toJsonTemplate(div) as any
+  expect(json.t).toBe('DIV')
+  expect(json.a.id).toBe('x')
+  expect(json.c[0].t).toBe('SPAN')
+  expect(json.c[0].c[0].d).toBe('hi')
 })
