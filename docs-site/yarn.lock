@@ -1763,15 +1763,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"docs-site@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "docs-site@workspace:."
-  dependencies:
-    "@astrojs/starlight": "npm:^0.34.3"
-    astro: "npm:^5.9.2"
-  languageName: unknown
-  linkType: soft
-
 "dset@npm:^3.1.4":
   version: 3.1.4
   resolution: "dset@npm:3.1.4"
@@ -4100,6 +4091,15 @@ __metadata:
   checksum: 10c0/687b3e063d4ca19b0de7c55c24353f868a0fb9ba21512692470d2fb412e3a410894dd5924c91ea49d8cb8fa865e36ec956e52436ae0a256bdc095ff136c30aba
   languageName: node
   linkType: hard
+
+"regor-doc-site@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "regor-doc-site@workspace:."
+  dependencies:
+    "@astrojs/starlight": "npm:^0.34.3"
+    astro: "npm:^5.9.2"
+  languageName: unknown
+  linkType: soft
 
 "rehype-expressive-code@npm:^0.41.2":
   version: 0.41.2
