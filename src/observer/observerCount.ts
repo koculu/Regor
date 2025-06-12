@@ -6,7 +6,7 @@ export const observerCount = <TValueType extends AnyRef>(
   source: TValueType,
 ): number => {
   if (!isRef(source))
-    throw getError(ErrorType.RequiresRefSourceArgument, 'observe')
+    throw getError(ErrorType.RequiresRefSourceArgument, 'observerCount')
   const srefImpl = source as unknown as SRefSignature<TValueType>
   return srefImpl(undefined, undefined, RefOperation.observerCount) as number
 }
