@@ -3,6 +3,7 @@ import { type AnyRef } from '../api/types'
 import { onUnmounted } from '../composition/onUnmounted'
 import { isDeepRef } from '../reactivity/isDeepRef'
 import { ErrorType, getError } from '../log/errors'
+import { warning, WarningType } from '../log/warnings'
 
 export const persist = <TRef extends AnyRef>(
   anyRef: TRef,
@@ -15,7 +16,16 @@ export const persist = <TRef extends AnyRef>(
     localStorage.setItem(key, JSON.stringify(flatten(anyRef())))
   const existing = localStorage.getItem(key)
   if (existing != null) {
-    anyRef(makeRef(JSON.parse(existing)))
+    try {
+      anyRef(makeRef(JSON.parse(existing)))
+    } catch (e) {
+      warning(
+        WarningType.ErrorLog,
+        `persist: failed to parse data for key ${key}`,
+        e as Error,
+      )
+      store()
+    }
   } else {
     store()
   }

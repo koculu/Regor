@@ -1,5 +1,5 @@
-import { expect, test } from 'vitest'
-import { persist, ref } from '../../src'
+import { expect, test, vi } from 'vitest'
+import { persist, ref, warningHandler } from '../../src'
 import { ErrorType, getError } from '../../src/log/errors'
 
 const KEY = 'persist-key'
@@ -17,6 +17,20 @@ test('should persist value changes and restore existing data', () => {
   const r2 = ref(0)
   persist(r2, KEY)
   expect(r2.value).toBe(2)
+})
+
+test('should reset storage on invalid data', () => {
+  localStorage.clear()
+  localStorage.setItem(KEY, '[')
+  const spy = vi.fn()
+  const prev = warningHandler.warning
+  warningHandler.warning = spy
+  const r = ref(5)
+  persist(r, KEY)
+  expect(localStorage.getItem(KEY)).toBe('5')
+  expect(r.value).toBe(5)
+  expect(spy).toHaveBeenCalled()
+  warningHandler.warning = prev
 })
 
 // Validate that a key is required
