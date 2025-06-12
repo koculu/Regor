@@ -9,6 +9,7 @@ export enum ErrorType {
   ComposablesRequireScope,
   RequiresRefSourceArgument,
   ComputedIsReadOnly,
+  PersistRequiresKey,
 }
 
 const errors = {
@@ -21,6 +22,7 @@ const errors = {
   [ErrorType.RequiresRefSourceArgument]: (name: string) =>
     `${name} requires ref source argument`,
   [ErrorType.ComputedIsReadOnly]: 'computed is readonly.',
+  [ErrorType.PersistRequiresKey]: 'persist requires a string key.',
 }
 
 /**
