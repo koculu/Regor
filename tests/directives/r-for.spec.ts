@@ -113,7 +113,7 @@ test('should mount nested r-for.', () => {
   testContent()
 })
 
-test('should handle lists with falsy key values', async () => {
+test('should handle lists with falsy key values', () => {
   const root = document.createElement('div')
   const app = createApp(
     {
@@ -137,16 +137,11 @@ test('should handle lists with falsy key values', async () => {
     expect(getDomText()).toStrictEqual(getItemText())
   }
 
-  const flush = () => Promise.resolve()
-
   testContent()
   items.splice(0, 1, ref({ id: 0 }))
-  await flush()
   testContent()
   items.splice(1, 1, ref({ id: false }))
-  await flush()
   testContent()
   items.splice(2, 1, ref({ id: '' }))
-  await flush()
   testContent()
 })
