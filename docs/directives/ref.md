@@ -1,3 +1,7 @@
+---
+title: :ref Directive
+---
+
 # :ref Directive
 
 The `:ref` directive in Regor allows you to create references to HTML elements within your templates. These references enable you to interact with and manipulate specific DOM elements programmatically in your components.

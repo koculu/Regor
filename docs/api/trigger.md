@@ -1,3 +1,7 @@
+---
+title: trigger
+---
+
 # `trigger`
 
 ## Overview

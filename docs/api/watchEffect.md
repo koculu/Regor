@@ -1,3 +1,7 @@
+---
+title: watchEffect
+---
+
 # `watchEffect`
 
 ## Overview

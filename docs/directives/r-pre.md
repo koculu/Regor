@@ -1,3 +1,7 @@
+---
+title: r-pre Directive
+---
+
 # r-pre Directive
 
 The `r-pre` directive is a utility directive in Regor that allows you to exclude specific HTML elements from Regor's data binding and templating. This directive is useful when you want to preserve certain parts of your HTML markup as static content that should not be subject to data binding or dynamic updates.

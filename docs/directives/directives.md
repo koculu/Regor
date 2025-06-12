@@ -1,3 +1,7 @@
+---
+title: Supported Directives
+---
+
 # Supported Directives
 
 In Regor, directives are special attributes that start with the "r-" prefix. They allow you to enhance the behavior and appearance of your applications. Below, you'll find a list of supported directives categorized by their functionality.

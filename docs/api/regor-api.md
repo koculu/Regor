@@ -1,3 +1,7 @@
+---
+title: Regor API
+---
+
 # Regor API
 
 In this section, you will find a list of Regor's API methods organized by categories. Click on each method to view its detailed documentation.

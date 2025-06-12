@@ -1,3 +1,7 @@
+---
+title: r-on Directive
+---
+
 # `r-on` Directive
 
 The `r-on` directive in Regor is used to attach event listeners to HTML elements and invoke specified component methods when those events occur. It provides a way to make your components interactive and responsive to user actions.

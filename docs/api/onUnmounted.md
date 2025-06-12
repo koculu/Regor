@@ -1,3 +1,7 @@
+---
+title: onUnmounted
+---
+
 # `onUnmounted`
 
 ## Overview

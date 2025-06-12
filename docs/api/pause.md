@@ -1,3 +1,7 @@
+---
+title: pause
+---
+
 # `pause`
 
 ## Overview

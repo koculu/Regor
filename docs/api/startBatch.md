@@ -1,3 +1,7 @@
+---
+title: startBatch
+---
+
 # `startBatch`
 
 ## Overview

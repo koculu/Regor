@@ -1,3 +1,7 @@
+---
+title: observerCount
+---
+
 # `observerCount`
 
 ## Overview

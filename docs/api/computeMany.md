@@ -1,3 +1,7 @@
+---
+title: computeMany
+---
+
 # `computeMany`
 
 ## Overview

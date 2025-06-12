@@ -1,3 +1,7 @@
+---
+title: r-html Directive
+---
+
 # r-html Directive
 
 The `r-html` directive is used to render HTML content within an HTML element based on the result of an expression. It allows you to dynamically insert and update HTML markup inside an element.

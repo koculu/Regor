@@ -1,3 +1,7 @@
+---
+title: observeMany
+---
+
 # `observeMany`
 
 ## Overview

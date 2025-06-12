@@ -1,3 +1,7 @@
+---
+title: :class Directive
+---
+
 # :class Directive
 
 The `:class` directive in Regor allows you to dynamically apply CSS classes to HTML elements. It provides a way to bind and update the `class` attribute of an element based on data or expressions. With `:class`, you can create dynamic and responsive class-based styling for your components.

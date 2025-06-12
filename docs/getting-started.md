@@ -1,3 +1,7 @@
+---
+title: Getting Started with Regor
+---
+
 # Getting Started with Regor
 
 Welcome to Regor! This guide will walk you through the essential steps to start building HTML5-based applications using the Regor UI framework. Whether you're new to Regor or an experienced developer, this guide will help you get up and running quickly.

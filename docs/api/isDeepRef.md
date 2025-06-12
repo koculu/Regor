@@ -1,3 +1,7 @@
+---
+title: isDeepRef
+---
+
 # `isDeepRef`
 
 ## Overview

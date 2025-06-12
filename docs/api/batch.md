@@ -1,3 +1,7 @@
+---
+title: batch
+---
+
 # `batch`
 
 ## Overview

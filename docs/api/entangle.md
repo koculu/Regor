@@ -1,3 +1,7 @@
+---
+title: entangle
+---
+
 # `entangle`
 
 ## Overview

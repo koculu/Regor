@@ -1,3 +1,7 @@
+---
+title: :props-once Directive
+---
+
 # `:props-once` Directive
 
 The `:props-once` directive in Regor is used to bind expressions to a component's property, allowing dynamic updates. It is similar to the `r-bind` directive but specifically focuses on passing properties to components.

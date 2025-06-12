@@ -1,3 +1,7 @@
+---
+title: Regor Documentation
+---
+
 # Regor Documentation
 
 Welcome to the documentation for Regor, a powerful UI framework designed to streamline the development of HTML5-based applications for both web and desktop environments.

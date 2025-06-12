@@ -1,3 +1,7 @@
+---
+title: r-for Directive
+---
+
 # `r-for` Directive
 
 The `r-for` directive is a powerful tool in Regor that allows you to iterate over an array or iterable and generate repetitive elements based on a template. It enables you to efficiently render lists of items and is especially useful for creating dynamic content in your templates.

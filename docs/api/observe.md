@@ -1,3 +1,7 @@
+---
+title: observe
+---
+
 # `observe`
 
 ## Overview

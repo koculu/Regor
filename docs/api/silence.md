@@ -1,3 +1,7 @@
+---
+title: silence
+---
+
 # `silence`
 
 ## Overview

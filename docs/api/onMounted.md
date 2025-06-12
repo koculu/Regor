@@ -1,3 +1,7 @@
+---
+title: onMounted
+---
+
 # `onMounted`
 
 ## Overview

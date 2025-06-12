@@ -1,3 +1,7 @@
+---
+title: r-model Directive
+---
+
 # r-model Directive
 
 The `r-model` directive provides two-way data binding for form elements in your Regor components. It allows you to bind the value of form inputs to a component's data, ensuring that changes to the input are reflected in the component's data and vice versa.

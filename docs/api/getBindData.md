@@ -1,3 +1,7 @@
+---
+title: getBindData
+---
+
 # `getBindData`
 
 ## Overview

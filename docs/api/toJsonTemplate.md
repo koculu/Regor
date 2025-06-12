@@ -1,3 +1,7 @@
+---
+title: toJsonTemplate
+---
+
 # `toJsonTemplate`
 
 ## Overview
