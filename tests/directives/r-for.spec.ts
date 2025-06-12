@@ -192,3 +192,20 @@ test('should support object destructuring with index', () => {
   ])
 })
 
+test('should handle expressions with spaces', () => {
+  const root = document.createElement('div')
+  createApp(
+    {
+      numbers: ref([1, 2, 3, 4, 5, 6]),
+    },
+    {
+      element: root,
+      template: html`<div r-for="n in numbers.filter(n => n > 4 )">{{ n }}</div>`,
+    },
+  )
+  expect([...root.querySelectorAll('div')].map((x) => x.textContent)).toStrictEqual([
+    '5',
+    '6',
+  ])
+})
+

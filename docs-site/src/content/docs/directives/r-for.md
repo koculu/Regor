@@ -127,6 +127,17 @@ You can use either `of` or `in` to specify the iteration variable and the iterab
 </element>
 ```
 
+## Complex Expressions
+
+You can pass any JavaScript expression after `in` or `of`. This allows using
+helpers like `filter` directly within the directive.
+
+```html
+<ul>
+  <li r-for="n in numbers.filter(n => n > 5)">{{ n }}</li>
+</ul>
+```
+
 ## Key Attribute
 
 When iterating over lists of items, it's important to provide a unique `key` attribute to help Regor efficiently track and update elements. The `key` attribute should be applied to the repeated element, and its value should be unique for each item in the iterable.
