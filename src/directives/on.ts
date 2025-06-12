@@ -184,9 +184,9 @@ export const attachEventListener = (
       return
     }
     try {
-      if (flag.left && (e as MouseEvent).button !== 1) return
-      if (flag.middle && (e as MouseEvent).button !== 2) return
-      if (flag.right && (e as MouseEvent).button !== 3) return
+      if (flag.left && (e as MouseEvent).button !== 0) return
+      if (flag.middle && (e as MouseEvent).button !== 1) return
+      if (flag.right && (e as MouseEvent).button !== 2) return
       if (flag.self && e.target !== el) return
       if (flag.stop) e.stopPropagation()
       if (flag.prevent) e.preventDefault()
