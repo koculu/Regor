@@ -10,7 +10,7 @@ import {
 import { htmlEqual } from '../common/html-equal'
 
 test('should render components with reactive properties', () => {
-  const root = document.createElement('<div>')
+  const root = document.createElement('div')
 
   const myComponent = createComponent(
     () => ({
@@ -105,7 +105,7 @@ test('should render components with reactive properties', () => {
 })
 
 test('should render empty component', () => {
-  const root = document.createElement('<div>')
+  const root = document.createElement('div')
 
   const myComponent = createComponent(() => ({}), html``)
 
@@ -125,7 +125,7 @@ test('should render empty component', () => {
 })
 
 test('should render nested component with reactive properties', () => {
-  const root = document.createElement('<div>')
+  const root = document.createElement('div')
 
   interface MyApp extends IRegorContext {
     treeItem: Ref<TreeItem>
