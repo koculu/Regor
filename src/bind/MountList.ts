@@ -24,12 +24,12 @@ export class MountList {
 
   __setValueMap(item: MountListItem): void {
     const value = this.__getKey(item.value)
-    if (value) this.__valueMap.set(value, item)
+    if (value !== undefined) this.__valueMap.set(value, item)
   }
 
   __deleteValueMap(index: number): void {
     const value = this.__getKey(this.__list[index]?.value)
-    if (value) this.__valueMap.delete(value)
+    if (value !== undefined) this.__valueMap.delete(value)
   }
 
   /**
