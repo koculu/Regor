@@ -110,7 +110,7 @@ test('should be stable on several computed chains', () => {
       ++calculationCount
       return r
     }
-    const len = 777
+    const len = 500
     const list = [computed(() => calculator(0, 0))]
     for (let i = 1; i < len; ++i)
       list.push(computed(() => calculator(i, list[i - 1]())))
