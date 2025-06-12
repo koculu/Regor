@@ -187,7 +187,22 @@ test('should preserve cyclic references between objects', () => {
   const a: any = {}
   const b: any = { a }
   a.b = b
-  const r = ref<any>(a)
+  const r = ref<{ b: typeof b }>(a)
+  expect(r().b().a()).toBe(r())
+})
+
+test('should preserve cyclic references between nested objects', () => {
+  const x = { a: { b: { c: { d: undefined as any } } } }
+  x.a.b.c.d = x
+  const r = ref(x)
+  expect(r().a().b().c().d()).toBe(r())
+})
+
+test('should preserve cyclic references between objects1', () => {
+  const a: any = {}
+  const b: any = { a }
+  a.b = b
+  const r = ref<{ b: typeof b }>(a)
   expect(r().b().a()).toBe(r())
 })
 
@@ -196,4 +211,27 @@ test('should preserve cyclic references between objects', () => {
   x.a.b.c.d = x
   const r = ref(x)
   expect(r().a().b().c().d()).toBe(r())
+})
+
+test('should flatten self-referential objects', () => {
+  type objSelf = { self?: objSelf }
+  const obj: objSelf = {}
+  obj.self = obj
+  const r = ref(obj)
+  expect(() => flatten(r)).not.toThrow()
+})
+
+test('flatten should preserve cyclic references between objects', () => {
+  const a: any = {}
+  const b: any = { a }
+  a.b = b
+  const r = ref<any>(a)
+  expect(() => flatten(r)).not.toThrow()
+})
+
+test('flatten should preserve cyclic references between objects', () => {
+  const x = { a: { b: { c: { d: undefined as any } } } }
+  x.a.b.c.d = x
+  const r = ref(x)
+  expect(() => flatten(r)).not.toThrow()
 })

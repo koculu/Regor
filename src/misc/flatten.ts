@@ -12,7 +12,10 @@ export const flatten = <TValueType>(
   return flattenContent(unref(reference))
 }
 
-const flattenContent = (value: any): any => {
+const flattenContent = (
+  value: any,
+  weakMap: WeakMap<any, any> = new WeakMap<any, any>(),
+): any => {
   if (!value) return value
   if (!isObject(value)) return value
 
@@ -33,9 +36,11 @@ const flattenContent = (value: any): any => {
     }
     return map
   }
+  if (weakMap.has(value)) return unref(weakMap.get(value))
   const result: any = { ...value }
+  weakMap.set(value, result)
   for (const entry of Object.entries(result)) {
-    result[entry[0]] = flatten(entry[1])
+    result[entry[0]] = flattenContent(unref(entry[1]), weakMap)
   }
   return result
 }
