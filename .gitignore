@@ -9,3 +9,7 @@ dist/
 .yarn/build-state.yml
 .yarn/install-state.gz
 .yarn/sdks/
+
+.astro
+.yarn
+docs-dist
