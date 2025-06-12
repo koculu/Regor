@@ -112,3 +112,83 @@ test('should mount nested r-for.', () => {
   duplicate(0)
   testContent()
 })
+
+test('should iterate using of syntax', () => {
+  const root = document.createElement('div')
+  createApp(
+    {
+      fruits: ref(['Apple', 'Banana']),
+    },
+    {
+      element: root,
+      template: html`<div r-for="fruit of fruits">{{ fruit }}</div>`,
+    },
+  )
+  expect([...root.querySelectorAll('div')].map((x) => x.textContent)).toStrictEqual([
+    'Apple',
+    'Banana',
+  ])
+})
+
+test('should support index variable with parentheses', () => {
+  const root = document.createElement('div')
+  createApp(
+    {
+      fruits: ref(['Apple', 'Banana']),
+    },
+    {
+      element: root,
+      template: html`<div r-for="(fruit, #i) in fruits">{{ i }} - {{ fruit }}</div>`,
+    },
+  )
+  expect([...root.querySelectorAll('span')].map((x) => x.textContent)).toStrictEqual([
+    '0',
+    'Apple',
+    '1',
+    'Banana',
+  ])
+})
+
+test('should iterate object properties', () => {
+  const root = document.createElement('div')
+  createApp(
+    {
+      person: ref({ name: 'Alice', age: 25 }),
+    },
+    {
+      element: root,
+      template: html`<div r-for="(key, value) in person">{{ key }}: {{ value }}</div>`,
+    },
+  )
+  expect([...root.querySelectorAll('span')].map((x) => x.textContent)).toStrictEqual([
+    'name',
+    'Alice',
+    'age',
+    '25',
+  ])
+})
+
+test('should support object destructuring with index', () => {
+  const root = document.createElement('div')
+  createApp(
+    {
+      users: ref([
+        { name: 'Alice', age: 25 },
+        { name: 'Bob', age: 30 },
+      ]),
+    },
+    {
+      element: root,
+      template: html`<div r-for="{ name, age }, #index in users">{{ index }} - {{ name }} - {{ age }}</div>`,
+    },
+  )
+  expect([...root.querySelectorAll('span')].map((x) => x.textContent)).toStrictEqual([
+    '0',
+    'Alice',
+    '25',
+    '1',
+    'Bob',
+    '30',
+  ])
+})
+
