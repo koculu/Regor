@@ -1,9 +1,11 @@
 name: Build and Publish
 
 on:
-  push:
-    tags:
-      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'When you press run workflow, the npm package will be published.'
+        default: 'I understand.'
 
 jobs:
   build-and-publish:
@@ -16,7 +18,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           registry-url: 'https://registry.npmjs.org'
           cache: 'yarn'
 
