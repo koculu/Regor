@@ -10,7 +10,7 @@ on:
     paths-ignore:
       - '*.md'
 jobs:
-  build-and-publish:
+  build-and-test:
     runs-on: ubuntu-latest
     permissions:
       contents: read

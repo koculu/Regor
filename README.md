@@ -32,7 +32,7 @@ Regor is a powerful UI framework designed to streamline the development of HTML5
 Discover the capabilities of Regor by diving into our comprehensive documentation. Whether you're new to Regor or an experienced user, our documentation provides in-depth insights into its features, API, directives, and more.
 
 
-Start exploring the [Regor Documentation](https://tenray.io/regor) now to harness the full potential of this powerful UI framework. The documentation sources are located in [docs-site](docs-site/).
+Start exploring the [Regor Documentation](https://tenray.io/projects/regor) now to harness the full potential of this powerful UI framework. The documentation sources are located in [docs-site](docs-site/).
 
 ## Requirements
 
