@@ -174,3 +174,26 @@ test('should be consistent in watch callback', () => {
   count.value++
   expect(plusOne.value).toBe(2)
 })
+
+test('should handle self-referential objects', () => {
+  type objSelf = { self?: objSelf }
+  const obj: objSelf = {}
+  obj.self = obj
+  const r = ref(obj)
+  expect(r().self!()).toBe(r())
+})
+
+test('should preserve cyclic references between objects', () => {
+  const a: any = {}
+  const b: any = { a }
+  a.b = b
+  const r = ref<any>(a)
+  expect(r().b().a).toBe(r())
+})
+
+test('should preserve cyclic references between objects', () => {
+  const x = { a: { b: { c: { d: undefined as any } } } }
+  x.a.b.c.d = x
+  const r = ref(x)
+  expect(r().a().b().c().d()).toBe(r())
+})

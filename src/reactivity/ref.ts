@@ -80,6 +80,7 @@ export const ref = <TValueType>(
     if (isDeepRef(val)) continue
     const key = item[0]
     if (isSymbol(key)) continue
+    ;(value as any)[key] = null // assign null first, to prevent cyclic references.
     ;(value as any)[key] = ref(val)
   }
   return result
