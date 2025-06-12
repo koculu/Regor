@@ -141,7 +141,7 @@ const attachDOMChangeListener = (
   const f1 = getFlags(directiveFlags?.join(','))
   const f2 = getFlags(parsedValue()[1])
   const flags: ModelFlags = {
-    int: f1.int || f1.int,
+    int: f1.int || f2.int,
     lazy: f1.lazy || f2.lazy,
     number: f1.number || f2.number,
     trim: f1.trim || f2.trim,
