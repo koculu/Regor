@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { ref, isDeepRef, pause, resume, entangle, watchEffect } from '../../src'
+import { ref, isDeepRef, pause, resume, entangle, watchEffect, isRef, sref, unref } from '../../src'
 
 test('pause and resume', () => {
   const r = ref(1)
@@ -42,5 +42,5 @@ test('unref unwraps refs and returns value', () => {
   const sr = sref(3)
   expect(unref(r)).toBe(2)
   expect(unref(sr)).toBe(3)
-  expect(unref(4)).toBe(4
+  expect(unref(4)).toBe(4)
 })
