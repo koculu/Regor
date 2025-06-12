@@ -35,7 +35,7 @@ const patchClass = (el: HTMLElement, next: Class, prev: Class): void => {
   if (next && !isClassString) {
     if (prev && !isPrevClassString) {
       for (const key in prev) {
-        if (!(key in next)) {
+        if (!(key in next) || !next[key]) {
           classList.remove(key)
         }
       }
