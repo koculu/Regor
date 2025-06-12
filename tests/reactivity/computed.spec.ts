@@ -188,7 +188,7 @@ test('should preserve cyclic references between objects', () => {
   const b: any = { a }
   a.b = b
   const r = ref<any>(a)
-  expect(r().b().a).toBe(r())
+  expect(r().b().a()).toBe(r())
 })
 
 test('should preserve cyclic references between objects', () => {
