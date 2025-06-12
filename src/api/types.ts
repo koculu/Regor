@@ -303,7 +303,7 @@ export interface Component<TProps = Record<any, any>> {
   template: Node
 
   /**
-   * Indicates whether the component'^s content should inherit attributes from its parent.
+   * Indicates whether the component's content should inherit attributes from its parent.
    */
   inheritAttrs?: boolean
 
