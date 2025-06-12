@@ -12,13 +12,20 @@ export const batch = (updater: () => void): void => {
 }
 
 export const startBatch = (): void => {
-  if (!batchCollector.set) batchCollector.set = new Set<AnyRef>()
+  if (!batchCollector.stack) batchCollector.stack = []
+  batchCollector.stack.push(new Set<AnyRef>())
 }
 
 export const endBatch = (): void => {
-  const set = batchCollector.set
-  if (!set) return
-  delete batchCollector.set
+  const stack = batchCollector.stack
+  if (!stack || stack.length === 0) return
+  const set = stack.pop()!
+  if (stack.length) {
+    const parent = stack[stack.length - 1]
+    for (const ref of set) parent.add(ref)
+    return
+  }
+  delete batchCollector.stack
   for (const ref of set) {
     try {
       trigger(ref)

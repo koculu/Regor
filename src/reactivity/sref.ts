@@ -21,7 +21,7 @@ import { srefSymbol } from './refSymbols'
  * @internal
  */
 export const batchCollector: {
-  set?: Set<AnyRef>
+  stack?: Array<Set<AnyRef>>
 } = {}
 
 /**
@@ -84,8 +84,9 @@ export const sref = <TValueType>(
   const isProxy = createProxy(value)
   const observers = new Set<ObserveCallback<TValueType>>()
   const trigger = (newValue: TValueType, eventSource: any): void => {
-    if (batchCollector.set) {
-      batchCollector.set.add(srefFunction as unknown as AnyRef)
+    if (batchCollector.stack && batchCollector.stack.length) {
+      const current = batchCollector.stack[batchCollector.stack.length - 1]
+      current.add(srefFunction as unknown as AnyRef)
       return
     }
     if (observers.size === 0) return
