@@ -1,0 +1,36 @@
+name: Build and Test
+
+on:
+  push:
+    branches: ['main']
+    paths-ignore:
+      - '*.md'
+  pull_request:
+    branches: ['main']
+    paths-ignore:
+      - '*.md'
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: |
+          corepack enable
+          yarn install --immutable
+
+      - name: Run tests
+        run: yarn test
+
+      - name: Build package
+        run: yarn build
