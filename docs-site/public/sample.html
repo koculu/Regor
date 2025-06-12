@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Regor Counter Demo</title>
+  <!-- Highlight.js styles -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <style>
+    body { font-family: sans-serif; padding: 2em; }
+    .tabs { display: flex; gap: 0.5em; margin-bottom: 1em; }
+    .tabs button {
+      padding: 0.5em 1em;
+      border: 1px solid #ccc;
+      background: #f0f0f0;
+      cursor: pointer;
+    }
+    .tabs button.active {
+      background: #e0e0e0;
+      border-bottom: 2px solid #333;
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    pre { background: #fafafa; border: 1px solid #ddd; padding: 1em; overflow-x: auto; }
+    code { font-family: Consolas, monospace; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <h1>Regor Counter App Demo</h1>
+
+    <!-- Tab controls -->
+    <div class="tabs">
+      <button 
+        @click="activeTab = 'app'" 
+        :class="{ active: activeTab === 'app' }"
+      >App</button>
+      <button 
+        @click="activeTab = 'html'" 
+        :class="{ active: activeTab === 'html' }"
+      >HTML</button>
+      <button 
+        @click="activeTab = 'js'" 
+        :class="{ active: activeTab === 'js' }"
+      >JavaScript</button>
+      <button 
+        @click="activeTab = 'ts'" 
+        :class="{ active: activeTab === 'ts' }"
+      >TypeScript</button>
+    </div>
+
+    <!-- App tab (live Regor counter) -->
+    <div class="tab-content" :class="{ active: activeTab === 'app' }">
+      <button @click="count++">Count is: {{ count }}</button>
+    </div>
+
+    <!-- HTML source tab -->
+    <div class="tab-content" :class="{ active: activeTab === 'html' }">
+      <pre><code class="language-html">&lt;!-- index.html excerpt --&gt;
+&lt;button @click=\"count++\"&gt;Count is: {{ count }}&lt;/button&gt;</code></pre>
+    </div>
+
+    <!-- JavaScript source tab -->
+    <div class="tab-content" :class="{ active: activeTab === 'js' }">
+      <pre><code class="language-javascript">// main.js
+import { createApp, ref } from 'https://cdn.jsdelivr.net/npm/regor@1.0.9/dist/regor.es2022.esm.js';
+
+createApp({ count: ref(0) });
+</code></pre>
+    </div>
+
+    <!-- TypeScript example tab -->
+    <div class="tab-content" :class="{ active: activeTab === 'ts' }">
+      <pre><code class="language-typescript">// example.ts
+import { createApp, createComponent, ref, html, type Ref } from 'regor';
+
+interface CounterProps { initial: Ref<number>; }
+const template = html`<button @click=\"count++\">{{ count }} (initial: {{ initial }})</button>`;
+const Counter = createComponent<CounterProps>(
+  (head) => ({ initial: head.props.initial, count: ref(head.props.initial()) }),
+  template,
+  ['initial']
+);
+createApp({ components: { Counter }, initial: ref(5) });
+</code></pre>
+    </div>
+  </div>
+
+  <!-- Highlight.js script -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  <!-- Regor bootstrap -->
+  <script type="module">
+    import { createApp, ref } from 'https://cdn.jsdelivr.net/npm/regor@1.0.9/dist/regor.es2022.esm.js';
+    window.a = createApp({ activeTab: ref('app'), count: ref(0) });
+  </script>
+</body>
+</html>
