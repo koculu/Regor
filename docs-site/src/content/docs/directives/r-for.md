@@ -64,22 +64,22 @@ In this example, the `r-for` directive generates a numbered list of fruits, disp
 You can use the `r-for` directive to iterate over the properties of an object.
 
 ```html
-<element r-for="(value, key) in object">
-  <!-- 'value' and 'key' variables -->
+<element r-for="(key, value) in object">
+  <!-- 'key' and 'value' variables -->
   <!-- Content to be repeated for each property -->
   {{ key }}: {{ value }}
 </element>
 ```
 
-- `value`: Represents the current property's value.
 - `key`: Represents the current property's key (name).
+- `value`: Represents the current property's value.
 - `object`: An object whose properties are iterated over.
 
 ### Example
 
 ```html
 <ul>
-  <li r-for="(value, key) in person">{{ key }}: {{ value }}</li>
+  <li r-for="(key, value) in person">{{ key }}: {{ value }}</li>
 </ul>
 ```
 
@@ -125,6 +125,17 @@ You can use either `of` or `in` to specify the iteration variable and the iterab
   <!-- Content to be repeated for each item -->
   {{ fruit }}
 </element>
+```
+
+## Complex Expressions
+
+You can pass any JavaScript expression after `in` or `of`. This allows using
+helpers like `filter` directly within the directive.
+
+```html
+<ul>
+  <li r-for="n in numbers.filter(n => n > 5)">{{ n }}</li>
+</ul>
 ```
 
 ## Key Attribute

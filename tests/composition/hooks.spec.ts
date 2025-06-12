@@ -1,18 +1,17 @@
-import { expect, test, vi } from 'vitest'
+import { expect, test } from 'vitest'
 import { onMounted, onUnmounted, useScope } from '../../src'
 import { callMounted } from '../../src/composition/callMounted'
 import { callUnmounted } from '../../src/composition/callUnmounted'
 
- test('mounted and unmounted callbacks run', () => {
-  const m = vi.fn()
-  const u = vi.fn()
+test('onMounted and onUnmounted callbacks execute', () => {
+  const calls: string[] = []
   const scope = useScope(() => {
-    onMounted(m)
-    onUnmounted(u)
+    onMounted(() => calls.push('mount'))
+    onUnmounted(() => calls.push('unmount'))
     return {}
   })
   callMounted(scope.context)
-  expect(m).toHaveBeenCalledTimes(1)
+  expect(calls).toEqual(['mount'])
   callUnmounted(scope.context)
-  expect(u).toHaveBeenCalledTimes(1)
- })
+  expect(calls).toEqual(['mount', 'unmount'])
+})

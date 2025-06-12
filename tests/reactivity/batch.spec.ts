@@ -1,26 +1,23 @@
 import { expect, test } from 'vitest'
-import { batch, startBatch, endBatch, ref, watchEffect } from '../../src'
+import { batch, startBatch, endBatch, ref, observe } from '../../src'
 
-test('batch triggers once', () => {
-  const a = ref(0)
+test('batch triggers observers once', () => {
+  const r = ref(0)
   let calls = 0
-  watchEffect(() => { a(); calls++ })
-  calls = 0
+  observe(r, () => ++calls)
   batch(() => {
-    a.value++
-    a.value++
+    r.value++
+    r.value++
   })
   expect(calls).toBe(1)
 })
 
-test('manual batch', () => {
-  const a = ref(0)
+test('startBatch and endBatch delay triggers', () => {
+  const r = ref(0)
   let calls = 0
-  watchEffect(() => { a(); calls++ })
-  calls = 0
+  observe(r, () => ++calls)
   startBatch()
-  a.value++
-  a.value++
+  r.value++
   expect(calls).toBe(0)
   endBatch()
   expect(calls).toBe(1)
