@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { createApp, ref, html, raw } from '../../src'
+import { createApp, ref, html, raw, unref } from '../../src'
 
 test('should mount the people into reactive divs.', () => {
   const root = document.createElement('div')
@@ -110,5 +110,43 @@ test('should mount nested r-for.', () => {
   people.splice(0)
   testContent()
   duplicate(0)
+  testContent()
+})
+
+test('should handle lists with falsy key values', async () => {
+  const root = document.createElement('div')
+  const app = createApp(
+    {
+      items: ref([
+        { id: 0 },
+        { id: false },
+        { id: '' },
+        { id: 1 },
+      ]),
+    },
+    {
+      element: root,
+      template: html`<div r-for="{ id } in items" :key="id">{{ id }}</div>`,
+    },
+  )
+
+  const items = app.context.items()
+  const getDomText = () => [...root.querySelectorAll('div')].map((x) => x.textContent)
+  const getItemText = () => items.map((x) => String(unref(x().id)))
+  const testContent = () => {
+    expect(getDomText()).toStrictEqual(getItemText())
+  }
+
+  const flush = () => Promise.resolve()
+
+  testContent()
+  items.splice(0, 1, ref({ id: 0 }))
+  await flush()
+  testContent()
+  items.splice(1, 1, ref({ id: false }))
+  await flush()
+  testContent()
+  items.splice(2, 1, ref({ id: '' }))
+  await flush()
   testContent()
 })
