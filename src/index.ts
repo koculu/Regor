@@ -56,6 +56,6 @@ export type {
   OnCleanup,
   OnMounted,
   OnUnmounted,
-  TemplateOptions as Template,
+  Template,
   UnwrapRef,
 } from './api/types'

@@ -2,7 +2,7 @@ import { ErrorType, getError } from '../log/errors'
 import {
   type Scope,
   type IRegorContext,
-  type TemplateOptions,
+  type Template,
   type App,
 } from '../api/types'
 import { Binder } from '../bind/Binder'
@@ -21,16 +21,16 @@ import { isString } from '../common/is-what'
 
 export const createApp = <TRegorContext extends IRegorContext>(
   context: TRegorContext | Scope<TRegorContext>,
-  templateOptions: TemplateOptions | string = { selector: '#app' },
+  template: Template | string = { selector: '#app' },
   config?: RegorConfig,
 ): App<TRegorContext> => {
-  if (isString(templateOptions))
-    templateOptions = { selector: '#app', template: templateOptions }
+  if (isString(template))
+    template = { selector: '#app', template }
   if (isScope(context)) context = context.context
-  const root = templateOptions.element
-    ? templateOptions.element
-    : templateOptions.selector
-    ? document.querySelector(templateOptions.selector)
+  const root = template.element
+    ? template.element
+    : template.selector
+    ? document.querySelector(template.selector)
     : null
   if (!root || !isElement(root)) throw getError(ErrorType.AppRootElementMissing)
   if (!config) config = RegorConfig.getDefault()
@@ -46,17 +46,17 @@ export const createApp = <TRegorContext extends IRegorContext>(
     }
   }
 
-  if (templateOptions.template) {
+  if (template.template) {
     const element = document
       .createRange()
-      .createContextualFragment(templateOptions.template)
+      .createContextualFragment(template.template)
     cleanRoot()
     appendChildren(element.childNodes)
-    templateOptions.element = element
-  } else if (templateOptions.json) {
+    template.element = element
+  } else if (template.json) {
     const element = toFragment(
-      templateOptions.json,
-      templateOptions.isSVG,
+      template.json,
+      template.isSVG,
       config,
     )
     cleanRoot()
