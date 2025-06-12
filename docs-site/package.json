@@ -1,9 +1,11 @@
 {
-  "name": "docs-site",
+  "name": "regor-doc-site",
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "astro build"
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
   },
   "dependencies": {
     "@astrojs/starlight": "^0.34.3",
