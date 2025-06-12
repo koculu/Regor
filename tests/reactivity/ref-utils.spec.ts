@@ -1,12 +1,6 @@
 import { expect, test } from 'vitest'
 import { ref, isDeepRef, pause, resume, entangle, watchEffect } from '../../src'
 
-test('isDeepRef detects deep refs', () => {
-  const r = ref({ a: 1 })
-  expect(isDeepRef(r)).toBe(true)
-  expect(isDeepRef(r())).toBe(false)
-})
-
 test('pause and resume', () => {
   const r = ref(1)
   let n = 0
@@ -32,4 +26,21 @@ test('entangle syncs refs', () => {
   stop()
   r1(4)
   expect(r2()).toBe(3)
+})
+
+test('isRef and isDeepRef recognition', () => {
+  const r = ref(1)
+  const sr = sref(1)
+  expect(isRef(r)).toBe(true)
+  expect(isRef(sr)).toBe(true)
+  expect(isDeepRef(r)).toBe(true)
+  expect(isDeepRef(sr)).toBe(false)
+})
+
+test('unref unwraps refs and returns value', () => {
+  const r = ref(2)
+  const sr = sref(3)
+  expect(unref(r)).toBe(2)
+  expect(unref(sr)).toBe(3)
+  expect(unref(4)).toBe(4
 })

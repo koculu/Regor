@@ -2,12 +2,20 @@ export const html = (
   templates: TemplateStringsArray,
   ...args: any[]
 ): string => {
-  let str = ''
-  if (args.length === 0) return templates.join()
-  templates.forEach((template, i) => {
-    str += template + args[i]
-  })
-  return str
+  let result = ''
+  const tpl = templates
+  const a = args
+  const tplLen = tpl.length
+  const argLen = a.length
+
+  for (let i = 0; i < tplLen; ++i) {
+    result += tpl[i]
+    if (i < argLen) {
+      result += a[i]
+    }
+  }
+
+  return result
 }
 
 export const raw = html
