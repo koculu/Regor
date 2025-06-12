@@ -19,11 +19,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          registry-url: 'https://registry.npmjs.org'
+
+      - name: Enable Corepack & activate Yarn latest
+        run: |
+              corepack enable
+              corepack prepare yarn@4.9.2 --activate
 
       - name: Install dependencies
         run: |
-          corepack enable
           yarn install --immutable
 
       - name: Run tests
