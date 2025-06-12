@@ -24,7 +24,6 @@ jobs:
           node-version: '22'
           registry-url: 'https://registry.npmjs.org'
           always-auth: true
-          auth-token: ${{ secrets.NPM_TOKEN }}
 
       - name: Enable Corepack & activate Yarn latest
         run: |
