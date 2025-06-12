@@ -283,7 +283,7 @@ export class ForBinder {
   }
 
   static __forPathRegex =
-    /\{?\[?\(?([^)}\]]+)\)?\]?\}?([^)]+)?\s+\b(?:in|of)\b\s+([^\s]+)\s*/
+    /\{?\[?\(?([^)}\]]+)\)?\]?\}?([^)]+)?\s+\b(?:in|of)\b\s+(.*)\s*$/
 
   __parseForPath(forPath: string):
     | {
