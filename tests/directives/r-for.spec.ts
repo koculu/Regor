@@ -2,7 +2,7 @@ import { expect, test } from 'vitest'
 import { createApp, ref, html, raw } from '../../src'
 
 test('should mount the people into reactive divs.', () => {
-  const root = document.createElement('<div>')
+  const root = document.createElement('div')
   const app = createApp(
     {
       people: ref([
@@ -46,7 +46,7 @@ test('should mount the people into reactive divs.', () => {
 })
 
 test('should mount nested r-for.', () => {
-  const root = document.createElement('<div>')
+  const root = document.createElement('div')
   const app = createApp(
     {
       duplicate: ref(10),

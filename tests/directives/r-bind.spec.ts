@@ -3,7 +3,7 @@ import { createApp, html, raw, ref } from '../../src'
 import { htmlEqual } from '../common/html-equal'
 
 test('should bind reactive attributes.', () => {
-  const root = document.createElement('<div>')
+  const root = document.createElement('div')
   const app = createApp(
     {
       class1: ref('c1'),

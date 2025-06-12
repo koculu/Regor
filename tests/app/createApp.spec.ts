@@ -2,7 +2,7 @@ import { expect, test } from 'vitest'
 import { createApp, ref, html, raw } from '../../src'
 
 test('hello world', () => {
-  const root = document.createElement('<div>')
+  const root = document.createElement('div')
   createApp(
     {
       message: ref('hello world'),
@@ -17,7 +17,7 @@ test('hello world', () => {
 })
 
 test('click counter', () => {
-  const root = document.createElement('<div>')
+  const root = document.createElement('div')
   const count = ref(0)
   createApp(
     {
