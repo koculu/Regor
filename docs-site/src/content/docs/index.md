@@ -22,6 +22,6 @@ If you have any questions or need further assistance, feel free to [join our com
 
 ---
 
-**Note**: Regor is an open-source project, and your contributions are greatly appreciated. Help us make Regor even better by [contributing](../.github/CONTRIBUTING.md) or [reporting issues](#issues).
+**Note**: Regor is an open-source project, and your contributions are greatly appreciated. Help us make Regor even better by [contributing](../../../../.github/CONTRIBUTING.md) or [reporting issues](#issues).
 
 [Back to GitHub Repository](https://github.com/koculu/Regor)
