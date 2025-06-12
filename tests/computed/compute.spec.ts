@@ -23,3 +23,25 @@ test('computeRef derives value from single ref', () => {
   a.value = 5
   expect(twice()).toBe(10)
 })
+
+test('computeMany is read only and can be stopped', () => {
+  const a = ref(1)
+  const b = ref(1)
+  const sum = computeMany([a, b], (x, y) => x + y)
+  expect(sum()).toBe(2)
+  expect(() => sum(3 as any)).toThrowError('computed is readonly.')
+  sum.stop()
+  a.value = 2
+  b.value = 2
+  expect(sum()).toBe(2)
+})
+
+test('computeRef is read only and can be stopped', () => {
+  const a = ref(3)
+  const twice = computeRef(a, (v) => v * 2)
+  expect(twice()).toBe(6)
+  expect(() => twice(4 as any)).toThrowError('computed is readonly.')
+  twice.stop()
+  a.value = 4
+  expect(twice()).toBe(6)
+})
