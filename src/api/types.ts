@@ -242,7 +242,7 @@ export interface JSONTemplate {
  * If used with 'createComponent':
  * - Define only one option: 'selector', 'element', 'html', or 'json'. The single option defines the component's HTML template.
  */
-export interface TemplateOptions {
+export interface Template {
   /**
    * If used with 'createApp', specifies the target root element for mounting the application.
    * If used with 'createComponent', identifies the component template using a selector.

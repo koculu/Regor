@@ -12,7 +12,7 @@ To create a Regor component, call the `createComponent` function with the follow
 
 - `context` (required): A function that defines the Regor context for the component. This function receives a `ComponentHead` object, which you can use to specify the component's behavior and props. It should return the Regor context.
 
-- `templateOptions` (required): An HTML string or an object specifying the template for rendering the component. It can include the following properties:
+- `template` (required): An HTML string or an object specifying the template for rendering the component. It can include the following properties:
 
   - `selector` (string, optional): A CSS selector string for the root element of the component. Regor will attempt to find this element in the DOM.
   - `element` (Element, optional): A reference to the root DOM element of the component. If provided, this element will be used as the component's template.
@@ -46,7 +46,7 @@ createApp({
 
 - `context` (required): A function that defines the Regor context for the component. It should return the Regor context, which specifies the component's behavior and data.
 
-- `templateOptions` (required): An HTML string or an object specifying the template for rendering the component. It defines the component's UI structure, either by selecting an existing DOM element or providing HTML content or a JSON structure.
+- `template` (required): An HTML string or an object specifying the template for rendering the component. It defines the component's UI structure, either by selecting an existing DOM element or providing HTML content or a JSON structure.
 
 - `options` (optional): An array of strings that defines component properties or an object that configures various options for the component, including whether to use interpolation, props, or the component's default name.
 
@@ -70,7 +70,7 @@ The `createComponent` function returns a component object with the following pro
 
 - The `context` parameter defines the behavior and data of your component.
 
-- The `templateOptions` parameter specifies how the component's UI is rendered. You can select an existing element in the DOM, provide HTML content, or use a JSON structure to define the component's structure.
+- The `template` parameter specifies how the component's UI is rendered. You can select an existing element in the DOM, provide HTML content, or use a JSON structure to define the component's structure.
 
 - The `options` parameter allows you to configure various aspects of the component, such as enabling or disabling interpolation, specifying props, or setting a default name.
 

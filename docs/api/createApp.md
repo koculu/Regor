@@ -12,7 +12,7 @@ To create a Regor application, call the `createApp` function with the following 
 
 - `context` (required): The Regor context or scope that defines the application's behavior and data. It can be a context object or a scope created using [`useScope`](#useScope).
 
-- `templateOptions` (optional): An HTML string or object specifying the template for rendering the application. It can include the following properties:
+- `template` (optional): An HTML string or object specifying the template for rendering the application. It can include the following properties:
 
   - `selector` (string, optional): A CSS selector string for the root element of the application. If provided, Regor will attempt to find this element in the DOM.
   - `element` (Element, optional): A reference to the root DOM element of the application. If provided, this element will be used as the root.
@@ -39,7 +39,7 @@ const app = createApp(appContext) // default template: { selector: '#app'}
 
 - `context` (required): The Regor context or scope that defines the application's behavior and data.
 
-- `templateOptions` (optional): An HTML string or an object specifying the template for rendering the application. This can include the root element's selector, element reference, HTML content, JSON structure, and SVG indication.
+- `template` (optional): An HTML string or an object specifying the template for rendering the application. This can include the root element's selector, element reference, HTML content, JSON structure, and SVG indication.
 
 - `config` (optional): An optional configuration object that customizes Regor's behavior. It allows you to specify various options.
 
@@ -59,7 +59,7 @@ The `createApp` function returns an object with the following properties:
 
 - The `context` parameter defines the behavior and data of your application, allowing you to create reactive components and composable logic.
 
-- The `templateOptions` parameter allows you to specify how the initial content or structure of the application should be rendered.
+- The `template` parameter allows you to specify how the initial content or structure of the application should be rendered.
 
 - The `config` parameter lets you customize Regor's behavior to suit your application's requirements.
 
