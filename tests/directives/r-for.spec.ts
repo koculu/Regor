@@ -115,9 +115,19 @@ test('should mount nested r-for.', () => {
 
 test('should handle lists with falsy key values', () => {
   const root = document.createElement('div')
+  type objectType =
+    | {
+        id: number
+      }
+    | {
+        id: boolean
+      }
+    | {
+        id: string
+      }
   const app = createApp(
     {
-      items: ref([
+      items: ref<objectType[]>([
         { id: 0 },
         { id: false },
         { id: '' },
@@ -131,18 +141,19 @@ test('should handle lists with falsy key values', () => {
   )
 
   const items = app.context.items()
-  const getDomText = () => [...root.querySelectorAll('div')].map((x) => x.textContent)
+  const getDomText = () =>
+    [...root.querySelectorAll('div')].map((x) => x.textContent)
   const getItemText = () => items.map((x) => String(unref(x().id)))
   const testContent = () => {
     expect(getDomText()).toStrictEqual(getItemText())
   }
 
   testContent()
-  items.splice(0, 1, ref({ id: 0 }))
+  items.splice(0, 1, ref<objectType>({ id: 0 }))
   testContent()
-  items.splice(1, 1, ref({ id: false }))
+  items.splice(1, 1, ref<objectType>({ id: false }))
   testContent()
-  items.splice(2, 1, ref({ id: '' }))
+  items.splice(2, 1, ref<objectType>({ id: '' }))
   testContent()
 })
 
@@ -157,10 +168,9 @@ test('should iterate using of syntax', () => {
       template: html`<div r-for="fruit of fruits">{{ fruit }}</div>`,
     },
   )
-  expect([...root.querySelectorAll('div')].map((x) => x.textContent)).toStrictEqual([
-    'Apple',
-    'Banana',
-  ])
+  expect(
+    [...root.querySelectorAll('div')].map((x) => x.textContent),
+  ).toStrictEqual(['Apple', 'Banana'])
 })
 
 test('should support index variable with parentheses', () => {
@@ -171,15 +181,14 @@ test('should support index variable with parentheses', () => {
     },
     {
       element: root,
-      template: html`<div r-for="(fruit, #i) in fruits">{{ i }} - {{ fruit }}</div>`,
+      template: html`<div r-for="(fruit, #i) in fruits">
+        {{ i }} - {{ fruit }}
+      </div>`,
     },
   )
-  expect([...root.querySelectorAll('span')].map((x) => x.textContent)).toStrictEqual([
-    '0',
-    'Apple',
-    '1',
-    'Banana',
-  ])
+  expect(
+    [...root.querySelectorAll('span')].map((x) => x.textContent),
+  ).toStrictEqual(['0', 'Apple', '1', 'Banana'])
 })
 
 test('should iterate object properties', () => {
@@ -190,15 +199,14 @@ test('should iterate object properties', () => {
     },
     {
       element: root,
-      template: html`<div r-for="(key, value) in person">{{ key }}: {{ value }}</div>`,
+      template: html`<div r-for="(key, value) in person">
+        {{ key }}: {{ value }}
+      </div>`,
     },
   )
-  expect([...root.querySelectorAll('span')].map((x) => x.textContent)).toStrictEqual([
-    'name',
-    'Alice',
-    'age',
-    '25',
-  ])
+  expect(
+    [...root.querySelectorAll('span')].map((x) => x.textContent),
+  ).toStrictEqual(['name', 'Alice', 'age', '25'])
 })
 
 test('should support object destructuring with index', () => {
@@ -212,17 +220,14 @@ test('should support object destructuring with index', () => {
     },
     {
       element: root,
-      template: html`<div r-for="{ name, age }, #index in users">{{ index }} - {{ name }} - {{ age }}</div>`,
+      template: html`<div r-for="{ name, age }, #index in users">
+        {{ index }} - {{ name }} - {{ age }}
+      </div>`,
     },
   )
-  expect([...root.querySelectorAll('span')].map((x) => x.textContent)).toStrictEqual([
-    '0',
-    'Alice',
-    '25',
-    '1',
-    'Bob',
-    '30',
-  ])
+  expect(
+    [...root.querySelectorAll('span')].map((x) => x.textContent),
+  ).toStrictEqual(['0', 'Alice', '25', '1', 'Bob', '30'])
 })
 
 test('should handle expressions with spaces', () => {
@@ -233,11 +238,12 @@ test('should handle expressions with spaces', () => {
     },
     {
       element: root,
-      template: html`<div r-for="n in numbers.filter(n => n > 4 )">{{ n }}</div>`,
+      template: html`<div r-for="n in numbers.filter(n => n > 4 )">
+        {{ n }}
+      </div>`,
     },
   )
-  expect([...root.querySelectorAll('div')].map((x) => x.textContent)).toStrictEqual([
-    '5',
-    '6',
-  ])
+  expect(
+    [...root.querySelectorAll('div')].map((x) => x.textContent),
+  ).toStrictEqual(['5', '6'])
 })
