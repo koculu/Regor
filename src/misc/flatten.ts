@@ -28,7 +28,7 @@ const flattenContent = (value: any): any => {
   }
   if (isMap(value)) {
     const map = new Map<unknown, unknown>()
-    for (const el of map) {
+    for (const el of value) {
       map.set(flatten(el[0]), flatten(el[1]))
     }
     return map

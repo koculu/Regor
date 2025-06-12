@@ -13,7 +13,7 @@ test('flatten converts nested refs', () => {
 
   const map = ref(new Map([['k', ref(4)]]))
   const flatMap = flatten(map) as Map<string, any>
-  expect(flatMap.get('k')).toBeUndefined()
+  expect(flatMap.get('k')).toBe(4)
 })
 
 test('markRaw marks object as raw', () => {
