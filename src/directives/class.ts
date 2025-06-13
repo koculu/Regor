@@ -46,11 +46,11 @@ const patchClass = (el: HTMLElement, next: Class, prev: Class): void => {
   } else {
     if (isClassString) {
       if (prev !== next) {
-        if (isPrevClassString) classList.remove(...prev?.split(','))
-        classList.add(...next.split(','))
+        if (isPrevClassString) classList.remove(...prev.trim().split(/\s+/))
+        classList.add(...next.trim().split(/\s+/))
       }
     } else if (prev) {
-      if (isPrevClassString) classList.remove(...prev?.split(','))
+      if (isPrevClassString) classList.remove(...prev.trim().split(/\s+/))
     }
   }
 }

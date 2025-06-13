@@ -24,3 +24,21 @@ test('class directive toggles classes', () => {
   expect(root.querySelector('#js')?.classList.contains('active')).toBe(true)
   expect(root.querySelector('#ts')?.classList.contains('active')).toBe(false)
 })
+
+test('class directive handles space-separated class lists', () => {
+  const root = document.createElement('div')
+  const cls = ref('a b')
+  createApp(
+    { cls },
+    { element: root, template: html`<div :class="cls"></div>` },
+  )
+  const div = root.querySelector('div') as HTMLDivElement
+  expect(div.classList.contains('a')).toBe(true)
+  expect(div.classList.contains('b')).toBe(true)
+  expect(div.classList.length).toBe(2)
+  cls('b c')
+  expect(div.classList.contains('a')).toBe(false)
+  expect(div.classList.contains('b')).toBe(true)
+  expect(div.classList.contains('c')).toBe(true)
+  expect(div.classList.length).toBe(2)
+})
