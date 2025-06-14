@@ -2,7 +2,6 @@
 title: createComponent
 ---
 
-# `createComponent`
 
 ## Overview
 

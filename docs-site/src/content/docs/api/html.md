@@ -2,7 +2,6 @@
 title: html
 ---
 
-# `html`
 
 ## Overview
 

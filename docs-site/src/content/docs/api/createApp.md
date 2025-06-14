@@ -2,7 +2,6 @@
 title: createApp
 ---
 
-# `createApp`
 
 ## Overview
 

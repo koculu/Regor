@@ -2,7 +2,6 @@
 title: batch
 ---
 
-# `batch`
 
 ## Overview
 

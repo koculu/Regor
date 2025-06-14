@@ -2,7 +2,6 @@
 title: observerCount
 ---
 
-# `observerCount`
 
 ## Overview
 

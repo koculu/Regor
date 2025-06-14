@@ -2,7 +2,6 @@
 title: persist
 ---
 
-# `persist`
 
 ## Overview
 

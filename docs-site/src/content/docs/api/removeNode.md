@@ -2,7 +2,6 @@
 title: removeNode
 ---
 
-# `removeNode`
 
 ## Overview
 
