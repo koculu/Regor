@@ -2,7 +2,6 @@
 title: sref
 ---
 
-
 ## Overview
 
 The `sref` function converts a given value into an sref (short for "simple ref") object and returns the sref. An sref allows you to both retrieve and update its value.
@@ -95,4 +94,4 @@ console.log(mySRef().age) // Outputs 35
 - [`resume`](/api/resume)
 - [`trigger`](/api/trigger)
 
-[Back to the API list](/api/regor-api)
+[Back to the API list](/api/)

@@ -2,7 +2,6 @@
 title: collectRefs
 ---
 
-
 ## Overview
 
 The `collectRefs` function allows you to collect a set of reactive references (refs) within a specific scope and return both the result of an action and the collected refs. This is useful for managing and tracking the refs used within a certain code block.
@@ -73,4 +72,4 @@ console.log(refs) // Outputs an array containing myRef1 and myRef2
 - [`resume`](/api/resume)
 - [`trigger`](/api/trigger)
 
-[Back to the API list](/api/regor-api)
+[Back to the API list](/api/)

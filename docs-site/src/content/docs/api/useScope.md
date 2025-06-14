@@ -2,7 +2,6 @@
 title: useScope
 ---
 
-
 ## Overview
 
 The `useScope` function allows you to create a scope for an app or composable, enabling you to manage initialization and cleanup tasks specific to that scope. Scopes are useful for organizing and encapsulating logic within your components.
@@ -76,4 +75,4 @@ Scopes are especially useful for defining cleanup behavior when a component is u
 - [`onMounted`](/api/onMounted)
 - [`onUnmounted`](/api/onUnmounted)
 
-[Back to the API list](/api/regor-api)
+[Back to the API list](/api/)

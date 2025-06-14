@@ -4,6 +4,7 @@ import starlight from '@astrojs/starlight'
 export default defineConfig({
   site: 'https:/tenray.io/',
   base: '/regor/',
+  trailingSlash: 'ignore',
   integrations: [
     starlight({
       title: 'Regor',
@@ -47,7 +48,14 @@ function stripMdExtensions(node: Node) {
       node.properties!.href = href.slice(0, href.length - 3).toLocaleLowerCase()
     } else if (href.endsWith('mdx')) {
       node.properties!.href = href.slice(0, href.length - 4).toLocaleLowerCase()
+    } else {
+      node.properties!.href = href.toLocaleLowerCase()
     }
+    //Rooted urls should contain base url.
+    if (href.startsWith('/') && !href.startsWith('/regor')) {
+      node.properties!.href = '/regor' + node.properties!.href
+    }
+    console.log(node.properties!.href)
     return
   }
 

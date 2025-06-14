@@ -2,7 +2,6 @@
 title: onMounted
 ---
 
-
 ## Overview
 
 The `onMounted` function allows you to register a callback function that will be executed when an app or component is mounted or initialized. This is particularly useful for performing setup tasks or side effects when a component becomes active.
@@ -54,4 +53,4 @@ createApp(
 - [`useScope`](/api/useScope)
 - [`onUnmounted`](/api/onUnmounted)
 
-[Back to the API list](/api/regor-api)
+[Back to the API list](/api/)

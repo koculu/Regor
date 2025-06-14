@@ -2,7 +2,6 @@
 title: ref
 ---
 
-
 ## Overview
 
 The `ref` function converts a given value and its nested properties into ref objects recursively, returning a ref object that reflects the structure of the input value.
@@ -113,4 +112,4 @@ console.log(myRef().age()) // Outputs 35
 - [`resume`](/api/resume)
 - [`trigger`](/api/trigger)
 
-[Back to the API list](/api/regor-api)
+[Back to the API list](/api/)

@@ -2,7 +2,6 @@
 title: isRef
 ---
 
-
 ## Overview
 
 The `isRef` function determines whether a given value is a ref object, indicating that it has been converted into a ref using the `ref`, `sref` or `computed` functions.
@@ -61,4 +60,4 @@ if (isRef(refValue)) {
 - [`resume`](/api/resume)
 - [`trigger`](/api/trigger)
 
-[Back to the API list](/api/regor-api)
+[Back to the API list](/api/)

@@ -2,7 +2,6 @@
 title: getBindData
 ---
 
-
 ## Overview
 
 The `getBindData` function is used to retrieve or create a BindData object associated with a DOM node. The BindData object contains information about bound data and associated unbinders for Regor.
@@ -57,4 +56,4 @@ The `getBindData` function returns a `BindData` object associated with the provi
 - [removeNode](/api/removeNode)
 - [unbind](/api/unbind)
 
-[Back to the API list](/api/regor-api)
+[Back to the API list](/api/)

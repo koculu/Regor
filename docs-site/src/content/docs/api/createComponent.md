@@ -2,7 +2,6 @@
 title: createComponent
 ---
 
-
 ## Overview
 
 The `createComponent` function is used to create a Regor component, which encapsulates a part of your user interface (UI) with its own behavior and template. Components allow you to build complex UIs by composing smaller, reusable units.
@@ -85,4 +84,4 @@ The `createComponent` function returns a component object with the following pro
 - [`toFragment`](/api/toFragment)
 - [`toJsonTemplate`](/api/toJsonTemplate)
 
-[Back to the API list](/api/regor-api)
+[Back to the API list](/api/)

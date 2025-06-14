@@ -2,7 +2,6 @@
 title: raw
 ---
 
-
 ## Overview
 
 The `raw` function in Regor is an alias for the `html` function. It serves the same purpose and can be used interchangeably with `html` to create HTML strings from template literals and interpolated values. It is commonly used to generate HTML content dynamically within Regor components.
@@ -49,4 +48,4 @@ const htmlString = raw`<p>Hello, my name is ${name} and I am ${age} years old.</
 
 - [html](/api/html)
 
-[Back to the API list](/api/regor-api)
+[Back to the API list](/api/)

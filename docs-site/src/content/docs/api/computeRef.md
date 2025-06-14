@@ -2,7 +2,6 @@
 title: computeRef
 ---
 
-
 ## Overview
 
 The `computeRef` function allows you to create a computed ref object that automatically computes its value based on a source ref object and a computation function. This is useful for deriving values from reactive data and ensuring that the computed ref updates whenever the source ref changes.
@@ -72,4 +71,4 @@ console.log(computedValue.value) // Outputs 14
 - [`resume`](/api/resume)
 - [`trigger`](/api/trigger)
 
-[Back to the API list](/api/regor-api)
+[Back to the API list](/api/)

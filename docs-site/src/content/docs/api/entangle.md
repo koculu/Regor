@@ -2,7 +2,6 @@
 title: entangle
 ---
 
-
 ## Overview
 
 The `entangle` function allows you to create a bidirectional link between two refs, ensuring that changes in one ref are mirrored in the other. This bidirectional linking is particularly useful when you want two refs to always have the same value.
@@ -80,4 +79,4 @@ stopEntangle() // Stop the bidirectional linking
 - [`computeRef`](/api/computeRef)
 - [`watchEffect`](/api/watchEffect)
 
-[Back to the API list](/api/regor-api)
+[Back to the API list](/api/)

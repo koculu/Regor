@@ -2,7 +2,6 @@
 title: watchEffect
 ---
 
-
 ## Overview
 
 The `watchEffect` function allows you to create an "effect" that automatically reacts to changes in reactive data, such as ref objects or other observables. This effect is useful for handling side effects, such as updating the UI, in a reactive and efficient manner.
@@ -68,4 +67,4 @@ stopWatching()
 - [`resume`](/api/resume)
 - [`trigger`](/api/trigger)
 
-[Back to the API list](/api/regor-api)
+[Back to the API list](/api/)

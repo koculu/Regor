@@ -2,7 +2,6 @@
 title: observerCount
 ---
 
-
 ## Overview
 
 The `observerCount` function allows you to determine the number of observers (callbacks) currently registered on a ref object. This can be useful for debugging and understanding how many entities are actively reacting to changes in the ref object.
@@ -64,4 +63,4 @@ console.log('Observer count:', count) // Outputs 'Observer count: 1'
 - [`resume`](/api/resume)
 - [`trigger`](/api/trigger)
 
-[Back to the API list](/api/regor-api)
+[Back to the API list](/api/)

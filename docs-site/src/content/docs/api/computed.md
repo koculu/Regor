@@ -2,7 +2,6 @@
 title: computed
 ---
 
-
 ## Overview
 
 The `computed` function allows you to create a computed property that depends on reactive data and automatically updates when its dependencies change. Computed properties are useful for performing complex calculations or transformations on reactive data.
@@ -72,4 +71,4 @@ console.log(computedValue.value) // Outputs 14
 - [`resume`](/api/resume)
 - [`trigger`](/api/trigger)
 
-[Back to the API list](/api/regor-api)
+[Back to the API list](/api/)

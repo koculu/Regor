@@ -2,7 +2,6 @@
 title: computeMany
 ---
 
-
 ## Overview
 
 The `computeMany` function allows you to create a computed ref object that depends on multiple source ref objects and a computation function. The computed ref automatically updates when any of the source refs change, making it useful for deriving values from multiple reactive data sources.
@@ -81,4 +80,4 @@ console.log(computedValue.value) // Outputs 17
 - [`resume`](/api/resume)
 - [`trigger`](/api/trigger)
 
-[Back to the API list](/api/regor-api)
+[Back to the API list](/api/)

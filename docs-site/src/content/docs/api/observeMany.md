@@ -2,7 +2,6 @@
 title: observeMany
 ---
 
-
 ## Overview
 
 The `observeMany` function allows you to create observers that react to changes in multiple ref objects simultaneously. This is useful for handling side effects or updating UI elements based on changes in multiple reactive data sources.
@@ -69,4 +68,4 @@ stopObserving()
 - [`resume`](/api/resume)
 - [`trigger`](/api/trigger)
 
-[Back to the API list](/api/regor-api)
+[Back to the API list](/api/)

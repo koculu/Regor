@@ -2,7 +2,6 @@
 title: r-html Directive
 ---
 
-
 The `r-html` directive is used to render HTML content within an HTML element based on the result of an expression. It allows you to dynamically insert and update HTML markup inside an element.
 
 ## Syntax
@@ -50,4 +49,4 @@ In this example, if the `dynamicHtmlContent` property in your component's data i
 
 The `r-html` directive empowers you to create dynamic and interactive user interfaces that incorporate rich HTML content, making your Regor-powered applications more versatile and engaging.
 
-[Back to the directives](/directives/directives)
+[Back to the directives](/directives/)

@@ -2,7 +2,6 @@
 title: silence
 ---
 
-
 ## Overview
 
 The `silence` function is an internal utility provided by Regor. It is used to temporarily suspend the normal behavior of collecting refs within the callback of `watchEffect`, `computed` or `collectRefs`. This allows you to perform actions on refs excluded from normal behavior of `watchEffect`, `computed` or `collectRefs`. It is useful in specific scenarios when you want to prevent ref collection for some refs.
@@ -79,4 +78,4 @@ watchEffect(() => {
 - [`resume`](/api/resume)
 - [`trigger`](/api/trigger)
 
-[Back to the API list](/api/regor-api)
+[Back to the API list](/api/)

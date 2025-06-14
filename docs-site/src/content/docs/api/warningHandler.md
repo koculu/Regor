@@ -2,7 +2,6 @@
 title: warningHandler
 ---
 
-
 ## Overview
 
 The `warningHandler` is a configuration object in Regor that specifies how warning messages should be handled. Warnings are used to provide developers with information about potential issues or best practices when using the Regor library.
@@ -51,4 +50,4 @@ This ensures that warnings do not impact the user experience in production while
 
 - The `warningHandler` allows you to adapt Regor's behavior to your specific development and debugging needs.
 
-[Back to the API list](/api/regor-api)
+[Back to the API list](/api/)

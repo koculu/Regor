@@ -2,7 +2,6 @@
 title: RegorConfig
 ---
 
-
 ## Overview
 
 The `RegorConfig` class is used to configure and customize the behavior of the Regor library. It provides options for setting directives, global context, and other configuration parameters.
@@ -135,4 +134,4 @@ The `RegorConfig` class provides default configuration values for various proper
 - [`toFragment`](/api/toFragment)
 - [`toJsonTemplate`](/api/toJsonTemplate)
 
-[Back to the API list](/api/regor-api)
+[Back to the API list](/api/)

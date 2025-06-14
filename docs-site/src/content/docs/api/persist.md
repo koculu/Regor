@@ -2,7 +2,6 @@
 title: persist
 ---
 
-
 ## Overview
 
 The `persist` function allows you to persist the state of a ref in the browser's `localStorage` by associating it with a unique `key`. This enables you to store and retrieve the state of the ref across page reloads or even when the browser is closed and reopened.
@@ -61,4 +60,4 @@ The `persist` function returns the same ref that was passed as `anyRef`. This al
 - [`watchEffect`](/api/watchEffect)
 - [`localStorage` Documentation](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage)
 
-[Back to the API list](/api/regor-api)
+[Back to the API list](/api/)

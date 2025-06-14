@@ -2,7 +2,6 @@
 title: removeNode
 ---
 
-
 ## Overview
 
 The `removeNode` function in Regor is responsible for removing a DOM node and initiating the unbinding process to clean up associated data bindings and event listeners. This function ensures that elements are safely removed from the DOM while also releasing any resources associated with them.
@@ -45,4 +44,4 @@ removeNode(someElement)
 - [unbind](/api/unbind)
 - [getBindData](/api/getBindData)
 
-[Back to the API list](/api/regor-api)
+[Back to the API list](/api/)

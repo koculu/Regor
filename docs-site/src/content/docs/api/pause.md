@@ -2,7 +2,6 @@
 title: pause
 ---
 
-
 ## Overview
 
 The `pause` function is used to pause the automatic triggering of observers for a specific ref. When a ref is paused, its observers are temporarily deactivated, and changes to the ref's value will not trigger observer callbacks until it is resumed using the `resume` function.
@@ -59,4 +58,4 @@ myRef.value = 20 // The observer is triggered again
 - [`trigger`](/api/trigger)
 - [`resume`](/api/resume)
 
-[Back to the API list](/api/regor-api)
+[Back to the API list](/api/)

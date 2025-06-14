@@ -2,7 +2,6 @@
 title: createApp
 ---
 
-
 ## Overview
 
 The `createApp` function is the entry point for creating a Regor application. It allows you to bind a Regor context to a specified DOM element, effectively rendering and managing the dynamic behavior of your application.
@@ -74,4 +73,4 @@ The `createApp` function returns an object with the following properties:
 - [`toFragment`](/api/toFragment)
 - [`toJsonTemplate`](/api/toJsonTemplate)
 
-[Back to the API list](/api/regor-api)
+[Back to the API list](/api/)

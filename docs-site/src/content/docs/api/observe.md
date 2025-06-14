@@ -2,7 +2,6 @@
 title: observe
 ---
 
-
 ## Overview
 
 The `observe` function allows you to create observers that react to changes in ref objects, providing a callback that triggers when the ref's value changes. This is useful for handling side effects or updating UI elements based on reactive data.
@@ -69,4 +68,4 @@ stopObserving()
 - [`resume`](/api/resume)
 - [`trigger`](/api/trigger)
 
-[Back to the API list](/api/regor-api)
+[Back to the API list](/api/)

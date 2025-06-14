@@ -2,7 +2,6 @@
 title: trigger
 ---
 
-
 ## Overview
 
 The `trigger` function is used to manually trigger observers and update dependent refs. This function is particularly useful when you need to manually control when ref updates and observer notifications occur.
@@ -76,4 +75,4 @@ trigger(myRef, undefined, true)
 - [`computed`](/api/computeRef)
 - [`watchEffect`](/api/watchEffect)
 
-[Back to the API list](/api/regor-api)
+[Back to the API list](/api/)

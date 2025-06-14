@@ -2,7 +2,6 @@
 title: unref
 ---
 
-
 ## Overview
 
 The `unref` function allows you to safely retrieve the original value from a ref object if the given value is a ref, or it simply returns the value itself if it's not a ref.
@@ -61,4 +60,4 @@ console.log(sameValue) // Outputs 'This is not a ref.'
 - [`resume`](/api/resume)
 - [`trigger`](/api/trigger)
 
-[Back to the API list](/api/regor-api)
+[Back to the API list](/api/)

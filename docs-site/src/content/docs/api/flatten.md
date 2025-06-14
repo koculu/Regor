@@ -2,7 +2,6 @@
 title: flatten
 ---
 
-
 ## Overview
 
 The `flatten` function recursively traverses a nested structure, such as an object, array, set, or map, and returns a flattened version of the structure. This means that it removes any nested references and produces a structure containing no refs.
@@ -76,4 +75,4 @@ console.log(flattenedData)
 - [`resume`](/api/resume)
 - [`trigger`](/api/trigger)
 
-[Back to the API list](/api/regor-api)
+[Back to the API list](/api/)

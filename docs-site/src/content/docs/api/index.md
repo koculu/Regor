@@ -72,4 +72,4 @@ In this section, you will find a list of Regor's API methods organized by catego
 
 Each link will take you to a dedicated documentation page for the respective method, where you can find detailed information, examples, and usage guidelines.
 
-[Back to the main](/index)
+[Back to the main](/)

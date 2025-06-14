@@ -47,4 +47,4 @@ In Regor, directives are special attributes that start with the "r-" prefix. The
 
 These directives empower you to create dynamic and interactive user interfaces, enhancing the user experience of your Regor-powered applications. Click on each directive to view its detailed documentation, including examples and usage guidelines.
 
-[Back to the main](/index)
+[Back to the main](/)

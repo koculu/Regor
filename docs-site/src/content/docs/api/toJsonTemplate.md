@@ -2,7 +2,6 @@
 title: toJsonTemplate
 ---
 
-
 ## Overview
 
 The `toJsonTemplate` function is used to convert an HTML element or an array of HTML elements into a JSON structure. This can be useful for:
@@ -68,4 +67,4 @@ The `toJsonTemplate` function returns a JSON structure that represents the HTML 
 - [`createApp`](/api/createApp)
 - [`createComponent`](/api/createComponent)
 
-[Back to the API list](/api/regor-api)
+[Back to the API list](/api/)
