@@ -1,8 +1,8 @@
 ---
-title: Getting Started with Regor
+title: Getting Started
+sidebar:
+  order: 2
 ---
-
-# Getting Started with Regor
 
 Welcome to Regor! This guide will walk you through the essential steps to start building HTML5-based applications using the Regor UI framework. Whether you're new to Regor or an experienced developer, this guide will help you get up and running quickly.
 
@@ -28,7 +28,7 @@ npm install regor
 import { createApp, ref } from 'regor'
 
 createApp({
-  message: ref('Hello world!')
+  message: ref('Hello world!'),
 })
 ```
 
@@ -48,7 +48,7 @@ createApp({
     ref,
   } from 'https://unpkg.com/regor/dist/regor.es2022.esm.prod.js'
   createApp({
-    message: ref('Hello world!')
+    message: ref('Hello world!'),
   })
 </script>
 ```
