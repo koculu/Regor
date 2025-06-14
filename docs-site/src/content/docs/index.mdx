@@ -1,0 +1,76 @@
+---
+title: Regor
+template: splash
+sidebar:
+    order: 1
+hero:
+  title: "Build reactive UIs"
+  tagline: |
+    A modern, reactive UI framework for web & desktop.
+      zero build step, zero virtual DOM,  
+      with secure, flexible reactivity.
+  image:
+    file: ../../assets/regor-logo.svg
+  actions:
+    - text: "Get Started"
+      icon: right-arrow
+      link: ./getting-started
+    - text: "GitHub"
+      icon: external
+      variant: minimal
+      link: https://github.com/koculu/regor
+      attrs: 
+        target: _blank
+---
+
+import { CardGrid, Card, LinkCard } from '@astrojs/starlight/components';
+
+# Welcome to Regor
+
+Regor empowers developers to craft high-performance, reactive user interfaces effortlessly. Whether you're building a single-page app, desktop GUI, or hybrid solution, Regor’s intuitive API and uncompromising performance let you focus on what matters: your users.
+
+<CardGrid stagger>
+  <Card title="Vue-Like Syntax" icon="seti:vue">
+    Template conventions familiar to Vue.js developers for an instant productivity boost.
+  </Card>
+
+  <Card title="Native TypeScript" icon="seti:typescript">
+    Full type-safety with zero workarounds—define components and props in TS.
+  </Card>
+
+  <Card title="No Build Step" icon="rocket">
+    Run directly in the browser or Node.js—no bundler, no compilation delays.
+  </Card>
+
+  <Card title="Secure VM" icon="seti:lock">
+    Built-in JavaScript VM enforces CSP-friendly, sandboxed template evaluation.
+  </Card>
+
+  <Card title="Flexible Reactivity" icon="random">
+    Granular state control via ref, computed, watchEffect, and custom hooks.
+  </Card>
+
+  <Card title="Partial rendering" icon="laptop">
+    Partially render any part in the raw html.
+  </Card>
+
+  <Card title="Reentrance" icon="seti:json">
+    Mount multiple app contexts in the same DOM tree—dynamic components on the fly.
+  </Card>
+
+  <Card title="Library-Friendly" icon="puzzle">
+    Seamlessly coexists with other DOM-manipulating libraries and micro-frontends.
+  </Card>
+</CardGrid>
+
+## Quick Links
+
+<LinkCard title="Overview" href="overview" description="What makes Regor unique" icon="puzzle"/>
+<LinkCard title="Getting Started" href="getting-started" description="Your first Regor app"/>
+<LinkCard title="Directives" href="directives" description="Supported directives" />
+<LinkCard title="Community" href="https://github.com/koculu/regor/discussions" description="Join the conversation" target="_blank" />
+
+> **Note:** Regor is open-source. Contributions and feedback are welcome!
+
+<LinkCard title="Contribute" href="https://github.com/koculu/Regor/blob/main/.github/CONTRIBUTING.md" target="_blank" />
+<LinkCard title="Report an Issue" href="https://github.com/koculu/regor/issues" target="_blank" />
