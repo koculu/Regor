@@ -2,7 +2,6 @@
 title: r-bind Directive
 ---
 
-# `r-bind` Directive
 
 The `r-bind` directive in Regor is used to bind an element's attribute to a component's data, allowing dynamic updates. It is similar to Vue's `v-bind` directive and is a fundamental part of creating dynamic and interactive user interfaces.
 

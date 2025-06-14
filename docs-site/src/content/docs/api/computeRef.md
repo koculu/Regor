@@ -2,7 +2,6 @@
 title: computeRef
 ---
 
-# `computeRef`
 
 ## Overview
 

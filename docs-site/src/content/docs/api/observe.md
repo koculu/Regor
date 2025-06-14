@@ -2,7 +2,6 @@
 title: observe
 ---
 
-# `observe`
 
 ## Overview
 

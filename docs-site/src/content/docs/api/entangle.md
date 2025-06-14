@@ -2,7 +2,6 @@
 title: entangle
 ---
 
-# `entangle`
 
 ## Overview
 

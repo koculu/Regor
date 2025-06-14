@@ -2,7 +2,6 @@
 title: r-show Directive
 ---
 
-# r-show Directive
 
 The `r-show` directive is used to conditionally display or hide an HTML element based on the truthiness of an expression. It allows you to control the visibility of an element dynamically.
 

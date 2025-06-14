@@ -2,7 +2,6 @@
 title: useScope
 ---
 
-# `useScope`
 
 ## Overview
 

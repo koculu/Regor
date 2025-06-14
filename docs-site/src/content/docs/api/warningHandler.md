@@ -2,7 +2,6 @@
 title: warningHandler
 ---
 
-# `warningHandler`
 
 ## Overview
 

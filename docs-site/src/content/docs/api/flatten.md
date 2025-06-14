@@ -2,7 +2,6 @@
 title: flatten
 ---
 
-# `flatten`
 
 ## Overview
 

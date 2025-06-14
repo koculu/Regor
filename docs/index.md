@@ -2,7 +2,6 @@
 title: Regor Documentation
 ---
 
-# Documentation Relocated
 
 The documentation has moved to [docs-site/src/content/docs/index.md](../docs-site/src/content/docs/index.md).
 Please update your bookmarks.

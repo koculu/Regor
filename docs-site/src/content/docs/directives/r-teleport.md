@@ -2,7 +2,6 @@
 title: r-teleport Directive
 ---
 
-# `r-teleport` Directive
 
 The `r-teleport` directive in Regor is a straightforward directive that empowers you to move an element anywhere within your document's DOM structure. This can be especially useful when you need to dynamically relocate elements to different parts of your web page.
 

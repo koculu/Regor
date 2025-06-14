@@ -2,7 +2,6 @@
 title: r-if
 ---
 
-# Conditional Rendering Directives
 
 In Regor, conditional rendering allows you to control the visibility of elements in your templates based on the evaluation of expressions. You can conditionally render elements, provide alternatives, and create complex conditional structures using the following directives:
 

@@ -2,7 +2,6 @@
 title: silence
 ---
 
-# `silence`
 
 ## Overview
 

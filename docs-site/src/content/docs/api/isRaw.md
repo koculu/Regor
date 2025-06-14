@@ -2,7 +2,6 @@
 title: isRaw
 ---
 
-# `isRaw`
 
 ## Overview
 

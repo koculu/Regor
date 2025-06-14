@@ -2,7 +2,6 @@
 title: trigger
 ---
 
-# `trigger`
 
 ## Overview
 

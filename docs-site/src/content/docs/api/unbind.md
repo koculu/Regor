@@ -2,7 +2,6 @@
 title: unbind
 ---
 
-# `unbind`
 
 ## Overview
 

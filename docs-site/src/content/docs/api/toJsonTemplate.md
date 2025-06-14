@@ -2,7 +2,6 @@
 title: toJsonTemplate
 ---
 
-# `toJsonTemplate`
 
 ## Overview
 

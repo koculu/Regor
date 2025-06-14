@@ -2,7 +2,6 @@
 title: :is Directive
 ---
 
-# :is Directive
 
 The `:is` directive in Regor allows you to dynamically render components based on a value or expression. It provides a way to conditionally choose which component to render in a template, enabling you to create dynamic and flexible user interfaces.
 

@@ -2,7 +2,6 @@
 title: collectRefs
 ---
 
-# `collectRefs`
 
 ## Overview
 

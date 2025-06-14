@@ -2,7 +2,6 @@
 title: isRef
 ---
 
-# `isRef`
 
 ## Overview
 

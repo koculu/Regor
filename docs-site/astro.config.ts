@@ -43,11 +43,10 @@ interface Node {
 function stripMdExtensions(node: Node) {
   const href = node?.properties?.href
   if (href) {
-    if (href.includes('getting-started')) console.log(href)
     if (href.endsWith('.md')) {
-      node.properties!.href = href.slice(0, href.length - 3)
+      node.properties!.href = href.slice(0, href.length - 3).toLocaleLowerCase()
     } else if (href.endsWith('mdx')) {
-      node.properties!.href = href.slice(0, href.length - 4)
+      node.properties!.href = href.slice(0, href.length - 4).toLocaleLowerCase()
     }
     return
   }

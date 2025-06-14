@@ -2,7 +2,6 @@
 title: endBatch
 ---
 
-# `endBatch`
 
 ## Overview
 

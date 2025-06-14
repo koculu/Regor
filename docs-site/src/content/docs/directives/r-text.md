@@ -2,7 +2,6 @@
 title: r-text Directive
 ---
 
-# r-text Directive
 
 The `r-text` directive is used to set the text content of an HTML element to the result of an expression. It allows you to dynamically update the text displayed within an element based on the evaluated value of the provided expression.
 

@@ -2,7 +2,6 @@
 title: isDeepRef
 ---
 
-# `isDeepRef`
 
 ## Overview
 

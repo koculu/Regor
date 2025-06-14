@@ -2,7 +2,6 @@
 title: raw
 ---
 
-# `raw`
 
 ## Overview
 
