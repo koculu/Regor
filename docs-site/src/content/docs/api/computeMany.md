@@ -2,7 +2,6 @@
 title: computeMany
 ---
 
-
 ## Overview
 
 The `computeMany` function allows you to create a computed ref object that depends on multiple source ref objects and a computation function. The computed ref automatically updates when any of the source refs change, making it useful for deriving values from multiple reactive data sources.
@@ -64,21 +63,21 @@ console.log(computedValue.value) // Outputs 17
 
 ## See Also
 
-- [`computed`](computed.md)
-- [`computeRef`](computeRef.md)
-- [`ref`](ref.md)
-- [`observe`](observe.md)
-- [`observeMany`](observeMany.md)
-- [`watchEffect`](watchEffect.md)
-- [`isDeepRef`](isDeepRef.md)
-- [`isRef`](isRef.md)
-- [`unref`](unref.md)
-- [`sref`](sref.md)
-- [`flatten`](flatten.md)
-- [`isRaw`](isRaw.md)
-- [`markRaw`](markRaw.md)
-- [`pause`](pause.md)
-- [`resume`](resume.md)
-- [`trigger`](trigger.md)
+- [`computed`](/api/computed)
+- [`computeRef`](/api/computeRef)
+- [`ref`](/api/ref)
+- [`observe`](/api/observe)
+- [`observeMany`](/api/observeMany)
+- [`watchEffect`](/api/watchEffect)
+- [`isDeepRef`](/api/isDeepRef)
+- [`isRef`](/api/isRef)
+- [`unref`](/api/unref)
+- [`sref`](/api/sref)
+- [`flatten`](/api/flatten)
+- [`isRaw`](/api/isRaw)
+- [`markRaw`](/api/markRaw)
+- [`pause`](/api/pause)
+- [`resume`](/api/resume)
+- [`trigger`](/api/trigger)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](/api/)

@@ -2,7 +2,6 @@
 title: toFragment
 ---
 
-
 ## Overview
 
 The `toFragment` function is used to convert a JSON template, representing HTML or SVG elements, into a DocumentFragment. This can be particularly useful when you want to create a lightweight, in-memory representation of the DOM structure for further manipulation or rendering.
@@ -69,8 +68,8 @@ The `toFragment` function returns a `DocumentFragment` containing the elements c
 
 ## See Also
 
-- [`toJsonTemplate`](toJsonTemplate.md)
-- [`createApp`](createApp.md)
-- [`createComponent`](createComponent.md)
+- [`toJsonTemplate`](/api/toJsonTemplate)
+- [`createApp`](/api/createApp)
+- [`createComponent`](/api/createComponent)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](/api/)

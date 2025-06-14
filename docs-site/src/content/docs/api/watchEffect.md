@@ -2,7 +2,6 @@
 title: watchEffect
 ---
 
-
 ## Overview
 
 The `watchEffect` function allows you to create an "effect" that automatically reacts to changes in reactive data, such as ref objects or other observables. This effect is useful for handling side effects, such as updating the UI, in a reactive and efficient manner.
@@ -53,19 +52,19 @@ stopWatching()
 
 ## See Also
 
-- [`ref`](ref.md)
-- [`useScope`](useScope.md)
-- [`observe`](observe.md)
-- [`observeMany`](observeMany.md)
-- [`isDeepRef`](isDeepRef.md)
-- [`isRef`](isRef.md)
-- [`unref`](unref.md)
-- [`sref`](sref.md)
-- [`flatten`](flatten.md)
-- [`isRaw`](isRaw.md)
-- [`markRaw`](markRaw.md)
-- [`pause`](pause.md)
-- [`resume`](resume.md)
-- [`trigger`](trigger.md)
+- [`ref`](/api/ref)
+- [`useScope`](/api/useScope)
+- [`observe`](/api/observe)
+- [`observeMany`](/api/observeMany)
+- [`isDeepRef`](/api/isDeepRef)
+- [`isRef`](/api/isRef)
+- [`unref`](/api/unref)
+- [`sref`](/api/sref)
+- [`flatten`](/api/flatten)
+- [`isRaw`](/api/isRaw)
+- [`markRaw`](/api/markRaw)
+- [`pause`](/api/pause)
+- [`resume`](/api/resume)
+- [`trigger`](/api/trigger)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](/api/)

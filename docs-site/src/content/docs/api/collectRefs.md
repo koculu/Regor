@@ -2,7 +2,6 @@
 title: collectRefs
 ---
 
-
 ## Overview
 
 The `collectRefs` function allows you to collect a set of reactive references (refs) within a specific scope and return both the result of an action and the collected refs. This is useful for managing and tracking the refs used within a certain code block.
@@ -57,20 +56,20 @@ console.log(refs) // Outputs an array containing myRef1 and myRef2
 
 ## See Also
 
-- [`ref`](ref.md)
-- [`observe`](observe.md)
-- [`observeMany`](observeMany.md)
-- [`computed`](computed.md)
-- [`watchEffect`](watchEffect.md)
-- [`isDeepRef`](isDeepRef.md)
-- [`isRef`](isRef.md)
-- [`unref`](unref.md)
-- [`sref`](sref.md)
-- [`flatten`](flatten.md)
-- [`isRaw`](isRaw.md)
-- [`markRaw`](markRaw.md)
-- [`pause`](pause.md)
-- [`resume`](resume.md)
-- [`trigger`](trigger.md)
+- [`ref`](/api/ref)
+- [`observe`](/api/observe)
+- [`observeMany`](/api/observeMany)
+- [`computed`](/api/computed)
+- [`watchEffect`](/api/watchEffect)
+- [`isDeepRef`](/api/isDeepRef)
+- [`isRef`](/api/isRef)
+- [`unref`](/api/unref)
+- [`sref`](/api/sref)
+- [`flatten`](/api/flatten)
+- [`isRaw`](/api/isRaw)
+- [`markRaw`](/api/markRaw)
+- [`pause`](/api/pause)
+- [`resume`](/api/resume)
+- [`trigger`](/api/trigger)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](/api/)

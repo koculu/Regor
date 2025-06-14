@@ -2,7 +2,6 @@
 title: observerCount
 ---
 
-
 ## Overview
 
 The `observerCount` function allows you to determine the number of observers (callbacks) currently registered on a ref object. This can be useful for debugging and understanding how many entities are actively reacting to changes in the ref object.
@@ -50,18 +49,18 @@ console.log('Observer count:', count) // Outputs 'Observer count: 1'
 
 ## See Also
 
-- [`ref`](ref.md)
-- [`observe`](observe.md)
-- [`observeMany`](observeMany.md)
-- [`isDeepRef`](isDeepRef.md)
-- [`isRef`](isRef.md)
-- [`unref`](unref.md)
-- [`sref`](sref.md)
-- [`flatten`](flatten.md)
-- [`isRaw`](isRaw.md)
-- [`markRaw`](markRaw.md)
-- [`pause`](pause.md)
-- [`resume`](resume.md)
-- [`trigger`](trigger.md)
+- [`ref`](/api/ref)
+- [`observe`](/api/observe)
+- [`observeMany`](/api/observeMany)
+- [`isDeepRef`](/api/isDeepRef)
+- [`isRef`](/api/isRef)
+- [`unref`](/api/unref)
+- [`sref`](/api/sref)
+- [`flatten`](/api/flatten)
+- [`isRaw`](/api/isRaw)
+- [`markRaw`](/api/markRaw)
+- [`pause`](/api/pause)
+- [`resume`](/api/resume)
+- [`trigger`](/api/trigger)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](/api/)

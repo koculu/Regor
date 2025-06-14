@@ -2,7 +2,6 @@
 title: isDeepRef
 ---
 
-
 ## Overview
 
 The `isDeepRef` function determines whether a given value is a deep ref object, indicating that it has been deeply converted into a ref object using the `ref` function.
@@ -49,16 +48,16 @@ if (isDeepRef(deepRefValue)) {
 
 ## See Also
 
-- [`ref`](ref.md)
-- [`sref`](ref.md)
-- [`isRef`](isRef.md)
-- [`unref`](unref.md)
-- [`observe`](observe.md)
-- [`sref`](sref.md)
-- [`isRaw`](isRaw.md)
-- [`markRaw`](markRaw.md)
-- [`pause`](pause.md)
-- [`resume`](resume.md)
-- [`trigger`](trigger.md)
+- [`ref`](/api/ref)
+- [`sref`](/api/ref)
+- [`isRef`](/api/isRef)
+- [`unref`](/api/unref)
+- [`observe`](/api/observe)
+- [`sref`](/api/sref)
+- [`isRaw`](/api/isRaw)
+- [`markRaw`](/api/markRaw)
+- [`pause`](/api/pause)
+- [`resume`](/api/resume)
+- [`trigger`](/api/trigger)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](/api/)

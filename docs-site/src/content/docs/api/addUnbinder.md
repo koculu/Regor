@@ -2,7 +2,6 @@
 title: addUnbinder
 ---
 
-
 ## Overview
 
 The `addUnbinder` function is used to associate an unbinder function with a DOM node in Regor. An unbinder function is used to remove bound data and associated logic from the DOM node when necessary.
@@ -53,8 +52,8 @@ addUnbinder(someElement, myUnbinder)
 
 ## See Also
 
-- [removeNode](removeNode.md)
-- [unbind](unbind.md)
-- [getBindData](getBindData.md)
+- [removeNode](/api/removeNode)
+- [unbind](/api/unbind)
+- [getBindData](/api/getBindData)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](/api/)

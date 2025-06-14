@@ -2,7 +2,6 @@
 title: r-text Directive
 ---
 
-
 The `r-text` directive is used to set the text content of an HTML element to the result of an expression. It allows you to dynamically update the text displayed within an element based on the evaluated value of the provided expression.
 
 ## Syntax
@@ -50,4 +49,4 @@ In this example, if the `greeting` property in your component's data is initiall
 
 The `r-text` directive simplifies the process of updating text content within your templates, allowing you to create dynamic and responsive user interfaces with ease.
 
-[Back to the directives](directives.md)
+[Back to the directives](/directives/)

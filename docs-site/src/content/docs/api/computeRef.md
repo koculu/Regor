@@ -2,7 +2,6 @@
 title: computeRef
 ---
 
-
 ## Overview
 
 The `computeRef` function allows you to create a computed ref object that automatically computes its value based on a source ref object and a computation function. This is useful for deriving values from reactive data and ensuring that the computed ref updates whenever the source ref changes.
@@ -56,20 +55,20 @@ console.log(computedValue.value) // Outputs 14
 
 ## See Also
 
-- [`ref`](ref.md)
-- [`observe`](observe.md)
-- [`observeMany`](observeMany.md)
-- [`computed`](computed.md)
-- [`watchEffect`](watchEffect.md)
-- [`isDeepRef`](isDeepRef.md)
-- [`isRef`](isRef.md)
-- [`unref`](unref.md)
-- [`sref`](sref.md)
-- [`flatten`](flatten.md)
-- [`isRaw`](isRaw.md)
-- [`markRaw`](markRaw.md)
-- [`pause`](pause.md)
-- [`resume`](resume.md)
-- [`trigger`](trigger.md)
+- [`ref`](/api/ref)
+- [`observe`](/api/observe)
+- [`observeMany`](/api/observeMany)
+- [`computed`](/api/computed)
+- [`watchEffect`](/api/watchEffect)
+- [`isDeepRef`](/api/isDeepRef)
+- [`isRef`](/api/isRef)
+- [`unref`](/api/unref)
+- [`sref`](/api/sref)
+- [`flatten`](/api/flatten)
+- [`isRaw`](/api/isRaw)
+- [`markRaw`](/api/markRaw)
+- [`pause`](/api/pause)
+- [`resume`](/api/resume)
+- [`trigger`](/api/trigger)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](/api/)

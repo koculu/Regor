@@ -2,7 +2,6 @@
 title: trigger
 ---
 
-
 ## Overview
 
 The `trigger` function is used to manually trigger observers and update dependent refs. This function is particularly useful when you need to manually control when ref updates and observer notifications occur.
@@ -67,13 +66,13 @@ trigger(myRef, undefined, true)
 
 ## See Also
 
-- [`ref`](ref.md)
-- [`sref`](sref.md)
-- [`observe`](observe.md)
-- [`unref`](unref.md)
-- [`isRef`](isRef.md)
-- [`isDeepRef`](isDeepRef.md)
-- [`computed`](computeRef.md)
-- [`watchEffect`](watchEffect.md)
+- [`ref`](/api/ref)
+- [`sref`](/api/sref)
+- [`observe`](/api/observe)
+- [`unref`](/api/unref)
+- [`isRef`](/api/isRef)
+- [`isDeepRef`](/api/isDeepRef)
+- [`computed`](/api/computeRef)
+- [`watchEffect`](/api/watchEffect)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](/api/)

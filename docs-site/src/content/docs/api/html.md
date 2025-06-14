@@ -2,7 +2,6 @@
 title: html
 ---
 
-
 ## Overview
 
 The `html` function in Regor is a utility function for creating HTML strings using template literals and interpolating values into the resulting string. It is commonly used to generate HTML content dynamically within Regor components.
@@ -55,6 +54,6 @@ const htmlString = html`<p>
 
 ## See Also
 
-- [raw](raw.md)
+- [raw](/api/raw)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](/api/)

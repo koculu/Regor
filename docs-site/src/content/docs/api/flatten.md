@@ -2,7 +2,6 @@
 title: flatten
 ---
 
-
 ## Overview
 
 The `flatten` function recursively traverses a nested structure, such as an object, array, set, or map, and returns a flattened version of the structure. This means that it removes any nested references and produces a structure containing no refs.
@@ -63,17 +62,17 @@ console.log(flattenedData)
 
 ## See Also
 
-- [`ref`](sref.md)
-- [`sref`](sref.md)
-- [`isDeepRef`](isDeepRef.md)
-- [`isRef`](isRef.md)
-- [`unref`](unref.md)
-- [`observe`](observe.md)
-- [`flatten`](flatten.md)
-- [`isRaw`](isRaw.md)
-- [`markRaw`](markRaw.md)
-- [`pause`](pause.md)
-- [`resume`](resume.md)
-- [`trigger`](trigger.md)
+- [`ref`](/api/sref)
+- [`sref`](/api/sref)
+- [`isDeepRef`](/api/isDeepRef)
+- [`isRef`](/api/isRef)
+- [`unref`](/api/unref)
+- [`observe`](/api/observe)
+- [`flatten`](/api/flatten)
+- [`isRaw`](/api/isRaw)
+- [`markRaw`](/api/markRaw)
+- [`pause`](/api/pause)
+- [`resume`](/api/resume)
+- [`trigger`](/api/trigger)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](/api/)

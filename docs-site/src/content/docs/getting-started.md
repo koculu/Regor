@@ -53,4 +53,4 @@ createApp({
 </script>
 ```
 
-[Back to the main](index.md)
+[Back to the main](/)

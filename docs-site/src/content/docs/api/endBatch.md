@@ -2,7 +2,6 @@
 title: endBatch
 ---
 
-
 ## Overview
 
 The `endBatch` function is used in conjunction with the `startBatch`function to end a batch of ref updates and notify observers of the changes made during the batch. Batching ref updates using `startBatch` and `endBatch` can improve application performance by reducing the number of observer notifications and triggers during a series of updates.
@@ -43,10 +42,10 @@ endBatch() // End the batch and notify observers
 
 ## See Also
 
-- [`startBatch`](startBatch.md)
-- [`batch`](batch.md)
-- [`ref`](ref.md)
-- [`sref`](sref.md)
-- [`trigger`](trigger.md)
+- [`startBatch`](/api/startBatch)
+- [`batch`](/api/batch)
+- [`ref`](/api/ref)
+- [`sref`](/api/sref)
+- [`trigger`](/api/trigger)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](/api/)

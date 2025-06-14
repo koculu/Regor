@@ -2,7 +2,6 @@
 title: r-show Directive
 ---
 
-
 The `r-show` directive is used to conditionally display or hide an HTML element based on the truthiness of an expression. It allows you to control the visibility of an element dynamically.
 
 ## Syntax
@@ -53,4 +52,4 @@ In this example, clicking the "Toggle Visibility" button will trigger the `toggl
 
 The `r-show` directive provides a straightforward way to implement conditional visibility in your Regor-powered applications, making it easier to control what content is displayed to users in response to various conditions and interactions.
 
-[Back to the directives](directives.md)
+[Back to the directives](/directives/)

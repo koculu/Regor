@@ -2,7 +2,6 @@
 title: batch
 ---
 
-
 ## Overview
 
 The `batch` function is used to batch multiple updates to refs, which can help optimize performance by reducing the number of observer notifications and triggers during a series of updates. When multiple changes to refs are made within a `batch` block, observers are only notified once, at the end of the batch.
@@ -45,11 +44,11 @@ batch(() => {
 
 ## See Also
 
-- [`startBatch`](startBatch.md)
-- [`endBatch`](endBatch.md)
-- [`ref`](ref.md)
-- [`sref`](sref.md)
-- [`trigger`](trigger.md)
-- [`observe`](observe.md)
+- [`startBatch`](/api/startBatch)
+- [`endBatch`](/api/endBatch)
+- [`ref`](/api/ref)
+- [`sref`](/api/sref)
+- [`trigger`](/api/trigger)
+- [`observe`](/api/observe)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](/api/)

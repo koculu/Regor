@@ -8,68 +8,68 @@ In this section, you will find a list of Regor's API methods organized by catego
 
 **App / Component Template Functions:**
 
-- [`createApp`](createApp.md)
-- [`createComponent`](createComponent.md)
-- [`toFragment`](toFragment.md)
-- [`toJsonTemplate`](toJsonTemplate.md)
-- [`RegorConfig`](regorConfig.md)
+- [`createApp`](/api/createApp)
+- [`createComponent`](/api/createComponent)
+- [`toFragment`](/api/toFragment)
+- [`toJsonTemplate`](/api/toJsonTemplate)
+- [`RegorConfig`](/api/regorConfig)
 
 **Cleanup Functions:**
 
-- [`addUnbinder`](addUnbinder.md)
-- [`getBindData`](getBindData.md)
-- [`removeNode`](removeNode.md)
-- [`unbind`](unbind.md)
+- [`addUnbinder`](/api/addUnbinder)
+- [`getBindData`](/api/getBindData)
+- [`removeNode`](/api/removeNode)
+- [`unbind`](/api/unbind)
 
 **Compute Functions:**
 
-- [`computed`](computed.md)
-- [`computeRef`](computeRef.md)
-- [`computeMany`](computeMany.md)
-- [`watchEffect`](watchEffect.md)
-- [`collectRefs`](collectRefs.md)
-- [`silence`](silence.md)
+- [`computed`](/api/computed)
+- [`computeRef`](/api/computeRef)
+- [`computeMany`](/api/computeMany)
+- [`watchEffect`](/api/watchEffect)
+- [`collectRefs`](/api/collectRefs)
+- [`silence`](/api/silence)
 
 **Misc Functions:**
 
-- [`flatten`](flatten.md)
-- [`isRaw`](isRaw.md)
-- [`markRaw`](markRaw.md)
-- [`persist`](persist.md)
-- [`html`](html.md)
-- [`raw`](raw.md)
+- [`flatten`](/api/flatten)
+- [`isRaw`](/api/isRaw)
+- [`markRaw`](/api/markRaw)
+- [`persist`](/api/persist)
+- [`html`](/api/html)
+- [`raw`](/api/raw)
 
 **Observe Functions:**
 
-- [`observe`](observe.md)
-- [`observeMany`](observeMany.md)
-- [`observerCount`](observerCount.md)
-- [`batch`](batch.md)
-- [`startBatch`](startBatch.md)
-- [`endBatch`](endBatch.md)
+- [`observe`](/api/observe)
+- [`observeMany`](/api/observeMany)
+- [`observerCount`](/api/observerCount)
+- [`batch`](/api/batch)
+- [`startBatch`](/api/startBatch)
+- [`endBatch`](/api/endBatch)
 
 **Reactivity Functions:**
 
-- [`ref`](ref.md)
-- [`sref`](sref.md)
-- [`isDeepRef`](isDeepRef.md)
-- [`isRef`](isRef.md)
-- [`pause`](pause.md)
-- [`resume`](resume.md)
-- [`trigger`](trigger.md)
-- [`unref`](unref.md)
-- [`entangle`](entangle.md)
+- [`ref`](/api/ref)
+- [`sref`](/api/sref)
+- [`isDeepRef`](/api/isDeepRef)
+- [`isRef`](/api/isRef)
+- [`pause`](/api/pause)
+- [`resume`](/api/resume)
+- [`trigger`](/api/trigger)
+- [`unref`](/api/unref)
+- [`entangle`](/api/entangle)
 
 **Composition Functions:**
 
-- [`useScope`](useScope.md)
-- [`onMounted`](onMounted.md)
-- [`onUnmounted`](onUnmounted.md)
+- [`useScope`](/api/useScope)
+- [`onMounted`](/api/onMounted)
+- [`onUnmounted`](/api/onUnmounted)
 
 **Log Configuration:**
 
-- [`warningHandler`](warningHandler.md)
+- [`warningHandler`](/api/warningHandler)
 
 Each link will take you to a dedicated documentation page for the respective method, where you can find detailed information, examples, and usage guidelines.
 
-[Back to the main](../index.md)
+[Back to the main](/)

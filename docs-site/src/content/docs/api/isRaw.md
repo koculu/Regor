@@ -2,7 +2,6 @@
 title: isRaw
 ---
 
-
 ## Overview
 
 The `isRaw` function determines whether a given value has been marked as "raw" using the `markRaw` function, indicating that it should not be deeply converted into a deep ref when using the `ref` function.
@@ -58,16 +57,16 @@ if (isRaw(data.rawProperty)) {
 
 ## See Also
 
-- [`markRaw`](markRaw.md)
-- [`ref`](ref.md)
-- [`isDeepRef`](isDeepRef.md)
-- [`isRef`](isRef.md)
-- [`unref`](unref.md)
-- [`observe`](observe.md)
-- [`sref`](sref.md)
-- [`flatten`](flatten.md)
-- [`pause`](pause.md)
-- [`resume`](resume.md)
-- [`trigger`](trigger.md)
+- [`markRaw`](/api/markRaw)
+- [`ref`](/api/ref)
+- [`isDeepRef`](/api/isDeepRef)
+- [`isRef`](/api/isRef)
+- [`unref`](/api/unref)
+- [`observe`](/api/observe)
+- [`sref`](/api/sref)
+- [`flatten`](/api/flatten)
+- [`pause`](/api/pause)
+- [`resume`](/api/resume)
+- [`trigger`](/api/trigger)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](/api/)

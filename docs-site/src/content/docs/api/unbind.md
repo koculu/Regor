@@ -2,7 +2,6 @@
 title: unbind
 ---
 
-
 ## Overview
 
 The `unbind` function in Regor is responsible for removing bound data and associated logic from a DOM node and its descendants. This function is crucial for cleaning up data bindings and event listeners when elements are removed from the DOM or when they are no longer needed.
@@ -43,8 +42,8 @@ unbind(someElement)
 
 ## See Also
 
-- [addUnbinder](addUnbinder.md)
-- [removeNode](removeNode.md)
-- [getBindData](getBindData.md)
+- [addUnbinder](/api/addUnbinder)
+- [removeNode](/api/removeNode)
+- [getBindData](/api/getBindData)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](/api/)

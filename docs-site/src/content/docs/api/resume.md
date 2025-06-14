@@ -2,7 +2,6 @@
 title: resume
 ---
 
-
 ## Overview
 
 The `resume` function is used to resume the automatic triggering of observers for a specific ref that has previously been paused using the `pause` function. When a ref is resumed, its observers are reactivated, and changes to the ref's value will once again trigger observer callbacks.
@@ -51,9 +50,9 @@ myRef.value = 20 // The observer is triggered again
 
 ## See Also
 
-- [`ref`](ref.md)
-- [`observe`](observe.md)
-- [`trigger`](trigger.md)
-- [`pause`](pause.md)
+- [`ref`](/api/ref)
+- [`observe`](/api/observe)
+- [`trigger`](/api/trigger)
+- [`pause`](/api/pause)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](/api/)

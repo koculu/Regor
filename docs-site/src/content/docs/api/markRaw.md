@@ -2,7 +2,6 @@
 title: markRaw
 ---
 
-
 ## Overview
 
 The `markRaw` function allows you to mark a given value as "raw," indicating that it should not be converted into a deep ref when using the `ref` function. Marking a value as "raw" ensures that specific nested properties or the entire object will remain untracked and not reactive.
@@ -55,16 +54,16 @@ console.log(myRef().rawProperty.nested) // Outputs 'updated value'
 
 ## See Also
 
-- [`ref`](ref.md)
-- [`sref`](sref.md)
-- [`isDeepRef`](isDeepRef.md)
-- [`isRef`](isRef.md)
-- [`unref`](unref.md)
-- [`observe`](observe.md)
-- [`flatten`](flatten.md)
-- [`isRaw`](isRaw.md)
-- [`pause`](pause.md)
-- [`resume`](resume.md)
-- [`trigger`](trigger.md)
+- [`ref`](/api/ref)
+- [`sref`](/api/sref)
+- [`isDeepRef`](/api/isDeepRef)
+- [`isRef`](/api/isRef)
+- [`unref`](/api/unref)
+- [`observe`](/api/observe)
+- [`flatten`](/api/flatten)
+- [`isRaw`](/api/isRaw)
+- [`pause`](/api/pause)
+- [`resume`](/api/resume)
+- [`trigger`](/api/trigger)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](/api/)
