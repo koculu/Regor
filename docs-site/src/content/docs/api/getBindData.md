@@ -53,8 +53,8 @@ The `getBindData` function returns a `BindData` object associated with the provi
 
 ## See Also
 
-- [addUnbinder](addUnbinder.md)
-- [removeNode](removeNode.md)
-- [unbind](unbind.md)
+- [addUnbinder](../addUnbinder.md)
+- [removeNode](../removeNode.md)
+- [unbind](../unbind.md)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](../regor-api.md)

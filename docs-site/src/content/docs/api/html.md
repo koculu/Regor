@@ -55,6 +55,6 @@ const htmlString = html`<p>
 
 ## See Also
 
-- [raw](raw.md)
+- [raw](../raw.md)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](../regor-api.md)

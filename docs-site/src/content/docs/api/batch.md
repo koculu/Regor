@@ -45,11 +45,11 @@ batch(() => {
 
 ## See Also
 
-- [`startBatch`](startBatch.md)
-- [`endBatch`](endBatch.md)
-- [`ref`](ref.md)
-- [`sref`](sref.md)
-- [`trigger`](trigger.md)
-- [`observe`](observe.md)
+- [`startBatch`](../startBatch.md)
+- [`endBatch`](../endBatch.md)
+- [`ref`](../ref.md)
+- [`sref`](../sref.md)
+- [`trigger`](../trigger.md)
+- [`observe`](../observe.md)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](../regor-api.md)

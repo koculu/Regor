@@ -55,16 +55,16 @@ console.log(myRef().rawProperty.nested) // Outputs 'updated value'
 
 ## See Also
 
-- [`ref`](ref.md)
-- [`sref`](sref.md)
-- [`isDeepRef`](isDeepRef.md)
-- [`isRef`](isRef.md)
-- [`unref`](unref.md)
-- [`observe`](observe.md)
-- [`flatten`](flatten.md)
-- [`isRaw`](isRaw.md)
-- [`pause`](pause.md)
-- [`resume`](resume.md)
-- [`trigger`](trigger.md)
+- [`ref`](../ref.md)
+- [`sref`](../sref.md)
+- [`isDeepRef`](../isDeepRef.md)
+- [`isRef`](../isRef.md)
+- [`unref`](../unref.md)
+- [`observe`](../observe.md)
+- [`flatten`](../flatten.md)
+- [`isRaw`](../isRaw.md)
+- [`pause`](../pause.md)
+- [`resume`](../resume.md)
+- [`trigger`](../trigger.md)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](../regor-api.md)

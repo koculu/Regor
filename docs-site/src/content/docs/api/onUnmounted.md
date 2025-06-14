@@ -52,7 +52,7 @@ createApp(
 
 ## See Also
 
-- [`useScope`](useScope.md)
-- [`onMounted`](onMounted.md)
+- [`useScope`](../useScope.md)
+- [`onMounted`](../onMounted.md)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](../regor-api.md)

@@ -58,16 +58,16 @@ if (isRaw(data.rawProperty)) {
 
 ## See Also
 
-- [`markRaw`](markRaw.md)
-- [`ref`](ref.md)
-- [`isDeepRef`](isDeepRef.md)
-- [`isRef`](isRef.md)
-- [`unref`](unref.md)
-- [`observe`](observe.md)
-- [`sref`](sref.md)
-- [`flatten`](flatten.md)
-- [`pause`](pause.md)
-- [`resume`](resume.md)
-- [`trigger`](trigger.md)
+- [`markRaw`](../markRaw.md)
+- [`ref`](../ref.md)
+- [`isDeepRef`](../isDeepRef.md)
+- [`isRef`](../isRef.md)
+- [`unref`](../unref.md)
+- [`observe`](../observe.md)
+- [`sref`](../sref.md)
+- [`flatten`](../flatten.md)
+- [`pause`](../pause.md)
+- [`resume`](../resume.md)
+- [`trigger`](../trigger.md)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](../regor-api.md)

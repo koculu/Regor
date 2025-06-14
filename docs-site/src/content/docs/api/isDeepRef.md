@@ -49,16 +49,16 @@ if (isDeepRef(deepRefValue)) {
 
 ## See Also
 
-- [`ref`](ref.md)
-- [`sref`](ref.md)
-- [`isRef`](isRef.md)
-- [`unref`](unref.md)
-- [`observe`](observe.md)
-- [`sref`](sref.md)
-- [`isRaw`](isRaw.md)
-- [`markRaw`](markRaw.md)
-- [`pause`](pause.md)
-- [`resume`](resume.md)
-- [`trigger`](trigger.md)
+- [`ref`](../ref.md)
+- [`sref`](../ref.md)
+- [`isRef`](../isRef.md)
+- [`unref`](../unref.md)
+- [`observe`](../observe.md)
+- [`sref`](../sref.md)
+- [`isRaw`](../isRaw.md)
+- [`markRaw`](../markRaw.md)
+- [`pause`](../pause.md)
+- [`resume`](../resume.md)
+- [`trigger`](../trigger.md)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](../regor-api.md)

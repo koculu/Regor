@@ -69,8 +69,8 @@ The `toFragment` function returns a `DocumentFragment` containing the elements c
 
 ## See Also
 
-- [`toJsonTemplate`](toJsonTemplate.md)
-- [`createApp`](createApp.md)
-- [`createComponent`](createComponent.md)
+- [`toJsonTemplate`](../toJsonTemplate.md)
+- [`createApp`](../createApp.md)
+- [`createComponent`](../createComponent.md)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](../regor-api.md)

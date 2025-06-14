@@ -43,10 +43,10 @@ endBatch() // End the batch and notify observers
 
 ## See Also
 
-- [`startBatch`](startBatch.md)
-- [`batch`](batch.md)
-- [`ref`](ref.md)
-- [`sref`](sref.md)
-- [`trigger`](trigger.md)
+- [`startBatch`](../startBatch.md)
+- [`batch`](../batch.md)
+- [`ref`](../ref.md)
+- [`sref`](../sref.md)
+- [`trigger`](../trigger.md)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](../regor-api.md)

@@ -64,8 +64,8 @@ The `toJsonTemplate` function returns a JSON structure that represents the HTML 
 
 ## See Also
 
-- [`toFragment`](toFragment.md)
-- [`createApp`](createApp.md)
-- [`createComponent`](createComponent.md)
+- [`toFragment`](../toFragment.md)
+- [`createApp`](../createApp.md)
+- [`createComponent`](../createComponent.md)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](../regor-api.md)
