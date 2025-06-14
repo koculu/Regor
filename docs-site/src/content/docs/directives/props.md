@@ -20,4 +20,4 @@ The `:props` directive has the same syntax as the `r-bind` directive, allowing y
 
 - The `:props` directive enables binding properties not defined in component's props definition.
 
-[Back to the directives](directives.md)
+[Back to the directives](/directives/directives)

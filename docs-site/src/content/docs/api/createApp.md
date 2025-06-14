@@ -70,8 +70,8 @@ The `createApp` function returns an object with the following properties:
 
 ## See Also
 
-- [`createComponent`](createComponent.md)
-- [`toFragment`](toFragment.md)
-- [`toJsonTemplate`](toJsonTemplate.md)
+- [`createComponent`](/api/createComponent)
+- [`toFragment`](/api/toFragment)
+- [`toJsonTemplate`](/api/toJsonTemplate)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](/api/regor-api)

@@ -50,4 +50,4 @@ The `r-pre` directive is helpful in various scenarios, including:
 
 By using the `r-pre` directive in your Regor templates, you can effectively manage which parts of your HTML are subject to data binding and dynamic updates and which parts remain static and unaltered. This flexibility allows you to create dynamic and interactive user interfaces while preserving the integrity of your existing HTML content.
 
-[Back to the directives](directives.md)
+[Back to the directives](/directives/directives)

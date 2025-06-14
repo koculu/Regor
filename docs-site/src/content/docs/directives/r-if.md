@@ -105,4 +105,4 @@ In this example, different greetings are displayed based on the user's role. The
 
 Conditional rendering directives in Regor empower you to create dynamic and context-aware user interfaces, improving the user experience of your applications.
 
-[Back to the directives](directives.md)
+[Back to the directives](/directives/directives)

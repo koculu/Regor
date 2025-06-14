@@ -56,9 +56,9 @@ The `persist` function returns the same ref that was passed as `anyRef`. This al
 
 ## See Also
 
-- [`ref`](ref.md)
-- [`flatten`](flatten.md)
-- [`watchEffect`](watchEffect.md)
+- [`ref`](/api/ref)
+- [`flatten`](/api/flatten)
+- [`watchEffect`](/api/watchEffect)
 - [`localStorage` Documentation](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](/api/regor-api)

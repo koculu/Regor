@@ -83,4 +83,4 @@ The `:class` directive is useful in various scenarios:
 
 By using the `:class` directive in your Regor templates, you can create flexible and responsive user interfaces with the ability to toggle, add, or remove classes based on various conditions and user interactions.
 
-[Back to the directives](directives.md)
+[Back to the directives](/directives/directives)

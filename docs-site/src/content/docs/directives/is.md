@@ -73,4 +73,4 @@ The `:is` directive is valuable in several scenarios:
 
 By using the `:is` directive in your Regor templates, you can take advantage of dynamic component rendering to create versatile and interactive web applications.
 
-[Back to the directives](directives.md)
+[Back to the directives](/directives/directives)

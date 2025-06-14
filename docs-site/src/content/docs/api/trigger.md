@@ -67,13 +67,13 @@ trigger(myRef, undefined, true)
 
 ## See Also
 
-- [`ref`](ref.md)
-- [`sref`](sref.md)
-- [`observe`](observe.md)
-- [`unref`](unref.md)
-- [`isRef`](isRef.md)
-- [`isDeepRef`](isDeepRef.md)
-- [`computed`](computeRef.md)
-- [`watchEffect`](watchEffect.md)
+- [`ref`](/api/ref)
+- [`sref`](/api/sref)
+- [`observe`](/api/observe)
+- [`unref`](/api/unref)
+- [`isRef`](/api/isRef)
+- [`isDeepRef`](/api/isDeepRef)
+- [`computed`](/api/computeRef)
+- [`watchEffect`](/api/watchEffect)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](/api/regor-api)

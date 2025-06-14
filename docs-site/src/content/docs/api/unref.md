@@ -49,16 +49,16 @@ console.log(sameValue) // Outputs 'This is not a ref.'
 
 ## See Also
 
-- [`ref`](ref.md)
-- [`isDeepRef`](isDeepRef.md)
-- [`isRef`](isRef.md)
-- [`observe`](observe.md)
-- [`sref`](sref.md)
-- [`flatten`](flatten.md)
-- [`isRaw`](isRaw.md)
-- [`markRaw`](markRaw.md)
-- [`pause`](pause.md)
-- [`resume`](resume.md)
-- [`trigger`](trigger.md)
+- [`ref`](/api/ref)
+- [`isDeepRef`](/api/isDeepRef)
+- [`isRef`](/api/isRef)
+- [`observe`](/api/observe)
+- [`sref`](/api/sref)
+- [`flatten`](/api/flatten)
+- [`isRaw`](/api/isRaw)
+- [`markRaw`](/api/markRaw)
+- [`pause`](/api/pause)
+- [`resume`](/api/resume)
+- [`trigger`](/api/trigger)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](/api/regor-api)

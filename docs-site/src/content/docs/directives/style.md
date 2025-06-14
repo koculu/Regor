@@ -72,4 +72,4 @@ The `:style` directive is useful in various scenarios:
 
 By using the `:style` directive in your Regor templates, you can create flexible and responsive user interfaces with the ability to adapt and change styles based on various conditions and user interactions.
 
-[Back to the directives](directives.md)
+[Back to the directives](/directives/directives)

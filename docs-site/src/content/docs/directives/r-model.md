@@ -129,4 +129,4 @@ You can use these modifiers individually or combine them to achieve the desired 
 
 The `r-model` directive simplifies the process of creating interactive forms in your Regor-powered applications by enabling two-way data binding between form elements and your component's data properties. It ensures that your forms remain in sync with the underlying data, providing a seamless user experience.
 
-[Back to the directives](directives.md)
+[Back to the directives](/directives/directives)

@@ -27,4 +27,4 @@ Regor is a powerful UI framework designed for building HTML5-based applications 
 
 Explore the Regor documentation to learn more about its features and how to leverage them in your projects.
 
-[Back to the main](index.md)
+[Back to the main](/index)

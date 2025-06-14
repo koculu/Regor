@@ -156,4 +156,4 @@ In this example, the `:key` attribute is set to `id`, ensuring that each `<li>` 
 
 The `r-for` directive in Regor simplifies the process of rendering dynamic lists of items, making your templates more flexible and data-driven.
 
-[Back to the directives](directives.md)
+[Back to the directives](/directives/directives)

@@ -43,8 +43,8 @@ unbind(someElement)
 
 ## See Also
 
-- [addUnbinder](addUnbinder.md)
-- [removeNode](removeNode.md)
-- [getBindData](getBindData.md)
+- [addUnbinder](/api/addUnbinder)
+- [removeNode](/api/removeNode)
+- [getBindData](/api/getBindData)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](/api/regor-api)

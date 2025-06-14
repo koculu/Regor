@@ -50,4 +50,4 @@ In this example, if the `greeting` property in your component's data is initiall
 
 The `r-text` directive simplifies the process of updating text content within your templates, allowing you to create dynamic and responsive user interfaces with ease.
 
-[Back to the directives](directives.md)
+[Back to the directives](/directives/directives)

@@ -41,8 +41,8 @@ removeNode(someElement)
 
 ## See Also
 
-- [addUnbinder](addUnbinder.md)
-- [unbind](unbind.md)
-- [getBindData](getBindData.md)
+- [addUnbinder](/api/addUnbinder)
+- [unbind](/api/unbind)
+- [getBindData](/api/getBindData)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](/api/regor-api)

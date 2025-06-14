@@ -50,4 +50,4 @@ In this example, if the `dynamicHtmlContent` property in your component's data i
 
 The `r-html` directive empowers you to create dynamic and interactive user interfaces that incorporate rich HTML content, making your Regor-powered applications more versatile and engaging.
 
-[Back to the directives](directives.md)
+[Back to the directives](/directives/directives)

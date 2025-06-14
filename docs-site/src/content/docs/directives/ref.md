@@ -64,4 +64,4 @@ The `:ref` directive is useful in various scenarios, including:
 
 By using the `:ref` directive in your Regor templates, you can bridge the gap between your component's JavaScript logic and the HTML elements in your template, enhancing your ability to create dynamic and interactive user interfaces.
 
-[Back to the directives](directives.md)
+[Back to the directives](/directives/directives)

@@ -51,7 +51,7 @@ createApp(
 
 ## See Also
 
-- [`useScope`](useScope.md)
-- [`onUnmounted`](onUnmounted.md)
+- [`useScope`](/api/useScope)
+- [`onUnmounted`](/api/onUnmounted)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](/api/regor-api)

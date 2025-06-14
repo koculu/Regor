@@ -83,16 +83,16 @@ console.log(mySRef().age) // Outputs 35
 
 ## See Also
 
-- [`ref`](ref.md)
-- [`isDeepRef`](isDeepRef.md)
-- [`isRef`](isRef.md)
-- [`unref`](unref.md)
-- [`observe`](observe.md)
-- [`flatten`](flatten.md)
-- [`isRaw`](isRaw.md)
-- [`markRaw`](markRaw.md)
-- [`pause`](pause.md)
-- [`resume`](resume.md)
-- [`trigger`](trigger.md)
+- [`ref`](/api/ref)
+- [`isDeepRef`](/api/isDeepRef)
+- [`isRef`](/api/isRef)
+- [`unref`](/api/unref)
+- [`observe`](/api/observe)
+- [`flatten`](/api/flatten)
+- [`isRaw`](/api/isRaw)
+- [`markRaw`](/api/markRaw)
+- [`pause`](/api/pause)
+- [`resume`](/api/resume)
+- [`trigger`](/api/trigger)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](/api/regor-api)

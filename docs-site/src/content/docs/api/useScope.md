@@ -73,7 +73,7 @@ Scopes are especially useful for defining cleanup behavior when a component is u
 
 ## See Also
 
-- [`onMounted`](onMounted.md)
-- [`onUnmounted`](onUnmounted.md)
+- [`onMounted`](/api/onMounted)
+- [`onUnmounted`](/api/onUnmounted)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](/api/regor-api)

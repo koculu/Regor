@@ -22,4 +22,4 @@ The `:props-once` directive has the same syntax as the `r-bind` directive, allow
 
 - The `:props-once` directive enables binding properties not defined in component's props definition.
 
-[Back to the directives](directives.md)
+[Back to the directives](/directives/directives)

@@ -51,9 +51,9 @@ myRef.value = 20 // The observer is triggered again
 
 ## See Also
 
-- [`ref`](ref.md)
-- [`observe`](observe.md)
-- [`trigger`](trigger.md)
-- [`pause`](pause.md)
+- [`ref`](/api/ref)
+- [`observe`](/api/observe)
+- [`trigger`](/api/trigger)
+- [`pause`](/api/pause)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](/api/regor-api)

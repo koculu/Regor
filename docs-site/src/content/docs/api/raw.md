@@ -47,6 +47,6 @@ const htmlString = raw`<p>Hello, my name is ${name} and I am ${age} years old.</
 
 ## See Also
 
-- [html](html.md)
+- [html](/api/html)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](/api/regor-api)

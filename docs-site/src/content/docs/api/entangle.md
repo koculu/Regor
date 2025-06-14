@@ -70,14 +70,14 @@ stopEntangle() // Stop the bidirectional linking
 
 ## See Also
 
-- [`ref`](ref.md)
-- [`sref`](ref.md)
-- [`observe`](observe.md)
-- [`observeMany`](observeMany.md)
-- [`unref`](unref.md)
-- [`isRef`](isRef.md)
-- [`isDeepRef`](isDeepRef.md)
-- [`computeRef`](computeRef.md)
-- [`watchEffect`](watchEffect.md)
+- [`ref`](/api/ref)
+- [`sref`](/api/ref)
+- [`observe`](/api/observe)
+- [`observeMany`](/api/observeMany)
+- [`unref`](/api/unref)
+- [`isRef`](/api/isRef)
+- [`isDeepRef`](/api/isDeepRef)
+- [`computeRef`](/api/computeRef)
+- [`watchEffect`](/api/watchEffect)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](/api/regor-api)

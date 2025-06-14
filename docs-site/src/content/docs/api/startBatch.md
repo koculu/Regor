@@ -43,10 +43,10 @@ endBatch() // End the batch
 
 ## See Also
 
-- [`endBatch`](endBatch.md)
-- [`batch`](batch.md)
-- [`ref`](ref.md)
-- [`sref`](sref.md)
-- [`trigger`](trigger.md)
+- [`endBatch`](/api/endBatch)
+- [`batch`](/api/batch)
+- [`ref`](/api/ref)
+- [`sref`](/api/sref)
+- [`trigger`](/api/trigger)
 
-[Back to the API list](regor-api.md)
+[Back to the API list](/api/regor-api)
