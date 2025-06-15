@@ -5,6 +5,13 @@ import { isDeepRef } from '../reactivity/isDeepRef'
 import { ErrorType, getError } from '../log/errors'
 import { warning, WarningType } from '../log/warnings'
 
+/**
+ * Persists the value of a ref to `localStorage` using the provided key. When
+ * the ref is restored, its previous value is rehydrated from storage.
+ *
+ * @param anyRef - Ref whose value should be persisted.
+ * @param key - Storage key used to store and retrieve the ref value.
+ */
 export const persist = <TRef extends AnyRef>(
   anyRef: TRef,
   key: string,

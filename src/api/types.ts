@@ -1,8 +1,10 @@
 import { type ComponentHead } from '../app/ComponentHead'
 import { type RegorConfig } from '../app/RegorConfig'
 
+/** Utility type that resolves to `true` if `T` is exactly `null`. */
 export type IsNull<T> = [T] extends [null] ? true : false
 
+/** Strict type equality check. */
 export type Equals<T, U> = T extends U ? (U extends T ? true : false) : false
 
 type RawTypes =
@@ -34,11 +36,16 @@ declare const RawSymbol: unique symbol
 
 declare const ScopeSymbol: unique symbol
 
+/** Generic ref signature used internally. */
 export type AnyRef = (
   newValue?: any,
   eventSource?: any,
 ) => any & { [RefSymbol]: true }
 
+/**
+ * Deep reactive reference. Calling the function updates or returns the stored
+ * value and `.value` provides direct access.
+ */
 export type Ref<TValueType> = ((
   newValue?:
     | RefContent<TValueType>
@@ -49,6 +56,7 @@ export type Ref<TValueType> = ((
   value: RefContent<TValueType>
 }
 
+/** Shallow ref that only tracks its top-level value. */
 export type SRef<TValueType> = ((
   newValue?: TValueType | SRef<TValueType>,
   eventSource?: any,
@@ -56,112 +64,120 @@ export type SRef<TValueType> = ((
   value: SRefContent<TValueType>
 }
 
+/** Ref produced by computed functions. Includes a `stop` method to cease updates. */
 export type ComputedRef<TValueType> = SRef<TValueType> & {
   stop: StopObserving
 }
 
+/** Internal marker used by {@link markRaw}. */
 export interface RawMarker {
   [RawSymbol]: true
 }
 
+/** Extracts the underlying value type from a ref. */
 export type RefContent<TValueType> = TValueType extends undefined
   ? never
   : TValueType extends Ref<infer V1>
-  ? RefContent<V1>
-  : TValueType extends SRef<infer V2>
-  ? V2
-  : TValueType extends Array<infer V3>
-  ? Array<Ref<RefParam<V3>>>
-  : TValueType extends RawTypes
-  ? TValueType
-  : {
-      [Key in keyof TValueType]: Key extends symbol
-        ? TValueType[Key]
-        : TValueType[Key] extends Ref<infer V4>
-        ? Ref<RefParam<V4>>
-        : TValueType[Key] extends SRef<infer V5>
-        ? Ref<RefParam<V5>>
-        : TValueType[Key] extends RawMarker
-        ? TValueType[Key]
-        : Ref<RefParam<TValueType[Key]>>
-    }
+    ? RefContent<V1>
+    : TValueType extends SRef<infer V2>
+      ? V2
+      : TValueType extends Array<infer V3>
+        ? Array<Ref<RefParam<V3>>>
+        : TValueType extends RawTypes
+          ? TValueType
+          : {
+              [Key in keyof TValueType]: Key extends symbol
+                ? TValueType[Key]
+                : TValueType[Key] extends Ref<infer V4>
+                  ? Ref<RefParam<V4>>
+                  : TValueType[Key] extends SRef<infer V5>
+                    ? Ref<RefParam<V5>>
+                    : TValueType[Key] extends RawMarker
+                      ? TValueType[Key]
+                      : Ref<RefParam<TValueType[Key]>>
+            }
 
-export type RefParam<TValueType> = Equals<
-  TValueType,
-  MakeRefParam<TValueType>
-> extends true
-  ? TValueType
-  : MakeRefParam<TValueType>
+/** Parameter type accepted by {@link Ref}. */
+export type RefParam<TValueType> =
+  Equals<TValueType, MakeRefParam<TValueType>> extends true
+    ? TValueType
+    : MakeRefParam<TValueType>
 
+/** Helper to recursively convert properties to ref parameter types. */
 export type MakeRefParam<TValueType> = TValueType extends undefined
   ? never
   : TValueType extends Ref<infer V1>
-  ? MakeRefParam<V1>
-  : TValueType extends SRef<infer V2>
-  ? MakeRefParam<V2>
-  : TValueType extends Array<infer V3>
-  ? Array<MakeRefParam<V3>>
-  : TValueType extends RawTypes
-  ? TValueType
-  : {
-      [Key in keyof TValueType]: TValueType[Key] extends Ref<infer V4>
-        ? MakeRefParam<V4>
-        : TValueType[Key] extends SRef<infer V5>
-        ? MakeRefParam<V5>
-        : MakeRefParam<TValueType[Key]>
-    }
+    ? MakeRefParam<V1>
+    : TValueType extends SRef<infer V2>
+      ? MakeRefParam<V2>
+      : TValueType extends Array<infer V3>
+        ? Array<MakeRefParam<V3>>
+        : TValueType extends RawTypes
+          ? TValueType
+          : {
+              [Key in keyof TValueType]: TValueType[Key] extends Ref<infer V4>
+                ? MakeRefParam<V4>
+                : TValueType[Key] extends SRef<infer V5>
+                  ? MakeRefParam<V5>
+                  : MakeRefParam<TValueType[Key]>
+            }
 
-export type SRefContent<TValueType> = Equals<
-  TValueType,
-  MakeSRefContent<TValueType>
-> extends true
-  ? TValueType
-  : MakeSRefContent<TValueType>
+/** Value type stored inside a {@link SRef}. */
+export type SRefContent<TValueType> =
+  Equals<TValueType, MakeSRefContent<TValueType>> extends true
+    ? TValueType
+    : MakeSRefContent<TValueType>
 
+/** Helper to compute {@link SRefContent}. */
 export type MakeSRefContent<TValueType> = TValueType extends undefined
   ? never
   : TValueType extends Ref<infer V1>
-  ? RefContent<V1>
-  : TValueType extends SRef<infer V2>
-  ? V2
-  : TValueType extends Array<infer V3>
-  ? V3[]
-  : TValueType extends RawTypes
-  ? TValueType
-  : TValueType
+    ? RefContent<V1>
+    : TValueType extends SRef<infer V2>
+      ? V2
+      : TValueType extends Array<infer V3>
+        ? V3[]
+        : TValueType extends RawTypes
+          ? TValueType
+          : TValueType
 
-export type UnwrapRef<TRef> = TRef extends Ref<infer V1>
-  ? RefContent<V1>
-  : TRef extends SRef<infer V2>
-  ? SRefContent<V2>
-  : TRef
+/** Removes ref wrappers from a type. */
+export type UnwrapRef<TRef> =
+  TRef extends Ref<infer V1>
+    ? RefContent<V1>
+    : TRef extends SRef<infer V2>
+      ? SRefContent<V2>
+      : TRef
 
-export type FlattenRef<TRef> = TRef extends Array<infer V1>
-  ? Array<FlattenRef<V1>>
-  : TRef extends Ref<infer V2>
-  ? FlattenRef<V2>
-  : TRef extends SRef<infer V3>
-  ? FlattenRef<V3>
-  : TRef extends AnyRef
-  ? unknown
-  : TRef extends RawTypes
-  ? TRef
-  : {
-      [Key in keyof TRef]: FlattenRef<TRef[Key]>
-    }
+/** Recursively removes refs from nested structures. */
+export type FlattenRef<TRef> =
+  TRef extends Array<infer V1>
+    ? Array<FlattenRef<V1>>
+    : TRef extends Ref<infer V2>
+      ? FlattenRef<V2>
+      : TRef extends SRef<infer V3>
+        ? FlattenRef<V3>
+        : TRef extends AnyRef
+          ? unknown
+          : TRef extends RawTypes
+            ? TRef
+            : {
+                [Key in keyof TRef]: FlattenRef<TRef[Key]>
+              }
 
-export type Flat<TValueType> = Equals<
-  RefParam<TValueType>,
-  FlattenRef<TValueType>
-> extends true
-  ? RefParam<TValueType>
-  : FlattenRef<TValueType>
+/** Convenience type returning a flattened version of `TValueType`. */
+export type Flat<TValueType> =
+  Equals<RefParam<TValueType>, FlattenRef<TValueType>> extends true
+    ? RefParam<TValueType>
+    : FlattenRef<TValueType>
 
+/** Callback signature for {@link observe}. */
 export type ObserveCallback<TValueType> = (
   newValue: TValueType,
   eventSource?: any,
 ) => void
 
+/** Function returned by observer utilities to stop observing. */
 export type StopObserving = () => void
 
 export declare interface IRegorContext extends Record<any, any> {
@@ -170,8 +186,10 @@ export declare interface IRegorContext extends Record<any, any> {
   unmounted?: () => void
 }
 
+/** Predicate used by lazy directives. */
 export type IsLazy = (i: number, d: number) => boolean
 
+/** Predicate used by lazy directives for key-based updates. */
 export type IsLazyKey = (key: string, d: number) => boolean
 
 export interface Directive {
@@ -204,13 +222,16 @@ export interface Directive {
   ) => Unbinder
 }
 
+/** Data associated with a bound DOM node. */
 export interface BindData {
   unbinders: Unbinder[]
   data: Record<any, any>
 }
 
+/** Function that cleans up bindings created for a DOM node. */
 export type Unbinder = () => void
 
+/** Result of parsing a directive expression. */
 export interface ParseResult {
   value: SRef<unknown[]>
   stop: StopObserving
@@ -218,8 +239,10 @@ export interface ParseResult {
   context: Record<any, any>
 }
 
+/** Callback used by watchEffect to register cleanup logic. */
 export type OnCleanup = (cleanup: () => void) => void
 
+/** JSON representation of an HTML/SVG tree. */
 export interface JSONTemplate {
   /** tag-name */
   t?: string
@@ -277,6 +300,7 @@ export interface Template {
   isSVG?: boolean
 }
 
+/** Return type of {@link createApp}. */
 export interface App<TRegorContext extends IRegorContext> {
   context: TRegorContext
   unmount: () => void
@@ -319,7 +343,10 @@ export interface Component<TProps = Record<any, any>> {
   defaultName?: string
 }
 
+/** Callback invoked when a scope or component is mounted. */
 export type OnMounted = () => void
+/**
+ * Callback invoked when a scope or component is unmounted. */
 export type OnUnmounted = () => void
 
 export interface CreateComponentOptions {
@@ -344,6 +371,7 @@ export interface CreateComponentOptions {
   defaultName?: string
 }
 
+/** Object returned by {@link useScope}. */
 export interface Scope<TRegorContext> {
   context: TRegorContext
   unmount: () => void

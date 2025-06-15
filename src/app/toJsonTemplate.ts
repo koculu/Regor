@@ -2,6 +2,14 @@ import { type JSONTemplate } from '../api/types'
 import { getChildNodes } from '../common/common'
 import { isArray } from '../common/is-what'
 
+/**
+ * Converts DOM elements into the JSON template format used by Regor. This
+ * transformation is handy for serializing templates or rendering in strict CSP
+ * scenarios where inline HTML is not allowed.
+ *
+ * @param node - DOM element or array of elements to convert.
+ * @returns JSON representation of the supplied DOM nodes.
+ */
 export const toJsonTemplate = (
   node: Element | Element[],
 ): JSONTemplate | JSONTemplate[] => {

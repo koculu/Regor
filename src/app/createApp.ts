@@ -19,19 +19,28 @@ import { isScope } from '../composition/useScope'
 import { isElement } from '../common/common'
 import { isString } from '../common/is-what'
 
+/**
+ * Initializes a Regor application by binding the given context to a DOM element
+ * defined by the template. The function optionally accepts a configuration
+ * object and returns an interface to unmount or unbind the application.
+ *
+ * @param context - Regor context or scope that drives the application.
+ * @param template - Template configuration or selector of the root element.
+ * @param config - Optional Regor configuration.
+ * @returns The created application instance.
+ */
 export const createApp = <TRegorContext extends IRegorContext>(
   context: TRegorContext | Scope<TRegorContext>,
   template: Template | string = { selector: '#app' },
   config?: RegorConfig,
 ): App<TRegorContext> => {
-  if (isString(template))
-    template = { selector: '#app', template }
+  if (isString(template)) template = { selector: '#app', template }
   if (isScope(context)) context = context.context
   const root = template.element
     ? template.element
     : template.selector
-    ? document.querySelector(template.selector)
-    : null
+      ? document.querySelector(template.selector)
+      : null
   if (!root || !isElement(root)) throw getError(ErrorType.AppRootElementMissing)
   if (!config) config = RegorConfig.getDefault()
 
@@ -54,11 +63,7 @@ export const createApp = <TRegorContext extends IRegorContext>(
     appendChildren(element.childNodes)
     template.element = element
   } else if (template.json) {
-    const element = toFragment(
-      template.json,
-      template.isSVG,
-      config,
-    )
+    const element = toFragment(template.json, template.isSVG, config)
     cleanRoot()
     appendChildren(element.childNodes)
   }

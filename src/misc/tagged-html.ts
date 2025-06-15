@@ -1,3 +1,8 @@
+/**
+ * Template tag that simply concatenates template strings and expressions. It
+ * is mainly provided for symmetry with `raw` and does not perform any HTML
+ * escaping.
+ */
 export const html = (
   templates: TemplateStringsArray,
   ...args: any[]
@@ -18,4 +23,7 @@ export const html = (
   return result
 }
 
+/**
+ * Alias of {@link html} provided for clarity when embedding raw HTML strings.
+ */
 export const raw = html

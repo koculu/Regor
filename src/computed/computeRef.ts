@@ -8,6 +8,14 @@ import { trigger } from '../reactivity/trigger'
 import { srefSymbol } from '../reactivity/refSymbols'
 import { onUnmounted } from '../composition/onUnmounted'
 
+/**
+ * Creates a computed ref based on a single source ref. The `compute` callback
+ * is invoked with the source's value and the result is cached until the source
+ * changes.
+ *
+ * @param source - Source ref to observe.
+ * @param compute - Function that derives the computed value from the source.
+ */
 export const computeRef = <TValueType extends AnyRef, TReturnType>(
   source: TValueType,
   compute: (value: UnwrapRef<TValueType>) => TReturnType,
