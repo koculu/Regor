@@ -13,6 +13,15 @@ import { toJsonTemplate } from './toJsonTemplate'
 import { isHTMLElement } from '../common/common'
 import { isArray, isString } from '../common/is-what'
 
+/**
+ * Creates a Regor component from the provided context function and template.
+ * Components encapsulate a part of the UI and can be registered for reuse.
+ *
+ * @param context - Function returning the component's Regor context.
+ * @param template - HTML string or template object describing the component UI.
+ * @param options - Optional component options such as props and config.
+ * @returns The constructed component definition.
+ */
 export const createComponent = <TProps = Record<any, any>>(
   context: (head: ComponentHead<TProps>) => IRegorContext,
   template: Template | string,
@@ -28,10 +37,7 @@ export const createComponent = <TProps = Record<any, any>>(
   } else if (template.selector) {
     const element = document.querySelector(template.selector)
     if (!element)
-      throw getError(
-        ErrorType.ComponentTemplateNotFound,
-        template.selector,
-      )
+      throw getError(ErrorType.ComponentTemplateNotFound, template.selector)
     element.remove()
     template.element = element
   } else if (template.template) {
@@ -40,15 +46,10 @@ export const createComponent = <TProps = Record<any, any>>(
       .createContextualFragment(template.template)
     template.element = element
   } else if (template.json) {
-    template.element = toFragment(
-      template.json,
-      template.isSVG,
-      options.config,
-    )
+    template.element = toFragment(template.json, template.isSVG, options.config)
     svgHandled = true
   }
-  if (!template.element)
-    template.element = document.createDocumentFragment()
+  if (!template.element) template.element = document.createDocumentFragment()
   if (options.useInterpolation ?? true) interpolate(template.element)
   const element = template.element
   if (

@@ -2,6 +2,11 @@ import { type IRegorContext } from '../api/types'
 import { callUnmounted } from '../composition/callUnmounted'
 import { removeNode } from '../cleanup/removeNode'
 
+/**
+ * Represents the region of DOM that a component manages. It provides access to
+ * component props, start and end comment nodes and helper methods for emitting
+ * events or unmounting the component.
+ */
 export class ComponentHead<TProps = Record<any, any>> {
   props: TProps
 

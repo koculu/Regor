@@ -6,6 +6,14 @@ import {
 import { onUnmounted } from '../composition/onUnmounted'
 import { observe } from './observe'
 
+/**
+ * Observes multiple refs at once and invokes the given callback when any of
+ * them change. The callback receives an array with the current values.
+ *
+ * @param sources - List of refs to observe.
+ * @param observer - Callback called with an array of current values.
+ * @param init - When true, the observer is called immediately.
+ */
 export const observeMany = (
   sources: AnyRef[],
   observer: ObserveCallback<any[]>,

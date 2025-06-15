@@ -17,6 +17,10 @@ import { flatten } from '../misc/flatten'
 import { ref } from '../reactivity/ref'
 import { sref } from '../reactivity/sref'
 
+/**
+ * Configuration object used when creating Regor applications or components. It
+ * controls directive prefixes, registered components and other global options.
+ */
 export class RegorConfig {
   static getDefault(): RegorConfig {
     return (

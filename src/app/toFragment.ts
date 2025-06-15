@@ -74,6 +74,15 @@ const render = (
   }
 }
 
+/**
+ * Converts a JSON-based template into a `DocumentFragment`. This helper is
+ * useful when templates must be created from JSON (e.g. in strict CSP
+ * environments) before being inserted into the DOM.
+ *
+ * @param json - Template description or list of nodes in JSON format.
+ * @param isSVG - Treat elements as SVG when `true`.
+ * @param config - Optional Regor configuration used for attribute normalization.
+ */
 export const toFragment = (
   json: JSONTemplate | JSONTemplate[],
   isSVG?: boolean,

@@ -13,6 +13,14 @@ import { sref } from '../reactivity/sref'
 import { trigger } from '../reactivity/trigger'
 import { type ComputedOnce } from './computed'
 
+/**
+ * Creates a computed ref whose value is derived from multiple source refs. The
+ * supplied compute function receives the values of all sources and is re-run
+ * whenever any of them change.
+ *
+ * @param sources - Array of refs to watch.
+ * @param compute - Function that produces the computed value.
+ */
 export const computeMany = <TReturnType>(
   sources: AnyRef[],
   compute: (...values: any[]) => TReturnType,

@@ -1,5 +1,12 @@
 import { bindDataSymbol } from './bindDataSymbol'
 
+/**
+ * Recursively removes Regor bindings from a node and all of its descendants.
+ * Each node's unbinders are executed to detach event listeners and other bound
+ * data.
+ *
+ * @param node - Root node from which to remove bindings.
+ */
 export const unbind = (node: Node): void => {
   const queue: any[] = [node]
 

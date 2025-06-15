@@ -44,6 +44,10 @@ export class DirectiveElement {
   }
 }
 
+/**
+ * Mapping of directive attribute names to the elements on which they appear.
+ * Used internally when collecting directives from the DOM tree.
+ */
 export type DirectiveMap = Map<string, DirectiveElement>
 
 /**
