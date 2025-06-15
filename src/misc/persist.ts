@@ -6,11 +6,28 @@ import { ErrorType, getError } from '../log/errors'
 import { warning, WarningType } from '../log/warnings'
 
 /**
- * Persists the value of a ref to `localStorage` using the provided key. When
- * the ref is restored, its previous value is rehydrated from storage.
+ * Persists a reactive reference’s value to `localStorage` and keeps it in sync.
  *
- * @param anyRef - Ref whose value should be persisted.
- * @param key - Storage key used to store and retrieve the ref value.
+ * On initialization, attempts to load and parse an existing value from
+ * `localStorage` under the given key. If parsing fails, it will overwrite
+ * the stored value with the current ref value. After that, any change to
+ * the ref will be serialized (via `JSON.stringify`) and saved to
+ * `localStorage` automatically.
+ *
+ * @template TRef
+ * @param {TRef} anyRef - A ref (or deep ref) whose value should be persisted.
+ * @param {string} key - The `localStorage` key under which to store the ref’s value.
+ * @throws {Error} If `key` is an empty string or not provided.
+ * @returns {TRef} The same ref instance, now synchronized with `localStorage`.
+ *
+ * @example
+ * ```ts
+ * import { ref, persist } from 'regor'
+ * const count = ref(0)
+ * persist(count, 'app:count')
+ * // count will be initialized from localStorage if present,
+ * // and any updates to count ref will be saved automatically.
+ * ```
  */
 export const persist = <TRef extends AnyRef>(
   anyRef: TRef,
