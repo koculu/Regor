@@ -44,6 +44,6 @@ jobs:
         run: yarn build
 
       - name: Publish to npm
-        run: yarn npm publish --access public --publishRegistry=https://registry.npmjs.org
+        run: yarn npm publish --access public
         env:
            NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
