@@ -1,10 +1,11 @@
 {
   "name": "regor",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "A modern UI framework for web and desktop applications, inspired by Vue's concepts and powered by simplicity and flexibility.",
   "author": "Ahmed Yasin Koculu",
   "license": "MIT",
-  "main": "dist/regor.es2022.cjs.js",
+  "type": "module",
+  "main": "dist/regor.es2022.esm.js",
   "module": "dist/regor.es2022.esm.js",
   "types": "dist/regor.d.ts",
   "scripts": {
