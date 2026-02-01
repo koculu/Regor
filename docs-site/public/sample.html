@@ -77,8 +77,8 @@ import { createApp, createComponent, ref, html, type Ref } from 'regor';
 interface CounterProps { initial: Ref<number>; }
 const template = html`<button @click=\"count++\">{{ count }} (initial: {{ initial }})</button>`;
 const Counter = createComponent<CounterProps>(
-  (head) => ({ initial: head.props.initial, count: ref(head.props.initial()) }),
   template,
+  (head) => ({ initial: head.props.initial, count: ref(head.props.initial()) }),
   ['initial']
 );
 createApp({ components: { Counter }, initial: ref(5) });

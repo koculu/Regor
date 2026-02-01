@@ -13,17 +13,15 @@ The `onUnmounted` function allows you to register a callback function that will 
 To register an `onUnmounted` callback, simply call the `onUnmounted` function and pass the desired callback function as an argument. The callback will be executed when the component or scope is unmounted or cleaned up.
 
 ```ts
-import { createApp, html, useScope, onUnmounted } from 'regor'
+import { createApp, createComponent, html, useScope, onUnmounted } from 'regor'
 
-const userRow = createComponent(() => ({
-    // Register an onUnmounted callback
-    onUnmounted(() => {
-      // Perform cleanup  tasks
-      console.log('Component is unmounted!')
-    })
-}), {
-  html: html`<div></div>`,
-})
+const userRow = createComponent(html`<div></div>`, () => ({
+  // Register an onUnmounted callback
+  onUnmounted(() => {
+    // Perform cleanup  tasks
+    console.log('Component is unmounted!')
+  })
+}))
 
 createApp(
   useScope(() => {

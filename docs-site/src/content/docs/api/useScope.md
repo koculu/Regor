@@ -16,16 +16,15 @@ To create a scope for an app or composable, call the `useScope` function and pas
 
 ```ts
 
-import { createApp, html, useScope, onUnmounted, ref, computed, watchEffect } from 'regor'
+import { createApp, createComponent, html, useScope, onUnmounted, ref, computed, watchEffect } from 'regor'
 
-const userRow = createComponent(() => ({
+const userRow = createComponent(html`<div></div>`, () => ({
     // Register an onUnmounted callback
     onUnmounted(() => {
       // Perform cleanup  tasks
       console.log('Component is unmounted!')
     })
-}),
-html`<div></div>`)
+}))
 
 createApp(
   useScope(() => {

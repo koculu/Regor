@@ -73,11 +73,11 @@ const template = html`<button @click="count++">
 const props = ['message']
 
 const myComponent = createComponent<MyComponent>(
+  template,
   (head) => ({
     message: head.props.message,
     count: ref(0),
   }),
-  template,
   props,
 )
 
