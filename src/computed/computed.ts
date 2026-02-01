@@ -15,6 +15,13 @@ export interface ComputedOnce<TReturnType> {
   ref?: ComputedRef<UnwrapRef<TReturnType>>
 }
 
+/**
+ * Generates a lazily-evaluated computed ref. The provided compute function is
+ * executed the first time the computed value is accessed and whenever its
+ * dependencies change.
+ *
+ * @param compute - Function returning the computed value.
+ */
 export const computed = <TReturnType>(
   compute: () => TReturnType,
 ): ComputedRef<UnwrapRef<TReturnType>> => {

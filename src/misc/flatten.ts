@@ -2,6 +2,11 @@ import { isArray, isMap, isObject, isSet } from '../common/is-what'
 import type { Ref, SRef, ComputedRef, Flat } from '../api/types'
 import { unref } from '../reactivity/unref'
 
+/**
+ * Returns a non-reactive copy of a ref or ordinary value by recursively
+ * unwrapping all nested refs. Maps, Sets and plain objects are processed so
+ * that no ref wrappers remain in the result.
+ */
 export const flatten = <TValueType>(
   reference:
     | TValueType

@@ -63,4 +63,9 @@ export const warning = (type: WarningType, ...args: unknown[]): void => {
   else handler(item, ...item.args)
 }
 
+/**
+ * Global handler used by Regor to emit warning messages. By default warnings
+ * are logged using `console.warn` but this object can be customised to display
+ * warnings differently.
+ */
 export const warningHandler = { warning: console.warn }

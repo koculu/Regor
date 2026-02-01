@@ -19,6 +19,14 @@ interface Terminator {
   stop: StopObserving
 }
 
+/**
+ * Runs the supplied effect function and automatically re-runs it whenever any
+ * refs accessed during its execution change. The function returns a stopper
+ * that can be used to cancel the effect.
+ *
+ * @param effect - Effect callback that may register cleanup callbacks via its
+ *   `onCleanup` parameter.
+ */
 export const watchEffect = (
   effect: (onCleanup?: OnCleanup) => void,
 ): StopObserving => {
@@ -60,6 +68,11 @@ const watchEffectInternal = (
   }
 }
 
+/**
+ * Temporarily suppresses ref collection while executing the given action. Any
+ * refs accessed within the action will not trigger re-execution of the current
+ * effect.
+ */
 export const silence = <TReturnType>(
   action: () => TReturnType,
 ): TReturnType => {
@@ -73,6 +86,11 @@ export const silence = <TReturnType>(
   }
 }
 
+/**
+ * Executes the supplied action while collecting all refs that are read. The
+ * returned object contains the action's result together with the list of refs
+ * accessed during execution.
+ */
 export const collectRefs = <TReturnType>(
   action: () => TReturnType,
 ): { value: TReturnType; refs: AnyRef[] } => {
