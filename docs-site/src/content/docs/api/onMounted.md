@@ -15,13 +15,15 @@ To register an `onMounted` callback, simply call the `onMounted` function and pa
 ```ts
 import { createApp, createComponent, html, useScope, onMounted } from 'regor'
 
-const userRow = createComponent(html`<div></div>`, () => ({
-  // Register an onMounted callback
-  onMounted(() => {
-    // Perform initialization tasks
-    console.log('Component is mounted!')
+const userRow = createComponent(html`<div></div>`, {
+  context: () => ({
+    // Register an onMounted callback
+    onMounted(() => {
+      // Perform initialization tasks
+      console.log('Component is mounted!')
+    })
   })
-}))
+})
 
 createApp(
   useScope(() => {

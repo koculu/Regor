@@ -327,6 +327,11 @@ export interface CreateComponentOptions {
 
   config?: RegorConfig
 
+  /**
+   * A function that defines the Regor context for the component.
+   */
+  context?: (head: ComponentHead<any>) => IRegorContext
+
   inheritAttrs?: boolean
 
   /**

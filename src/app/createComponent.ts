@@ -1,12 +1,9 @@
 import {
   type CreateComponentOptions,
   type Component,
-  type IRegorContext,
   type Template,
 } from '../api/types'
 import { ErrorType, getError } from '../log/errors'
-import { type ComponentHead } from './ComponentHead'
-
 import { interpolate } from '../bind/interpolation'
 import { toFragment } from './toFragment'
 import { toJsonTemplate } from './toJsonTemplate'
@@ -15,11 +12,11 @@ import { isArray, isString } from '../common/is-what'
 
 export const createComponent = <TProps = Record<any, any>>(
   template: Template | string,
-  context: (head: ComponentHead<TProps>) => IRegorContext = () => ({}),
   options: CreateComponentOptions | string[] = {},
 ): Component<TProps> => {
   if (isArray(options)) options = { props: options }
   if (isString(template)) template = { template }
+  const context = options.context ?? (() => ({}))
   let svgHandled = false
   if (template.element) {
     const element = template.element as ChildNode

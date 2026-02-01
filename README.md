@@ -74,11 +74,13 @@ const props = ['message']
 
 const myComponent = createComponent<MyComponent>(
   template,
-  (head) => ({
-    message: head.props.message,
-    count: ref(0),
-  }),
-  props,
+  {
+    context: (head) => ({
+      message: head.props.message,
+      count: ref(0),
+    }),
+    props,
+  },
 )
 
 createApp({
