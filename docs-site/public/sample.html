@@ -78,8 +78,10 @@ interface CounterProps { initial: Ref<number>; }
 const template = html`<button @click=\"count++\">{{ count }} (initial: {{ initial }})</button>`;
 const Counter = createComponent<CounterProps>(
   template,
-  (head) => ({ initial: head.props.initial, count: ref(head.props.initial()) }),
-  ['initial']
+  {
+    context: (head) => ({ initial: head.props.initial, count: ref(head.props.initial()) }),
+    props: ['initial']
+  }
 );
 createApp({ components: { Counter }, initial: ref(5) });
 </code></pre>

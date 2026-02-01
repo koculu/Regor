@@ -18,13 +18,15 @@ To create a scope for an app or composable, call the `useScope` function and pas
 
 import { createApp, createComponent, html, useScope, onUnmounted, ref, computed, watchEffect } from 'regor'
 
-const userRow = createComponent(html`<div></div>`, () => ({
+const userRow = createComponent(html`<div></div>`, {
+  context: () => ({
     // Register an onUnmounted callback
     onUnmounted(() => {
       // Perform cleanup  tasks
       console.log('Component is unmounted!')
     })
-}))
+  }),
+})
 
 createApp(
   useScope(() => {

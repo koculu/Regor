@@ -14,11 +14,13 @@ test('should render components with reactive properties', () => {
 
   const myComponent = createComponent(
     html`<div>{{ prop1 + '-' + prop2 }}</div>`,
-    () => ({
-      prop1: ref('prop-1'),
-      prop2: ref('prop-2'),
-    }),
-    ['prop1'],
+    {
+      context: () => ({
+        prop1: ref('prop-1'),
+        prop2: ref('prop-2'),
+      }),
+      props: ['prop1'],
+    },
   )
 
   const app = createApp(
@@ -107,7 +109,7 @@ test('should render components with reactive properties', () => {
 test('should render empty component', () => {
   const root = document.createElement('div')
 
-  const myComponent = createComponent(html``, () => ({}))
+  const myComponent = createComponent(html``)
 
   createApp(
     {
@@ -145,10 +147,10 @@ test('should render nested component with reactive properties', () => {
       name: {{ item.name }}
       <MyComponent r-for="child in item.children" :item="child"></MyComponent>
     </div>`,
-    (head) => ({
-      item: head.props.item,
-    }),
     {
+      context: (head) => ({
+        item: head.props.item,
+      }),
       props: ['item'],
     },
   )

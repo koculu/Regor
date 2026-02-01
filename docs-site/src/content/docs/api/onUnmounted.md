@@ -15,13 +15,15 @@ To register an `onUnmounted` callback, simply call the `onUnmounted` function an
 ```ts
 import { createApp, createComponent, html, useScope, onUnmounted } from 'regor'
 
-const userRow = createComponent(html`<div></div>`, () => ({
-  // Register an onUnmounted callback
-  onUnmounted(() => {
-    // Perform cleanup  tasks
-    console.log('Component is unmounted!')
+const userRow = createComponent(html`<div></div>`, {
+  context: () => ({
+    // Register an onUnmounted callback
+    onUnmounted(() => {
+      // Perform cleanup  tasks
+      console.log('Component is unmounted!')
+    })
   })
-}))
+})
 
 createApp(
   useScope(() => {
