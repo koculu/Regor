@@ -14,8 +14,8 @@ import { isHTMLElement } from '../common/common'
 import { isArray, isString } from '../common/is-what'
 
 export const createComponent = <TProps = Record<any, any>>(
-  context: (head: ComponentHead<TProps>) => IRegorContext,
   template: Template | string,
+  context: (head: ComponentHead<TProps>) => IRegorContext = () => ({}),
   options: CreateComponentOptions | string[] = {},
 ): Component<TProps> => {
   if (isArray(options)) options = { props: options }

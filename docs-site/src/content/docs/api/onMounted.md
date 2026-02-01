@@ -13,16 +13,15 @@ The `onMounted` function allows you to register a callback function that will be
 To register an `onMounted` callback, simply call the `onMounted` function and pass the desired callback function as an argument. The callback will be executed when the app or component is mounted.
 
 ```ts
-import { createApp, html, useScope, onMounted } from 'regor'
+import { createApp, createComponent, html, useScope, onMounted } from 'regor'
 
-const userRow = createComponent(() => ({
+const userRow = createComponent(html`<div></div>`, () => ({
   // Register an onMounted callback
   onMounted(() => {
     // Perform initialization tasks
     console.log('Component is mounted!')
   })
-}),
-html`<div></div>`)
+}))
 
 createApp(
   useScope(() => {

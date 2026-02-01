@@ -12,12 +12,6 @@ The `createComponent` function is used to create a Regor component, which encaps
 
 To create a Regor component, call the `createComponent` function with the following parameters:
 
-- `context` (required): A function that defines the Regor context for the component. This function receives a `ComponentHead` object, which you can use to specify the component's behavior and props. It should return the Regor context.
-  - `head.autoProps`: Automatically assigns properties defined in the `:props` binding to the component context. Defaults to `true`.
-  - `head.entangle`: Keeps refs defined in the component context entangled with `head.props` refs. Defaults to `true`.
-  - `head.enableSwitch`: Enables slot context switching to the parent. Defaults to `false`.
-  - `head.onAutoPropsAssigned`: Callback invoked after auto props get assigned to the component context.
-
 - `template` (required): An HTML string or an object specifying the template for rendering the component. It can include the following properties:
 
   - `selector` (string, optional): A CSS selector string for the root element of the component. Regor will attempt to find this element in the DOM.
@@ -25,6 +19,12 @@ To create a Regor component, call the `createComponent` function with the follow
   - `template` (string, optional): An HTML string representing the initial content of the component's root element.
   - `json` (object, optional): A JSON object representing the initial structure of the component's UI.
   - `isSVG` (boolean, optional): Indicates whether the template contains SVG elements.
+
+- `context` (optional): A function that defines the Regor context for the component. This function receives a `ComponentHead` object, which you can use to specify the component's behavior and props. It should return the Regor context.
+  - `head.autoProps`: Automatically assigns properties defined in the `:props` binding to the component context. Defaults to `true`.
+  - `head.entangle`: Keeps refs defined in the component context entangled with `head.props` refs. Defaults to `true`.
+  - `head.enableSwitch`: Enables slot context switching to the parent. Defaults to `false`.
+  - `head.onAutoPropsAssigned`: Callback invoked after auto props get assigned to the component context.
 
 - `options` (optional): An array of strings that defines component properties or an object that allows you to configure various options for the component, such as whether to use interpolation, props, or the component's default name.
 
@@ -35,11 +35,11 @@ import { createComponent, createApp, html } from 'regor'
 
 // Define a Regor component
 const myComponent = createComponent(
+  html`<div></div>`, // Define the component content from html string
   (head) => ({
     // Define the component's context and behavior here
     // ... other context properties
   }),
-  html`<div></div>`, // Define the component content from html string
 )
 
 // Use the created component in your application
@@ -50,9 +50,9 @@ createApp({
 
 ## Parameters
 
-- `context` (required): A function that defines the Regor context for the component. It should return the Regor context, which specifies the component's behavior and data.
-
 - `template` (required): An HTML string or an object specifying the template for rendering the component. It defines the component's UI structure, either by selecting an existing DOM element or providing HTML content or a JSON structure.
+
+- `context` (optional): A function that defines the Regor context for the component. It should return the Regor context, which specifies the component's behavior and data.
 
 - `options` (optional): An array of strings that defines component properties or an object that configures various options for the component, including whether to use interpolation, props, or the component's default name.
 
@@ -74,9 +74,9 @@ The `createComponent` function returns a component object with the following pro
 
 - Components are a fundamental building block in Regor applications. They encapsulate UI elements, logic, and reactivity, making it easier to manage complex user interfaces.
 
-- The `context` parameter defines the behavior and data of your component.
-
 - The `template` parameter specifies how the component's UI is rendered. You can select an existing element in the DOM, provide HTML content, or use a JSON structure to define the component's structure.
+
+- The `context` parameter defines the behavior and data of your component.
 
 - The `options` parameter allows you to configure various aspects of the component, such as enabling or disabling interpolation, specifying props, or setting a default name.
 
