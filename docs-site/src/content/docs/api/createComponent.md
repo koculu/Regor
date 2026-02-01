@@ -13,6 +13,10 @@ The `createComponent` function is used to create a Regor component, which encaps
 To create a Regor component, call the `createComponent` function with the following parameters:
 
 - `context` (required): A function that defines the Regor context for the component. This function receives a `ComponentHead` object, which you can use to specify the component's behavior and props. It should return the Regor context.
+  - `head.autoProps`: Automatically assigns properties defined in the `:props` binding to the component context. Defaults to `true`.
+  - `head.entangle`: Keeps refs defined in the component context entangled with `head.props` refs. Defaults to `true`.
+  - `head.enableSwitch`: Enables slot context switching to the parent. Defaults to `false`.
+  - `head.onAutoPropsAssigned`: Callback invoked after auto props get assigned to the component context.
 
 - `template` (required): An HTML string or an object specifying the template for rendering the component. It can include the following properties:
 

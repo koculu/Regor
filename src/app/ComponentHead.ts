@@ -23,8 +23,9 @@ export class ComponentHead<TProps = Record<any, any>> {
    * Default: true */
   entangle = true
 
-  /** disables slot context switch to the parent */
-  disableSwitch = false
+  /** enables slot context switch to the parent
+   * Default: false */
+  enableSwitch = false
 
   /** A callback invoked after auto props get assigned to the component context. */
   onAutoPropsAssigned?: () => void

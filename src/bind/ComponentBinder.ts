@@ -198,7 +198,7 @@ export class ComponentBinder {
         }
 
         const createSwitchContext = (childNodes: ChildNode[]): void => {
-          if (head.disableSwitch) return
+          if (!head.enableSwitch) return
           // we can create the isolated props context for the slot here
           // however it is too early to bind because of r-if and r-for directives
           parser.__scoped(capturedContext, () => {
