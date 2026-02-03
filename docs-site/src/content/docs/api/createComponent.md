@@ -75,6 +75,8 @@ The `createComponent` function returns a component object with the following pro
 
 - The `template` parameter specifies how the component's UI is rendered. You can select an existing element in the DOM, provide HTML content, or use a JSON structure to define the component's structure.
 
+- Component tags can be used in PascalCase, camelCase, or kebab-case (for example, `<MyComponent>`, `<myComponent>`, or `<my-component>`).
+
 - The component context is configured through the `options.context` callback, which defines the behavior and data of your component.
 
 - The `options` parameter allows you to configure various aspects of the component, such as enabling or disabling interpolation, specifying props, setting a default name, or providing the component context.

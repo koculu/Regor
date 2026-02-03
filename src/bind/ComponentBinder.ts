@@ -48,11 +48,12 @@ export class ComponentBinder {
     const registeredComponents = binder.__config.__components
     const registeredComponentsUpperCase = binder.__config.__componentsUpperCase
     const contextComponents = parser.__getComponents()
+    const contextComponentSelectors = parser.__getComponentSelectors()
     const selector = [
       ...registeredComponents.keys(),
-      ...Object.keys(contextComponents),
+      ...contextComponentSelectors,
       ...[...registeredComponents.keys()].map(hyphenate),
-      ...[...Object.keys(contextComponents)].map(hyphenate),
+      ...contextComponentSelectors.map(hyphenate),
     ].join(',')
     if (isNullOrWhitespace(selector)) return
     const list = element.querySelectorAll<HTMLElement>(selector)

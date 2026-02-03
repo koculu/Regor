@@ -94,6 +94,7 @@ HTML:
 ```html
 <div id="app">
   <MyComponent :message="message"></MyComponent>
+  <my-component :message="message"></my-component>
 </div>
 ```
 

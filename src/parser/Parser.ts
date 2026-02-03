@@ -48,6 +48,23 @@ export class Parser {
     return obj
   }
 
+  __getComponentSelectors(): string[] {
+    const selectors: string[] = []
+    const seen = new Set<string>()
+    const componentsList = this.__contexts
+      .map((x) => x.components)
+      .filter((x) => !!x)
+      .reverse()
+    for (const components of componentsList) {
+      for (const key of Object.keys(components)) {
+        if (seen.has(key)) continue
+        seen.add(key)
+        selectors.push(key)
+      }
+    }
+    return selectors
+  }
+
   __parse(
     expression: string,
     isLazy?: IsLazy,
