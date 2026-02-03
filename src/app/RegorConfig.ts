@@ -74,8 +74,6 @@ export class RegorConfig {
 
   useInterpolation = true
 
-  useBracketInterpolation = false
-
   constructor(globalContext?: Record<any, any>) {
     this.setDirectives('r-')
     if (globalContext) {
