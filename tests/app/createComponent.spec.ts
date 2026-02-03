@@ -126,6 +126,27 @@ test('should render empty component', () => {
   )
 })
 
+test('should render components with kebab-case tags', () => {
+  const root = document.createElement('div')
+
+  const myComponent = createComponent(html`<div>kebab</div>`)
+
+  createApp(
+    {
+      components: { myComponent },
+    },
+    {
+      element: root,
+      template: html`<my-component></my-component>`,
+    },
+  )
+
+  htmlEqual(
+    root.innerHTML,
+    html`<!-- begin component: MY-COMPONENT--><div>kebab</div><!-- end component: MY-COMPONENT-->`,
+  )
+})
+
 test('should render nested component with reactive properties', () => {
   const root = document.createElement('div')
 
