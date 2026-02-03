@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { createApp, ref, html, raw, RegorConfig } from '../../src'
+import { createApp, ref, html, raw } from '../../src'
 
 test('hello world', () => {
   const root = document.createElement('div')
@@ -39,10 +39,8 @@ test('click counter', () => {
   )
 })
 
-test('interpolation supports brackets when configured', () => {
+test('interpolation supports bracket syntax', () => {
   const root = document.createElement('div')
-  const config = new RegorConfig()
-  config.useBracketInterpolation = true
   createApp(
     {
       message: ref('hello brackets'),
@@ -51,23 +49,23 @@ test('interpolation supports brackets when configured', () => {
       element: root,
       template: html`<div>[[ message ]]</div>`,
     },
-    config,
   )
 
   expect(root.textContent).toBe('hello brackets')
 })
 
-test('interpolation does not parse brackets by default', () => {
+test('interpolation supports both syntaxes at once', () => {
   const root = document.createElement('div')
   createApp(
     {
-      message: ref('hello brackets'),
+      message: ref('hello'),
+      target: ref('world'),
     },
     {
       element: root,
-      template: html`<div>[[ message ]]</div>`,
+      template: html`<div>{{ message }} [[ target ]]</div>`,
     },
   )
 
-  expect(root.textContent).toBe('[[ message ]]')
+  expect(root.textContent).toBe('hello world')
 })
