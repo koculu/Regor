@@ -47,6 +47,12 @@ This property holds the global context object, which can be used to define globa
 
 This property controls whether Regor should enable interpolation for data binding. When set to `true`, Regor will automatically perform data binding using the `{{ }}` syntax in templates.
 
+### `useBracketInterpolation` (boolean)
+
+- Default: `false`
+
+This property switches interpolation to the `[[ ]]` syntax when set to `true`. When enabled, only `[[ ]]` bindings are parsed (the default `{{ }}` syntax is not processed).
+
 ## Methods
 
 ### `addComponent(...)`
@@ -120,6 +126,7 @@ The `RegorConfig` class provides default configuration values for various proper
 - You can customize global context variables and functions to make them available in Regor templates.
 
 - The `useInterpolation` property enables or disables the use of `{{}}` syntax for data binding in templates.
+- The `useBracketInterpolation` property switches interpolation to `[[ ]]` and disables `{{ }}` parsing while enabled.
 
 - Registering custom components using `addComponent` makes those components available for use in your Regor templates.
 

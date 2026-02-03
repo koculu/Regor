@@ -9,6 +9,7 @@ import { toFragment } from './toFragment'
 import { toJsonTemplate } from './toJsonTemplate'
 import { isHTMLElement } from '../common/common'
 import { isArray, isString } from '../common/is-what'
+import { RegorConfig } from './RegorConfig'
 
 export const createComponent = <TProps = Record<any, any>>(
   template: Template | string,
@@ -46,7 +47,9 @@ export const createComponent = <TProps = Record<any, any>>(
   }
   if (!template.element)
     template.element = document.createDocumentFragment()
-  if (options.useInterpolation ?? true) interpolate(template.element)
+  if (options.useInterpolation ?? true) {
+    interpolate(template.element, options.config ?? RegorConfig.getDefault())
+  }
   const element = template.element
   if (
     !svgHandled &&

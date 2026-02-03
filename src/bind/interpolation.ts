@@ -7,14 +7,25 @@ import { isNullOrWhitespace } from '../common/is-what'
  */
 export const interpolate = (element: Node, config?: RegorConfig): void => {
   if (!element) return
-  const builtInNames = (config ?? RegorConfig.getDefault()).__builtInNames
-  for (const textNode of getTextNodes(element, builtInNames.pre)) {
-    interpolateTextNode(textNode, builtInNames.text)
+  const resolvedConfig = config ?? RegorConfig.getDefault()
+  const builtInNames = resolvedConfig.__builtInNames
+  const start = resolvedConfig.useBracketInterpolation ? '[[' : '{{'
+  const end = resolvedConfig.useBracketInterpolation ? ']]' : '}}'
+  const interpolationRegex = resolvedConfig.useBracketInterpolation
+    ? /(\[\[[^]*?\]\])/g
+    : /({{[^]*?}})/g
+  for (const textNode of getTextNodes(element, builtInNames.pre, start)) {
+    interpolateTextNode(textNode, builtInNames.text, interpolationRegex, start, end)
   }
 }
 
-const interpolationRegex = /({{[^]*?}})/g
-const interpolateTextNode = (textNode: Node, textDirective: string): void => {
+const interpolateTextNode = (
+  textNode: Node,
+  textDirective: string,
+  interpolationRegex: RegExp,
+  start: string,
+  end: string,
+): void => {
   const text = textNode.textContent
   if (!text) return
   const mustacheRegex = interpolationRegex
@@ -26,8 +37,8 @@ const interpolateTextNode = (textNode: Node, textDirective: string): void => {
     if (
       isNullOrWhitespace(parts[0]) &&
       isNullOrWhitespace(parts[2]) &&
-      part.startsWith('{{') &&
-      part.endsWith('}}')
+      part.startsWith(start) &&
+      part.endsWith(end)
     ) {
       const parent = textNode.parentElement
       parent.setAttribute(textDirective, part.substring(2, part.length - 2))
@@ -38,7 +49,7 @@ const interpolateTextNode = (textNode: Node, textDirective: string): void => {
 
   const fragment = document.createDocumentFragment()
   for (const part of parts) {
-    if (part.startsWith('{{') && part.endsWith('}}')) {
+    if (part.startsWith(start) && part.endsWith(end)) {
       const spanTag = document.createElement('span')
       spanTag.setAttribute(textDirective, part.substring(2, part.length - 2))
       fragment.appendChild(spanTag)
@@ -49,11 +60,15 @@ const interpolateTextNode = (textNode: Node, textDirective: string): void => {
   ;(textNode as ChildNode).replaceWith(fragment)
 }
 
-const getTextNodes = (node: Node, preDirective: string): Node[] => {
+const getTextNodes = (
+  node: Node,
+  preDirective: string,
+  start: string,
+): Node[] => {
   const textNodes: Node[] = []
   const traverseTextNodes = (node: Node): void => {
     if (node.nodeType === Node.TEXT_NODE) {
-      if (node.textContent?.includes('{{')) {
+      if (node.textContent?.includes(start)) {
         textNodes.push(node)
       }
     } else {
