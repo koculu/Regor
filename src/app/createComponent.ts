@@ -13,7 +13,7 @@ import { RegorConfig } from './RegorConfig'
 
 export const createComponent = <TProps = Record<any, any>>(
   template: Template | string,
-  options: CreateComponentOptions | string[] = {},
+  options: CreateComponentOptions<TProps> | string[] = {},
 ): Component<TProps> => {
   if (isArray(options)) options = { props: options }
   if (isString(template)) template = { template }
