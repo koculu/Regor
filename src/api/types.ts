@@ -322,7 +322,9 @@ export interface Component<TProps = Record<any, any>> {
 export type OnMounted = () => void
 export type OnUnmounted = () => void
 
-export interface CreateComponentOptions {
+export interface CreateComponentOptions<
+  TProps = Record<any, any>,
+> {
   useInterpolation?: boolean
 
   config?: RegorConfig
@@ -330,7 +332,7 @@ export interface CreateComponentOptions {
   /**
    * A function that defines the Regor context for the component.
    */
-  context?: (head: ComponentHead<any>) => IRegorContext
+  context?: (head: ComponentHead<TProps>) => IRegorContext
 
   inheritAttrs?: boolean
 
