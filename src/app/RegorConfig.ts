@@ -98,7 +98,7 @@ export class RegorConfig {
     return obj
   }
 
-  addComponent<TContext extends IRegorContext = IRegorContext>(
+  addComponent<TContext = IRegorContext>(
     ...components: Array<Component<TContext>>
   ): void {
     for (const component of components) {
@@ -111,11 +111,11 @@ export class RegorConfig {
       }
       this.__components.set(
         capitalize(component.defaultName),
-        component as Component<IRegorContext>,
+        component as unknown as Component<IRegorContext>,
       )
       this.__componentsUpperCase.set(
         capitalize(component.defaultName).toLocaleUpperCase(),
-        component as Component<IRegorContext>,
+        component as unknown as Component<IRegorContext>,
       )
     }
   }

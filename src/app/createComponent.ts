@@ -12,13 +12,13 @@ import { RegorConfig } from './RegorConfig'
 import { toFragment } from './toFragment'
 import { toJsonTemplate } from './toJsonTemplate'
 
-export const createComponent = <TContext extends IRegorContext = IRegorContext>(
+export const createComponent = <TContext = IRegorContext>(
   template: Template | string,
   options: CreateComponentOptions<TContext> | string[] = {},
 ): Component<TContext> => {
   if (isArray(options)) options = { props: options }
   if (isString(template)) template = { template }
-  const context = options.context ?? (() => ({}))
+  const context = options.context ?? (() => ({}) as TContext)
   let svgHandled = false
   if (template.element) {
     const element = template.element as ChildNode
@@ -61,5 +61,5 @@ export const createComponent = <TContext extends IRegorContext = IRegorContext>(
     inheritAttrs: options.inheritAttrs ?? true,
     props: options.props,
     defaultName: options.defaultName,
-  }
+  } satisfies Component<TContext>
 }

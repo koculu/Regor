@@ -1,6 +1,7 @@
 import { test } from 'vitest'
 
 import {
+  Component,
   createApp,
   createComponent,
   html,
@@ -26,7 +27,7 @@ test('should render components with reactive properties', () => {
 
   const app = createApp(
     {
-      components: { myComponent },
+      components: { myComponent } as unknown as Record<string, Component>,
       message: ref('ok'),
     },
     {
@@ -197,7 +198,7 @@ test('should render nested component with reactive properties', () => {
 
   createApp<MyApp>(
     {
-      components: { myComponent },
+      components: { myComponent } as unknown as Record<string, Component>,
       treeItem,
     },
     {

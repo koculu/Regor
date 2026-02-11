@@ -161,7 +161,7 @@ export type ObserveCallback<TValueType> = (
 export type StopObserving = () => void
 
 export declare interface IRegorContext extends Record<string, unknown> {
-  components?: Record<string, Component<never>>
+  components?: Record<string, Component>
   mounted?: () => void
   unmounted?: () => void
 }
@@ -284,14 +284,14 @@ export interface App<TRegorContext extends IRegorContext> {
  *
  * @typeparam TContext - The type of context accepted by the component.
  */
-export interface Component<TContext extends IRegorContext = IRegorContext> {
+export interface Component<TContext = IRegorContext> {
   /**
    * A function that returns the Regor context associated with the component.
    *
    * @param head - Provides information on component mount.
-   * @returns The Regor context.
+   * @returns The component context.
    */
-  context: (head: ComponentHead<TContext>) => IRegorContext
+  context: (head: ComponentHead<TContext>) => TContext
 
   /**
    * The template for the component.
@@ -318,9 +318,7 @@ export interface Component<TContext extends IRegorContext = IRegorContext> {
 export type OnMounted = () => void
 export type OnUnmounted = () => void
 
-export interface CreateComponentOptions<
-  TContext extends IRegorContext = IRegorContext,
-> {
+export interface CreateComponentOptions<TContext = IRegorContext> {
   useInterpolation?: boolean
 
   config?: RegorConfig
