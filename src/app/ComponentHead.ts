@@ -2,8 +2,8 @@ import { type IRegorContext } from '../api/types'
 import { callUnmounted } from '../composition/callUnmounted'
 import { removeNode } from '../cleanup/removeNode'
 
-export class ComponentHead<TProps = Record<any, any>> {
-  props: TProps
+export class ComponentHead<TContext extends IRegorContext = IRegorContext> {
+  props: TContext
 
   start: Comment
 
@@ -36,7 +36,7 @@ export class ComponentHead<TProps = Record<any, any>> {
   __element: Element
 
   constructor(
-    props: TProps,
+    props: TContext,
     element: Element,
     ctx: IRegorContext[],
     start: Comment,
@@ -50,9 +50,9 @@ export class ComponentHead<TProps = Record<any, any>> {
   }
 
   /** use arrow syntax to be called without using head.emit.bind(head) in Binder.ts. */
-  emit = (event: string, args: Record<any, any>): void => {
+  emit = (event: string, args: Record<string, unknown>): void => {
     this.__element.dispatchEvent(
-      new CustomEvent<Record<any, any>>(event, { detail: args }),
+      new CustomEvent<Record<string, unknown>>(event, { detail: args }),
     )
   }
 
@@ -63,6 +63,6 @@ export class ComponentHead<TProps = Record<any, any>> {
       removeNode(next)
       next = next.nextSibling
     }
-    callUnmounted(this)
+    for (const ctx of this.ctx) callUnmounted(ctx)
   }
 }

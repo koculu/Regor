@@ -88,8 +88,8 @@ export class ComponentBinder {
       const getProps = (
         component: HTMLElement,
         capturedContext: any[],
-      ): Record<any, any> => {
-        const props: Record<any, any> = {}
+      ): Record<string, unknown> => {
+        const props: Record<string, unknown> = {}
         const hasProps = component.hasAttribute(propsName)
         const hasPropsOnce = component.hasAttribute(propsOnceName)
         parser.__scoped(capturedContext, () => {
@@ -131,7 +131,7 @@ export class ComponentBinder {
       const capturedContext = [...parser.__capture()]
       const createComponentCtx = (): {
         componentCtx: IRegorContext
-        head: ComponentHead<Record<any, any>>
+        head: ComponentHead<Record<string, unknown>>
       } => {
         const props = getProps(component, capturedContext)
         const head = new ComponentHead(

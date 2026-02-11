@@ -139,8 +139,10 @@ export class Binder {
       if (!parent) return true
       const placeholder = new Comment(`teleported => '${valueExpression}'`)
       parent.insertBefore(placeholder, el)
-      ;(el as any).teleportedFrom = placeholder
-      ;(placeholder as any).teleportedTo = el
+      ;(el as HTMLElement & { teleportedFrom: Node }).teleportedFrom =
+        placeholder
+      ;(placeholder as Comment & { teleportedTo: HTMLElement }).teleportedTo =
+        el
       addUnbinder(placeholder, () => {
         removeNode(el)
       })

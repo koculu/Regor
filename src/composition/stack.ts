@@ -60,6 +60,6 @@ export const setScope = (context: IRegorContext): void => {
  * @internal
  */
 export const getScope = (context: IRegorContext): ComposableScope => {
-  const data = context as any
+  const data = context as { [scopeSymbol]: ComposableScope }
   return data[scopeSymbol] as ComposableScope
 }

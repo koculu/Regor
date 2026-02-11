@@ -11,14 +11,14 @@ export class MountList {
    * when the values are not duplicated.
    * Hence, will keep the valueMap for optimized lookups if possible
    */
-  __valueMap = new Map<any, MountListItem>()
+  __valueMap = new Map<unknown, MountListItem>()
 
   get __length(): number {
     return this.__list.length
   }
 
-  __getKey: (v: any) => any
-  constructor(getKey: (v: any) => any) {
+  __getKey: (v: unknown) => unknown
+  constructor(getKey: (v: unknown) => unknown) {
     this.__getKey = getKey
   }
 
@@ -35,7 +35,7 @@ export class MountList {
   /**
    * @internal
    */
-  static __createItem(index: SRef<number>, value: any): MountListItem {
+  static __createItem(index: SRef<number>, value: unknown): MountListItem {
     return {
       items: [],
       index,
@@ -82,11 +82,11 @@ export class MountList {
     this.__list.splice(index)
   }
 
-  __isValueMounted(value: any): boolean {
+  __isValueMounted(value: unknown): boolean {
     return this.__valueMap.has(value)
   }
 
-  __lookupValueOrderIfMounted(value: any): number {
+  __lookupValueOrderIfMounted(value: unknown): number {
     const item = this.__valueMap.get(value)
     return item?.order ?? -1
   }

@@ -80,5 +80,5 @@ export const isArray = Array.isArray
 /**
  * @internal
  */
-export const isObject = (val: unknown): val is Record<any, any> =>
+export const isObject = (val: unknown): val is Record<string, unknown> =>
   val !== null && typeof val === 'object'

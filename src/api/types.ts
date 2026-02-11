@@ -67,95 +67,91 @@ export interface RawMarker {
 export type RefContent<TValueType> = TValueType extends undefined
   ? never
   : TValueType extends Ref<infer V1>
-  ? RefContent<V1>
-  : TValueType extends SRef<infer V2>
-  ? V2
-  : TValueType extends Array<infer V3>
-  ? Array<Ref<RefParam<V3>>>
-  : TValueType extends RawTypes
-  ? TValueType
-  : {
-      [Key in keyof TValueType]: Key extends symbol
-        ? TValueType[Key]
-        : TValueType[Key] extends Ref<infer V4>
-        ? Ref<RefParam<V4>>
-        : TValueType[Key] extends SRef<infer V5>
-        ? Ref<RefParam<V5>>
-        : TValueType[Key] extends RawMarker
-        ? TValueType[Key]
-        : Ref<RefParam<TValueType[Key]>>
-    }
+    ? RefContent<V1>
+    : TValueType extends SRef<infer V2>
+      ? V2
+      : TValueType extends Array<infer V3>
+        ? Array<Ref<RefParam<V3>>>
+        : TValueType extends RawTypes
+          ? TValueType
+          : {
+              [Key in keyof TValueType]: Key extends symbol
+                ? TValueType[Key]
+                : TValueType[Key] extends Ref<infer V4>
+                  ? Ref<RefParam<V4>>
+                  : TValueType[Key] extends SRef<infer V5>
+                    ? Ref<RefParam<V5>>
+                    : TValueType[Key] extends RawMarker
+                      ? TValueType[Key]
+                      : Ref<RefParam<TValueType[Key]>>
+            }
 
-export type RefParam<TValueType> = Equals<
-  TValueType,
-  MakeRefParam<TValueType>
-> extends true
-  ? TValueType
-  : MakeRefParam<TValueType>
+export type RefParam<TValueType> =
+  Equals<TValueType, MakeRefParam<TValueType>> extends true
+    ? TValueType
+    : MakeRefParam<TValueType>
 
 export type MakeRefParam<TValueType> = TValueType extends undefined
   ? never
   : TValueType extends Ref<infer V1>
-  ? MakeRefParam<V1>
-  : TValueType extends SRef<infer V2>
-  ? MakeRefParam<V2>
-  : TValueType extends Array<infer V3>
-  ? Array<MakeRefParam<V3>>
-  : TValueType extends RawTypes
-  ? TValueType
-  : {
-      [Key in keyof TValueType]: TValueType[Key] extends Ref<infer V4>
-        ? MakeRefParam<V4>
-        : TValueType[Key] extends SRef<infer V5>
-        ? MakeRefParam<V5>
-        : MakeRefParam<TValueType[Key]>
-    }
+    ? MakeRefParam<V1>
+    : TValueType extends SRef<infer V2>
+      ? MakeRefParam<V2>
+      : TValueType extends Array<infer V3>
+        ? Array<MakeRefParam<V3>>
+        : TValueType extends RawTypes
+          ? TValueType
+          : {
+              [Key in keyof TValueType]: TValueType[Key] extends Ref<infer V4>
+                ? MakeRefParam<V4>
+                : TValueType[Key] extends SRef<infer V5>
+                  ? MakeRefParam<V5>
+                  : MakeRefParam<TValueType[Key]>
+            }
 
-export type SRefContent<TValueType> = Equals<
-  TValueType,
-  MakeSRefContent<TValueType>
-> extends true
-  ? TValueType
-  : MakeSRefContent<TValueType>
+export type SRefContent<TValueType> =
+  Equals<TValueType, MakeSRefContent<TValueType>> extends true
+    ? TValueType
+    : MakeSRefContent<TValueType>
 
 export type MakeSRefContent<TValueType> = TValueType extends undefined
   ? never
   : TValueType extends Ref<infer V1>
-  ? RefContent<V1>
-  : TValueType extends SRef<infer V2>
-  ? V2
-  : TValueType extends Array<infer V3>
-  ? V3[]
-  : TValueType extends RawTypes
-  ? TValueType
-  : TValueType
+    ? RefContent<V1>
+    : TValueType extends SRef<infer V2>
+      ? V2
+      : TValueType extends Array<infer V3>
+        ? V3[]
+        : TValueType extends RawTypes
+          ? TValueType
+          : TValueType
 
-export type UnwrapRef<TRef> = TRef extends Ref<infer V1>
-  ? RefContent<V1>
-  : TRef extends SRef<infer V2>
-  ? SRefContent<V2>
-  : TRef
+export type UnwrapRef<TRef> =
+  TRef extends Ref<infer V1>
+    ? RefContent<V1>
+    : TRef extends SRef<infer V2>
+      ? SRefContent<V2>
+      : TRef
 
-export type FlattenRef<TRef> = TRef extends Array<infer V1>
-  ? Array<FlattenRef<V1>>
-  : TRef extends Ref<infer V2>
-  ? FlattenRef<V2>
-  : TRef extends SRef<infer V3>
-  ? FlattenRef<V3>
-  : TRef extends AnyRef
-  ? unknown
-  : TRef extends RawTypes
-  ? TRef
-  : {
-      [Key in keyof TRef]: FlattenRef<TRef[Key]>
-    }
+export type FlattenRef<TRef> =
+  TRef extends Array<infer V1>
+    ? Array<FlattenRef<V1>>
+    : TRef extends Ref<infer V2>
+      ? FlattenRef<V2>
+      : TRef extends SRef<infer V3>
+        ? FlattenRef<V3>
+        : TRef extends AnyRef
+          ? unknown
+          : TRef extends RawTypes
+            ? TRef
+            : {
+                [Key in keyof TRef]: FlattenRef<TRef[Key]>
+              }
 
-export type Flat<TValueType> = Equals<
-  RefParam<TValueType>,
-  FlattenRef<TValueType>
-> extends true
-  ? RefParam<TValueType>
-  : FlattenRef<TValueType>
+export type Flat<TValueType> =
+  Equals<RefParam<TValueType>, FlattenRef<TValueType>> extends true
+    ? RefParam<TValueType>
+    : FlattenRef<TValueType>
 
 export type ObserveCallback<TValueType> = (
   newValue: TValueType,
@@ -164,8 +160,8 @@ export type ObserveCallback<TValueType> = (
 
 export type StopObserving = () => void
 
-export declare interface IRegorContext extends Record<any, any> {
-  components?: Record<string, Component<any>>
+export declare interface IRegorContext extends Record<string, unknown> {
+  components?: Record<string, Component<never>>
   mounted?: () => void
   unmounted?: () => void
 }
@@ -206,7 +202,7 @@ export interface Directive {
 
 export interface BindData {
   unbinders: Unbinder[]
-  data: Record<any, any>
+  data: Record<string, unknown>
 }
 
 export type Unbinder = () => void
@@ -215,7 +211,7 @@ export interface ParseResult {
   value: SRef<unknown[]>
   stop: StopObserving
   refs: Array<AnyRef | undefined>
-  context: Record<any, any>
+  context: Record<string, unknown>
 }
 
 export type OnCleanup = (cleanup: () => void) => void
@@ -286,16 +282,16 @@ export interface App<TRegorContext extends IRegorContext> {
 /**
  * Represents a component in the Regor framework.
  *
- * @typeparam TProps - The type of props accepted by the component.
+ * @typeparam TContext - The type of context accepted by the component.
  */
-export interface Component<TProps = Record<any, any>> {
+export interface Component<TContext extends IRegorContext = IRegorContext> {
   /**
    * A function that returns the Regor context associated with the component.
    *
    * @param head - Provides information on component mount.
    * @returns The Regor context.
    */
-  context: (head: ComponentHead<TProps>) => IRegorContext
+  context: (head: ComponentHead<TContext>) => IRegorContext
 
   /**
    * The template for the component.
@@ -323,7 +319,7 @@ export type OnMounted = () => void
 export type OnUnmounted = () => void
 
 export interface CreateComponentOptions<
-  TProps = Record<any, any>,
+  TContext extends IRegorContext = IRegorContext,
 > {
   useInterpolation?: boolean
 
@@ -332,7 +328,7 @@ export interface CreateComponentOptions<
   /**
    * A function that defines the Regor context for the component.
    */
-  context?: (head: ComponentHead<TProps>) => IRegorContext
+  context?: (head: ComponentHead<TContext>) => TContext
 
   inheritAttrs?: boolean
 
@@ -391,7 +387,7 @@ export enum RefOperation {
  */
 export interface MountListItem {
   items: ChildNode[]
-  value: any
+  value: unknown
   index: SRef<number>
   order: number
 }

@@ -99,7 +99,7 @@ const createLazyContext = (
 ): Context | undefined => {
   if (!e) return context
 
-  const ctx: Record<any, any> = Object.create(context ?? {})
+  const ctx: Record<string, unknown> = Object.create(context ?? {})
   ctx.$event = e
   return ctx
 }
@@ -643,7 +643,7 @@ class RegorEval {
     context?: Context,
   ): any {
     return (...args: any[]) => {
-      const ctx: Record<any, any> = Object.create(context ?? {})
+      const ctx: Record<string, unknown> = Object.create(context ?? {})
       const params = expr.params
       if (params) {
         let i = 0
