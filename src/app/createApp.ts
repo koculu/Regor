@@ -1,23 +1,23 @@
-import { ErrorType, getError } from '../log/errors'
 import {
-  type Scope,
-  type IRegorContext,
-  type Template,
   type App,
+  type IRegorContext,
+  type Scope,
+  type Template,
 } from '../api/types'
 import { Binder } from '../bind/Binder'
-import { Parser } from '../parser/Parser'
-import { RegorConfig } from './RegorConfig'
-import { addUnbinder } from '../cleanup/addUnbinder'
-import { callMounted } from '../composition/callMounted'
-import { callUnmounted } from '../composition/callUnmounted'
 import { interpolate } from '../bind/interpolation'
+import { addUnbinder } from '../cleanup/addUnbinder'
 import { removeNode } from '../cleanup/removeNode'
-import { toFragment } from './toFragment'
 import { unbind } from '../cleanup/unbind'
-import { isScope } from '../composition/useScope'
 import { isElement } from '../common/common'
 import { isString } from '../common/is-what'
+import { callMounted } from '../composition/callMounted'
+import { callUnmounted } from '../composition/callUnmounted'
+import { isScope } from '../composition/useScope'
+import { ErrorType, getError } from '../log/errors'
+import { Parser } from '../parser/Parser'
+import { RegorConfig } from './RegorConfig'
+import { toFragment } from './toFragment'
 
 export const createApp = <TRegorContext extends IRegorContext>(
   context: TRegorContext | Scope<TRegorContext>,

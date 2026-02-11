@@ -1,8 +1,8 @@
-import { removeNode } from '../cleanup/removeNode'
-import { type Binder } from '../bind/Binder'
-import { isElseNode } from '../bind/IfBinder'
 import { type AnyRef } from '../api/types'
 import { type RegorConfig } from '../app/RegorConfig'
+import { type Binder } from '../bind/Binder'
+import { isElseNode } from '../bind/IfBinder'
+import { removeNode } from '../cleanup/removeNode'
 
 /**
  * @internal

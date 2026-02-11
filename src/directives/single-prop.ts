@@ -1,7 +1,7 @@
 import { type Directive, type ParseResult, type Unbinder } from '../api/types'
+import { camelize } from '../common/common'
 import { observe } from '../observer/observe'
 import { isRef } from '../reactivity/isRef'
-import { camelize } from '../common/common'
 
 /**
  * @internal

@@ -1,13 +1,13 @@
-import { isNullOrWhitespace } from '../common/is-what'
 import {
-  type Component,
   type AnyRef,
+  type Component,
   type IsLazy,
   type IsLazyKey,
   type ParseResult,
   type StopObserving,
 } from '../api/types'
 import { type RegorConfig } from '../app/RegorConfig'
+import { isNullOrWhitespace } from '../common/is-what'
 import { warning, WarningType } from '../log/warnings'
 import { observe } from '../observer/observe'
 import { sref } from '../reactivity/sref'

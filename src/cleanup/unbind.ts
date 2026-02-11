@@ -21,6 +21,6 @@ const unbindSingle = (node: Node): void => {
     unbinder()
   }
   bindData.unbinders.splice(0)
-  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+   
   delete (node as any)[bindDataSymbol]
 }

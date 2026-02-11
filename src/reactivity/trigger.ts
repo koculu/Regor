@@ -1,5 +1,5 @@
-import { isArray, isMap, isObject, isSet } from '../common/is-what'
 import { type AnyRef, RefOperation, type SRefSignature } from '../api/types'
+import { isArray, isMap, isObject, isSet } from '../common/is-what'
 import { isRef } from './isRef'
 
 export const trigger = <TValueType extends AnyRef>(

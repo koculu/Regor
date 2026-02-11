@@ -1,5 +1,5 @@
-import { isArray } from '../common/is-what'
 import { type Directive, type ParseResult, type Unbinder } from '../api/types'
+import { isArray } from '../common/is-what'
 
 /**
  * @internal

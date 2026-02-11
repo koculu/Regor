@@ -1,5 +1,5 @@
-import { isArray, isString } from '../common/is-what'
 import { type Directive } from '../api/types'
+import { isArray, isString } from '../common/is-what'
 
 /**
  * @internal

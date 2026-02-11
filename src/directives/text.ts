@@ -1,5 +1,5 @@
-import { isMap, isObject, isSet } from '../common/is-what'
 import { type Directive } from '../api/types'
+import { isMap, isObject, isSet } from '../common/is-what'
 import { flatten } from '../misc/flatten'
 
 /**

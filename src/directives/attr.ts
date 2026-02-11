@@ -1,12 +1,12 @@
+import { type Directive } from '../api/types'
+import { camelize } from '../common/common'
 import {
   isArray,
   isNullOrUndefined,
   isObject,
   isString,
 } from '../common/is-what'
-import { type Directive } from '../api/types'
 import { warning, WarningType } from '../log/warnings'
-import { camelize } from '../common/common'
 
 const xlinkNS = 'http://www.w3.org/1999/xlink'
 

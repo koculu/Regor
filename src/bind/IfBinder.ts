@@ -1,9 +1,6 @@
 import { type StopObserving } from '../api/types'
 import { addUnbinder } from '../cleanup/addUnbinder'
 import { removeNode } from '../cleanup/removeNode'
-import { warning, WarningType } from '../log/warnings'
-import { observe } from '../observer/observe'
-import { type Binder } from './Binder'
 import {
   bindChildNodes,
   findElements,
@@ -11,6 +8,9 @@ import {
   toSelector,
   unmount,
 } from '../common/common'
+import { warning, WarningType } from '../log/warnings'
+import { observe } from '../observer/observe'
+import { type Binder } from './Binder'
 import { setSwitchOwner } from './switch'
 
 interface CollectedElses {

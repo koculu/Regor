@@ -1,6 +1,6 @@
-import { trigger } from './trigger'
 import { type AnyRef } from '../api/types'
 import { batchCollector } from './sref'
+import { trigger } from './trigger'
 
 export const batch = (updater: () => void): void => {
   startBatch()

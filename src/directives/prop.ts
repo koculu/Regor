@@ -1,8 +1,8 @@
-import { isArray, isNullOrUndefined, isObject } from '../common/is-what'
 import { type Directive } from '../api/types'
-import { warning, WarningType } from '../log/warnings'
-import { camelize } from '../common/common'
 import { unbind } from '../cleanup/unbind'
+import { camelize } from '../common/common'
+import { isArray, isNullOrUndefined, isObject } from '../common/is-what'
+import { warning, WarningType } from '../log/warnings'
 
 /**
  * @internal

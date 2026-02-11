@@ -1,16 +1,16 @@
 import {
-  type CreateComponentOptions,
   type Component,
-  type Template,
+  type CreateComponentOptions,
   IRegorContext,
+  type Template,
 } from '../api/types'
-import { ErrorType, getError } from '../log/errors'
 import { interpolate } from '../bind/interpolation'
-import { toFragment } from './toFragment'
-import { toJsonTemplate } from './toJsonTemplate'
 import { isHTMLElement } from '../common/common'
 import { isArray, isString } from '../common/is-what'
+import { ErrorType, getError } from '../log/errors'
 import { RegorConfig } from './RegorConfig'
+import { toFragment } from './toFragment'
+import { toJsonTemplate } from './toJsonTemplate'
 
 export const createComponent = <TContext extends IRegorContext = IRegorContext>(
   template: Template | string,

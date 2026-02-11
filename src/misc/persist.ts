@@ -1,9 +1,9 @@
 import { flatten, ref, watchEffect } from '..'
 import { type AnyRef } from '../api/types'
 import { onUnmounted } from '../composition/onUnmounted'
-import { isDeepRef } from '../reactivity/isDeepRef'
 import { ErrorType, getError } from '../log/errors'
 import { warning, WarningType } from '../log/warnings'
+import { isDeepRef } from '../reactivity/isDeepRef'
 
 export const persist = <TRef extends AnyRef>(
   anyRef: TRef,

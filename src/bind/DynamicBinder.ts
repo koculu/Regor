@@ -1,16 +1,16 @@
-import { isNullOrWhitespace, isObject, isString } from '../common/is-what'
 import { type StopObserving } from '../api/types'
 import { addUnbinder } from '../cleanup/addUnbinder'
 import { removeNode } from '../cleanup/removeNode'
-import { observe } from '../observer/observe'
-import { type Binder } from './Binder'
 import {
   findElements,
   getNodes,
   isTemplate,
-  unmount,
   toSelector,
+  unmount,
 } from '../common/common'
+import { isNullOrWhitespace, isObject, isString } from '../common/is-what'
+import { observe } from '../observer/observe'
+import { type Binder } from './Binder'
 import { setSwitchOwner } from './switch'
 
 const mount = (nodes: ChildNode[], parent: HTMLElement): void => {

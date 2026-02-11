@@ -1,7 +1,7 @@
-import { isNullOrWhitespace } from '../common/is-what'
 import { type Component, type IRegorContext } from '../api/types'
+import { ComponentHead } from '../app/ComponentHead'
 import { addUnbinder } from '../cleanup/addUnbinder'
-import { type Binder } from './Binder'
+import { unbind } from '../cleanup/unbind'
 import {
   bindChildNodes,
   camelize,
@@ -12,18 +12,18 @@ import {
   isTemplate,
   normalizeAttributeName,
 } from '../common/common'
-import { addSwitch, refSwitch, removeSwitch, rswitch } from './switch'
+import { isNullOrWhitespace } from '../common/is-what'
+import { callMounted } from '../composition/callMounted'
+import { callUnmounted } from '../composition/callUnmounted'
+import { useScope } from '../composition/useScope'
 import { propsDirective } from '../directives/props'
 import { propsOnceDirective } from '../directives/props-once'
-import { ComponentHead } from '../app/ComponentHead'
-import { useScope } from '../composition/useScope'
-import { isRef } from '../reactivity/isRef'
-import { entangle } from '../reactivity/entangle'
-import { unref } from '../reactivity/unref'
-import { callUnmounted } from '../composition/callUnmounted'
-import { unbind } from '../cleanup/unbind'
-import { callMounted } from '../composition/callMounted'
 import { singlePropDirective } from '../directives/single-prop'
+import { entangle } from '../reactivity/entangle'
+import { isRef } from '../reactivity/isRef'
+import { unref } from '../reactivity/unref'
+import { type Binder } from './Binder'
+import { addSwitch, refSwitch, removeSwitch, rswitch } from './switch'
 
 /**
  * @internal

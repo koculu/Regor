@@ -968,7 +968,7 @@ class Jsep {
         )
       ) {
         if (!updateNodeTypes.includes(env.node.type)) {
-          // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+           
           throw this.__getError(msgUnexpected + env.node.operator)
         }
         this.__index += 2

@@ -1,12 +1,12 @@
-import { observe } from '../observer/observe'
 import { type AnyRef, type ComputedRef, type UnwrapRef } from '../api/types'
-import { sref } from '../reactivity/sref'
 import { defineRefValue } from '../common/common'
-import { ErrorType, getError } from '../log/errors'
-import { type ComputedOnce } from './computed'
-import { trigger } from '../reactivity/trigger'
-import { srefSymbol } from '../reactivity/refSymbols'
 import { onUnmounted } from '../composition/onUnmounted'
+import { ErrorType, getError } from '../log/errors'
+import { observe } from '../observer/observe'
+import { srefSymbol } from '../reactivity/refSymbols'
+import { sref } from '../reactivity/sref'
+import { trigger } from '../reactivity/trigger'
+import { type ComputedOnce } from './computed'
 
 export const computeRef = <TValueType extends AnyRef, TReturnType>(
   source: TValueType,

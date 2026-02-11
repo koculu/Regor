@@ -1,6 +1,6 @@
 import { type IRegorContext } from '../api/types'
-import { callUnmounted } from '../composition/callUnmounted'
 import { removeNode } from '../cleanup/removeNode'
+import { callUnmounted } from '../composition/callUnmounted'
 
 export class ComponentHead<TContext extends IRegorContext = IRegorContext> {
   props: TContext

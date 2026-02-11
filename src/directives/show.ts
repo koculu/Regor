@@ -1,6 +1,6 @@
-import { isUndefined } from '../common/is-what'
 import { type Directive } from '../api/types'
 import { getBindData } from '../cleanup/getBindData'
+import { isUndefined } from '../common/is-what'
 
 /**
  * @internal

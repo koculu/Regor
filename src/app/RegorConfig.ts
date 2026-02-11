@@ -1,5 +1,5 @@
 import { warningHandler } from '..'
-import { type Directive, type Component, IRegorContext } from '../api/types'
+import { type Component, type Directive, IRegorContext } from '../api/types'
 import { capitalize } from '../common/common'
 import { attrDirective } from '../directives/attr'
 import { classDirective } from '../directives/class'
