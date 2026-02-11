@@ -8,7 +8,7 @@ import { isUndefined } from '../common/is-what'
 export const showDirective: Directive = {
   onChange: (el: HTMLElement, values: any[]) => {
     const data = getBindData(el).data
-    let originalDisplay = data._ord
+    let originalDisplay = data._ord as string
     if (isUndefined(originalDisplay)) {
       originalDisplay = data._ord = el.style.display
     }

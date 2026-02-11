@@ -179,7 +179,6 @@ const binaryPrecedence = (opVal: BinaryOperator): number => {
 type HookFunction = (env: HookResult) => void
 class Jsep {
   __hooks: {
-    // eslint-disable-next-line @typescript-eslint/ban-types
     [K in HookType]: HookFunction[]
   } = {
     [HookType.gobbleExpression]: [this.__gobbleEmptyArrowArg],
@@ -253,6 +252,7 @@ class Jsep {
     const hookFn = (f: HookFunction): void => {
       f.call(this, env)
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     hookCalltype === HookCallType.All ? hook.forEach(hookFn) : hook.find(hookFn)
     return env.node
   }
@@ -864,7 +864,7 @@ class Jsep {
    * Responsible for parsing Array literals `[1, 2, 3]`
    * This function assumes that it needs to gobble the opening bracket
    * and then tries to gobble the expressions as arguments.
-   * @returns {this.ArrayExpression}
+   * @returns array expression
    */
   __gobbleArray(): ArrayExpression {
     this.__index++
@@ -968,7 +968,6 @@ class Jsep {
         )
       ) {
         if (!updateNodeTypes.includes(env.node.type)) {
-           
           throw this.__getError(msgUnexpected + env.node.operator)
         }
         this.__index += 2

@@ -66,10 +66,10 @@ export const silence = <TReturnType>(
   const len = collectedRefs.length
   const hasPush = len > 0 && collectedRefs[len - 1]
   try {
-    hasPush && collectedRefs.push(null)
+    if (hasPush) collectedRefs.push(null)
     return action()
   } finally {
-    hasPush && collectedRefs.pop()
+    if (hasPush) collectedRefs.pop()
   }
 }
 

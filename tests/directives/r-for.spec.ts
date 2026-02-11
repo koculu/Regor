@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest'
-import { createApp, ref, html, raw, unref } from '../../src'
+
+import { createApp, html, ref, unref } from '../../src'
 
 test('should mount the people into reactive divs.', () => {
   const root = document.createElement('div')

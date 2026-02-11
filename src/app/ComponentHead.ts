@@ -17,7 +17,7 @@ export class ComponentHead<TContext extends IRegorContext = IRegorContext> {
 
   /** When both autoProps and entangle are enabled,
    * the refs defined in the component context (without using head.props)
-   * become entangled with the head.props refs. (parent[ref] <==> component[ref])
+   * become entangled with the head.props refs. (parent[ref] `<==>` component[ref])
    * This means that changes to parent[ref] reflect in component[ref], and vice versa.
    * Disable this flag to isolate refs created within the component context.
    * Default: true */

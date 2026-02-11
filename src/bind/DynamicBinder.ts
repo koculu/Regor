@@ -116,7 +116,7 @@ export class DynamicBinder {
               (x) => x[1] === (name as unknown),
             )[0]?.[0]
           } else {
-            name = name.name
+            name = name.name as string
           }
         }
         if (!isString(name) || isNullOrWhitespace(name)) {

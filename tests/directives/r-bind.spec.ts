@@ -1,4 +1,5 @@
 import { test } from 'vitest'
+
 import { createApp, html, raw, ref } from '../../src'
 import { htmlEqual } from '../common/html-equal'
 

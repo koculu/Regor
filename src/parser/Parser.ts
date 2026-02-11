@@ -105,7 +105,7 @@ export class Parser {
           context,
           collectRefObj,
         )
-        collectRefs && refs.push(...r.refs)
+        if (collectRefs) refs.push(...r.refs)
         return { value: r.value, refs: r.refs, ref: r.ref }
       } catch (e) {
         warning(WarningType.ErrorLog, `evaluation error: ${expression}`, e)

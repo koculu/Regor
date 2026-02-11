@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest'
-import { createApp, ref, html, raw } from '../../src'
+
+import { createApp, html, raw, ref } from '../../src'
 
 test('hello world', () => {
   const root = document.createElement('div')

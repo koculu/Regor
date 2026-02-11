@@ -1,5 +1,6 @@
 import { GlobalRegistrator } from '@happy-dom/global-registrator'
 import { beforeEach } from 'vitest'
+
 import { RegorConfig } from '../src/'
 GlobalRegistrator.register()
 

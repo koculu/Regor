@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest'
-import { batch, startBatch, endBatch, ref, observe } from '../../src'
+
+import { batch, endBatch, observe, ref, startBatch } from '../../src'
 
 test('batch triggers observers once', () => {
   const r = ref(0)

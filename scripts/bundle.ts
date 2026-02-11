@@ -1,6 +1,7 @@
-import { Builder } from './Builder'
-import fs from 'fs'
 import { Format, Platform } from 'esbuild'
+import fs from 'fs'
+
+import { Builder } from './Builder'
 
 fs.rm(
   'dist',
@@ -51,7 +52,7 @@ const bundle = async (minify: boolean) => {
   }
 
   for (const target of targets.split(',')) {
-    const p = bundleWithOptions(
+    bundleWithOptions(
       'src/index.ts',
       `dist/regor.${target}.cjs.${prod}`,
       'browser',

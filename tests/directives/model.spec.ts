@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest'
-import { createApp, ref, html } from '../../src'
+
+import { createApp, html, ref } from '../../src'
 
 test('r-model expression flag int converts input to integer', () => {
   const root = document.createElement('div')
@@ -30,7 +31,10 @@ test('r-model trim flag removes whitespace', () => {
 test('r-model.lazy updates only on change', () => {
   const root = document.createElement('div')
   const val = ref('')
-  createApp({ val }, { element: root, template: html`<input r-model.lazy="val" />` })
+  createApp(
+    { val },
+    { element: root, template: html`<input r-model.lazy="val" />` },
+  )
   const input = root.querySelector('input') as HTMLInputElement
   input.value = 'a'
   input.dispatchEvent(new Event('input'))
@@ -66,7 +70,9 @@ test('r-model with checkboxes populates array', () => {
         <input type="checkbox" value="b" r-model="selected" />`,
     },
   )
-  const [c1, c2] = root.querySelectorAll('input') as NodeListOf<HTMLInputElement>
+  const [c1, c2] = root.querySelectorAll(
+    'input',
+  ) as NodeListOf<HTMLInputElement>
   c1.checked = true
   c1.dispatchEvent(new Event('change'))
   expect(JSON.stringify(selected())).toBe('["a"]')

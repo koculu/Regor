@@ -1,15 +1,16 @@
 import { expect, test } from 'vitest'
+
 import {
-  ref,
-  isDeepRef,
-  pause,
-  resume,
   entangle,
-  watchEffect,
+  isDeepRef,
   isRef,
+  observe,
+  pause,
+  ref,
+  resume,
   sref,
   unref,
-  observe,
+  watchEffect,
 } from '../../src'
 
 test('pause and resume', () => {

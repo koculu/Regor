@@ -24,7 +24,7 @@ export const bindChildNodes = (
 ): void => {
   for (const child of childNodes) {
     // r-if binding can remove sibling else nodes
-    !isElseNode(child) && binder.__bindDefault(child as Element)
+    if (!isElseNode(child)) binder.__bindDefault(child as Element)
   }
 }
 

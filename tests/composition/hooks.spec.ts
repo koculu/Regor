@@ -1,4 +1,5 @@
 import { expect, test } from 'vitest'
+
 import { onMounted, onUnmounted, useScope } from '../../src'
 import { callMounted } from '../../src/composition/callMounted'
 import { callUnmounted } from '../../src/composition/callUnmounted'

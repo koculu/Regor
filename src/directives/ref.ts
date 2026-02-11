@@ -16,7 +16,7 @@ export const refDirective: Directive = {
     return () => {
       if (isAnArray) {
         const i = value.indexOf(el)
-        i !== -1 && value.splice(i, 1)
+        if (i !== -1) value.splice(i, 1)
       } else sref?.(null)
     }
   },

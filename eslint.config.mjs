@@ -5,6 +5,9 @@ import tsdocPlugin from 'eslint-plugin-tsdoc'
 import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
+  {
+    ignores: ['dist/**', 'node_modules/**', 'build/**', 'docs-site/**'],
+  },
   eslint.configs.recommended,
   tseslint.configs.recommended,
   {
@@ -16,6 +19,7 @@ export default tseslint.config(
     rules: {
       'simple-import-sort/imports': 'error',
       'simple-import-sort/exports': 'error',
+      '@typescript-eslint/no-explicit-any': 'off',
       '@stylistic/no-multiple-empty-lines': [
         'error',
         {
@@ -26,6 +30,14 @@ export default tseslint.config(
       ],
       'eol-last': ['error', 'always'], // add single empty line at the end of the file
       'eslint-plugin-tsdoc/syntax': 'error',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
     },
-  }
+  },
 )

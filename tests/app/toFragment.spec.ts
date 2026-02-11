@@ -1,4 +1,5 @@
 import { expect, test } from 'vitest'
+
 import { toFragment, toJsonTemplate } from '../../src'
 
 // Verify rendering from JSONTemplate

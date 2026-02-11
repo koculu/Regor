@@ -123,5 +123,5 @@ export const patchProp = (el: any, key: string, value: any): void => {
       warning(WarningType.PropertyAssignmentFailed, key, tag, value, e)
     }
   }
-  needRemove && el.removeAttribute(key)
+  if (needRemove) el.removeAttribute(key)
 }

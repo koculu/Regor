@@ -25,7 +25,7 @@ export const trigger = <TValueType extends AnyRef>(
   }
   if (isObject(obj)) {
     for (const k in obj) {
-      trigger(obj[k], eventSource, true)
+      trigger(obj[k] as any, eventSource, true)
     }
   }
 }

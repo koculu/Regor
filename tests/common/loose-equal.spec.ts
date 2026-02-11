@@ -1,5 +1,10 @@
 import { expect, test } from 'vitest'
-import { looseEqual, looseIndexOf, looseToNumber } from '../../src/common/looseEqual'
+
+import {
+  looseEqual,
+  looseIndexOf,
+  looseToNumber,
+} from '../../src/common/looseEqual'
 
 test('looseEqual compares values deeply', () => {
   expect(looseEqual(1, 1)).toBe(true)

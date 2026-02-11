@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest'
-import { Ref, SRef, isRef, ref, sref, unref, watchEffect } from '../../src'
+
+import { isRef, Ref, ref, SRef, sref, unref, watchEffect } from '../../src'
 
 test('should hold a value', () => {
   const a = sref(1)
@@ -233,6 +234,7 @@ test('should merge nested srefs into single sref.', () => {
   ref3().foo++
 
   // nested optional properties are correctly typed recursively
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
   ref2().nested?.nested?.value
 
   expect(typeof source.foo).toBe('number')

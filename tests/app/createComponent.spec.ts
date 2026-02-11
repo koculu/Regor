@@ -1,10 +1,11 @@
 import { test } from 'vitest'
+
 import {
-  IRegorContext,
-  Ref,
   createApp,
   createComponent,
   html,
+  IRegorContext,
+  Ref,
   ref,
 } from '../../src'
 import { htmlEqual } from '../common/html-equal'
@@ -143,7 +144,9 @@ test('should render components with kebab-case tags', () => {
 
   htmlEqual(
     root.innerHTML,
-    html`<!-- begin component: MY-COMPONENT--><div>kebab</div><!-- end component: MY-COMPONENT-->`,
+    html`<!-- begin component: MY-COMPONENT-->
+      <div>kebab</div>
+      <!-- end component: MY-COMPONENT-->`,
   )
 })
 

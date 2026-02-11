@@ -7,7 +7,7 @@ export type Equals<T, U> = T extends U ? (U extends T ? true : false) : false
 
 type RawTypes =
   | string
-  // eslint-disable-next-line @typescript-eslint/ban-types
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   | Function
   | number
   | boolean
@@ -335,7 +335,7 @@ export interface CreateComponentOptions<
   /**
    * Notes on component props:
    * The props defined in the props list can be used with :foo or r-bind:foo syntax.
-   * <MyComponent :prop-kebab-1="1" r-bind:prop-kebab-2="x ? 1 : 0" :props="{ propFoo3: true, propFoo4: x ? 'a' : 'b' }></MyComponent>
+   * `<MyComponent :prop-kebab-1="1" r-bind:prop-kebab-2="x ? 1 : 0" :props="{ propFoo3: true, propFoo4: x ? 'a' : 'b' }></MyComponent>`
    * It is required to define prop-kebab-1 and prop-kebab-2 in the props list camelized.
    * It is not required to define propFoo3 and propFoo4 in the props list because it uses :props binding. :props binding enables binding to any property of component regardless it is explicitly defined in props list.
    */
@@ -351,6 +351,7 @@ export interface Scope<TRegorContext> {
   context: TRegorContext
   unmount: () => void
   [ScopeSymbol]: true
+  [key: string]: unknown
 }
 
 /**
