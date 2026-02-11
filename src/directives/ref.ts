@@ -1,5 +1,5 @@
-import { isArray } from '../common/is-what'
 import { type Directive, type ParseResult, type Unbinder } from '../api/types'
+import { isArray } from '../common/is-what'
 
 /**
  * @internal
@@ -16,7 +16,7 @@ export const refDirective: Directive = {
     return () => {
       if (isAnArray) {
         const i = value.indexOf(el)
-        i !== -1 && value.splice(i, 1)
+        if (i !== -1) value.splice(i, 1)
       } else sref?.(null)
     }
   },

@@ -1,4 +1,5 @@
 import { expect, test } from 'vitest'
+
 import { computeMany, computeRef, ref } from '../../src'
 
 // computeMany should derive values from multiple refs

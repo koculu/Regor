@@ -1,7 +1,7 @@
-import { isArray, isString } from '../common/is-what'
 import { type Directive } from '../api/types'
 import { getBindData } from '../cleanup/getBindData'
 import { camelize, capitalize, hyphenate } from '../common/common'
+import { isArray, isString } from '../common/is-what'
 
 /**
  * @internal

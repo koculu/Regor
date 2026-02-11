@@ -28,9 +28,8 @@ export const refSwitch = (id: string): void => {
  */
 export const removeSwitch = (id: string): void => {
   if (--switchCounter[id] === 0) {
-    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
     delete switches[id]
-    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+
     delete switchCounter[id]
   }
 }

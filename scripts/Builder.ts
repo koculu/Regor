@@ -1,4 +1,5 @@
 import esbuild, { BuildOptions } from 'esbuild'
+
 import { getArgument } from './Utility'
 
 const watch = getArgument('--watch') ? '--watch' : ''

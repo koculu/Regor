@@ -1,6 +1,6 @@
-import { isUndefined } from '../common/is-what'
 import { type Directive } from '../api/types'
 import { getBindData } from '../cleanup/getBindData'
+import { isUndefined } from '../common/is-what'
 
 /**
  * @internal
@@ -8,7 +8,7 @@ import { getBindData } from '../cleanup/getBindData'
 export const showDirective: Directive = {
   onChange: (el: HTMLElement, values: any[]) => {
     const data = getBindData(el).data
-    let originalDisplay = data._ord
+    let originalDisplay = data._ord as string
     if (isUndefined(originalDisplay)) {
       originalDisplay = data._ord = el.style.display
     }

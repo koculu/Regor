@@ -1,4 +1,5 @@
 import { expect, test, vi } from 'vitest'
+
 import { observeMany, observerCount, ref } from '../../src'
 import { observe } from '../../src'
 

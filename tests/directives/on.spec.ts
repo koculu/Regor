@@ -1,10 +1,14 @@
 import { expect, test, vi } from 'vitest'
+
 import { createApp, html } from '../../src'
 
 test('click.left fires only on left button', () => {
   const root = document.createElement('div')
   const handler = vi.fn()
-  createApp({ handler }, { element: root, template: html`<button @click.left="handler"></button>` })
+  createApp(
+    { handler },
+    { element: root, template: html`<button @click.left="handler"></button>` },
+  )
 
   const btn = root.querySelector('button') as HTMLButtonElement
 
@@ -19,7 +23,13 @@ test('click.left fires only on left button', () => {
 test('click.middle fires only on middle button', () => {
   const root = document.createElement('div')
   const handler = vi.fn()
-  createApp({ handler }, { element: root, template: html`<button @click.middle="handler"></button>` })
+  createApp(
+    { handler },
+    {
+      element: root,
+      template: html`<button @click.middle="handler"></button>`,
+    },
+  )
 
   const btn = root.querySelector('button') as HTMLButtonElement
 
@@ -34,7 +44,10 @@ test('click.middle fires only on middle button', () => {
 test('click.right fires only on right button', () => {
   const root = document.createElement('div')
   const handler = vi.fn()
-  createApp({ handler }, { element: root, template: html`<button @click.right="handler"></button>` })
+  createApp(
+    { handler },
+    { element: root, template: html`<button @click.right="handler"></button>` },
+  )
 
   const btn = root.querySelector('button') as HTMLButtonElement
 

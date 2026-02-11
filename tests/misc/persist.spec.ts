@@ -1,4 +1,5 @@
 import { expect, test, vi } from 'vitest'
+
 import { persist, ref, warningHandler } from '../../src'
 import { ErrorType, getError } from '../../src/log/errors'
 
@@ -37,9 +38,7 @@ test('should reset storage on invalid data', () => {
 
 test('should throw when key is empty', () => {
   const r = ref(1)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   expect(() => persist(r as any, '')).toThrowError(
     getError(ErrorType.PersistRequiresKey),
   )
 })
-

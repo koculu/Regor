@@ -1,18 +1,17 @@
-import { isArray, isObject, isSymbol } from '../common/is-what'
-import { isRaw } from '../misc/isRaw'
-import { isRef } from './isRef'
-import { sref } from './sref'
-
 import type {
-  Ref,
   IsNull,
+  Ref,
   RefContent,
   RefParam,
   SRef,
   UnwrapRef,
 } from '../api/types'
-import { refSymbol } from './refSymbols'
+import { isArray, isObject, isSymbol } from '../common/is-what'
+import { isRaw } from '../misc/isRaw'
 import { isDeepRef } from './isDeepRef'
+import { isRef } from './isRef'
+import { refSymbol } from './refSymbols'
+import { sref } from './sref'
 
 /**
  * Converts the given value and its nested properties into ref objects recursively and returns the ref.

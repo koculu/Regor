@@ -1,7 +1,7 @@
 import {
-  RefOperation,
   type AnyRef,
   type ObserveCallback,
+  RefOperation,
   type SRefSignature,
   type StopObserving,
   type UnwrapRef,

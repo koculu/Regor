@@ -1,6 +1,3 @@
-import { trigger } from '../reactivity/trigger'
-import { isArray, isFunction, isSet, isString } from '../common/is-what'
-import { looseEqual, looseIndexOf, looseToNumber } from '../common/looseEqual'
 import {
   type AnyRef,
   type Directive,
@@ -8,10 +5,13 @@ import {
   type SRef,
   type Unbinder,
 } from '../api/types'
-import { WarningType, warning } from '../log/warnings'
+import { isArray, isFunction, isSet, isString } from '../common/is-what'
+import { looseEqual, looseIndexOf, looseToNumber } from '../common/looseEqual'
+import { warning, WarningType } from '../log/warnings'
 import { isRef } from '../reactivity/isRef'
 import { pause } from '../reactivity/pause'
 import { resume } from '../reactivity/resume'
+import { trigger } from '../reactivity/trigger'
 
 /**
  * @internal
@@ -215,7 +215,6 @@ const handleInputAndTextArea = (
           decimalSeparators.test(value[value.length - 1]) &&
           value.split(decimalSeparators).length === 2
         if (endsWithDecimalSeparator) {
-          // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
           value += '0'
           value = parseFloat(value)
           if (isNaN(value)) value = ''

@@ -1,10 +1,12 @@
 import { test } from 'vitest'
+
 import {
-  IRegorContext,
-  Ref,
+  Component,
   createApp,
   createComponent,
   html,
+  IRegorContext,
+  Ref,
   ref,
 } from '../../src'
 import { htmlEqual } from '../common/html-equal'
@@ -25,7 +27,7 @@ test('should render components with reactive properties', () => {
 
   const app = createApp(
     {
-      components: { myComponent },
+      components: { myComponent } as unknown as Record<string, Component>,
       message: ref('ok'),
     },
     {
@@ -143,7 +145,9 @@ test('should render components with kebab-case tags', () => {
 
   htmlEqual(
     root.innerHTML,
-    html`<!-- begin component: MY-COMPONENT--><div>kebab</div><!-- end component: MY-COMPONENT-->`,
+    html`<!-- begin component: MY-COMPONENT-->
+      <div>kebab</div>
+      <!-- end component: MY-COMPONENT-->`,
   )
 })
 
@@ -194,7 +198,7 @@ test('should render nested component with reactive properties', () => {
 
   createApp<MyApp>(
     {
-      components: { myComponent },
+      components: { myComponent } as unknown as Record<string, Component>,
       treeItem,
     },
     {

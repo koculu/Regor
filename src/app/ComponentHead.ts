@@ -1,9 +1,9 @@
 import { type IRegorContext } from '../api/types'
-import { callUnmounted } from '../composition/callUnmounted'
 import { removeNode } from '../cleanup/removeNode'
+import { callUnmounted } from '../composition/callUnmounted'
 
-export class ComponentHead<TProps = Record<any, any>> {
-  props: TProps
+export class ComponentHead<TContext = IRegorContext> {
+  props: TContext
 
   start: Comment
 
@@ -17,7 +17,7 @@ export class ComponentHead<TProps = Record<any, any>> {
 
   /** When both autoProps and entangle are enabled,
    * the refs defined in the component context (without using head.props)
-   * become entangled with the head.props refs. (parent[ref] <==> component[ref])
+   * become entangled with the head.props refs. (parent[ref] `<==>` component[ref])
    * This means that changes to parent[ref] reflect in component[ref], and vice versa.
    * Disable this flag to isolate refs created within the component context.
    * Default: true */
@@ -36,7 +36,7 @@ export class ComponentHead<TProps = Record<any, any>> {
   __element: Element
 
   constructor(
-    props: TProps,
+    props: TContext,
     element: Element,
     ctx: IRegorContext[],
     start: Comment,
@@ -50,9 +50,9 @@ export class ComponentHead<TProps = Record<any, any>> {
   }
 
   /** use arrow syntax to be called without using head.emit.bind(head) in Binder.ts. */
-  emit = (event: string, args: Record<any, any>): void => {
+  emit = (event: string, args: Record<string, unknown>): void => {
     this.__element.dispatchEvent(
-      new CustomEvent<Record<any, any>>(event, { detail: args }),
+      new CustomEvent<Record<string, unknown>>(event, { detail: args }),
     )
   }
 
@@ -63,6 +63,6 @@ export class ComponentHead<TProps = Record<any, any>> {
       removeNode(next)
       next = next.nextSibling
     }
-    callUnmounted(this)
+    for (const ctx of this.ctx) callUnmounted(ctx)
   }
 }

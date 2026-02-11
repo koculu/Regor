@@ -1,10 +1,11 @@
 import { expect, expectTypeOf, test, vi } from 'vitest'
+
 import {
-  ComputedRef,
-  Ref,
   computed,
+  ComputedRef,
   flatten,
   observe,
+  Ref,
   ref,
   useScope,
   watchEffect,
@@ -143,7 +144,7 @@ test('should no longer update when stopped', () => {
 })
 
 test('should invalidate before non-computed effects', () => {
-  let plusOneValues: number[] = []
+  const plusOneValues: number[] = []
   const n = ref(0)
   const plusOne = computed(() => n.value + 1)
   watchEffect(() => {
@@ -151,6 +152,7 @@ test('should invalidate before non-computed effects', () => {
     plusOneValues.push(plusOne.value)
   })
   // access plusOne, causing it to be non-dirty
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
   plusOne.value
   // mutate n
   n.value++

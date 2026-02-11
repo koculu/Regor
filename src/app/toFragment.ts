@@ -1,7 +1,7 @@
 import { type JSONTemplate } from '../api/types'
-import { isArray } from '../common/is-what'
-import { isTemplate, normalizeAttributeName } from '../common/common'
 import { RegorConfig } from '../app/RegorConfig'
+import { isTemplate, normalizeAttributeName } from '../common/common'
+import { isArray } from '../common/is-what'
 
 const svgTags =
   'svg,animate,animateMotion,animateTransform,circle,clipPath,color-profile,' +

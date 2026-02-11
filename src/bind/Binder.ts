@@ -1,25 +1,24 @@
+import type { Directive, ParseResult, StopObserving } from '../api/types'
 import { type RegorConfig } from '../app/RegorConfig'
 import { addUnbinder } from '../cleanup/addUnbinder'
-// import { warning, WarningType } from '../log/warnings'
-import { observe } from '../observer/observe'
-import { type Parser } from '../parser/Parser'
+import { removeNode } from '../cleanup/removeNode'
 import {
   bindChildNodes,
   camelize,
   isOptionDynamic,
   isTemplate,
 } from '../common/common'
-import { ForBinder } from './ForBinder'
-import { IfBinder } from './IfBinder'
-
-import type { Directive, ParseResult, StopObserving } from '../api/types'
-import { getSwitch, hasSwitch, rswitch } from './switch'
-import { DynamicBinder } from './DynamicBinder'
-import { ComponentBinder } from './ComponentBinder'
-import { DirectiveCollector } from './DirectiveCollector'
 import { isNullOrWhitespace } from '../common/is-what'
 import { teleportDirective } from '../directives/teleport'
-import { removeNode } from '../cleanup/removeNode'
+// import { warning, WarningType } from '../log/warnings'
+import { observe } from '../observer/observe'
+import { type Parser } from '../parser/Parser'
+import { ComponentBinder } from './ComponentBinder'
+import { DirectiveCollector } from './DirectiveCollector'
+import { DynamicBinder } from './DynamicBinder'
+import { ForBinder } from './ForBinder'
+import { IfBinder } from './IfBinder'
+import { getSwitch, hasSwitch, rswitch } from './switch'
 
 /**
  * @internal
@@ -139,8 +138,10 @@ export class Binder {
       if (!parent) return true
       const placeholder = new Comment(`teleported => '${valueExpression}'`)
       parent.insertBefore(placeholder, el)
-      ;(el as any).teleportedFrom = placeholder
-      ;(placeholder as any).teleportedTo = el
+      ;(el as HTMLElement & { teleportedFrom: Node }).teleportedFrom =
+        placeholder
+      ;(placeholder as Comment & { teleportedTo: HTMLElement }).teleportedTo =
+        el
       addUnbinder(placeholder, () => {
         removeNode(el)
       })

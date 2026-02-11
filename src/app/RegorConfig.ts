@@ -1,5 +1,5 @@
 import { warningHandler } from '..'
-import { type Directive, type Component } from '../api/types'
+import { type Component, type Directive, IRegorContext } from '../api/types'
 import { capitalize } from '../common/common'
 import { attrDirective } from '../directives/attr'
 import { classDirective } from '../directives/class'
@@ -70,11 +70,11 @@ export class RegorConfig {
 
   forGrowThreshold = 10
 
-  globalContext: Record<string, any>
+  globalContext: Record<string, unknown>
 
   useInterpolation = true
 
-  constructor(globalContext?: Record<any, any>) {
+  constructor(globalContext?: Record<string, unknown>) {
     this.setDirectives('r-')
     if (globalContext) {
       this.globalContext = globalContext
@@ -86,9 +86,9 @@ export class RegorConfig {
   /**
    * @internal
    */
-  __createGlobalContext(): Record<string, any> {
-    const obj: Record<string, any> = {}
-    const global = globalThis as Record<string, any>
+  __createGlobalContext(): Record<string, unknown> {
+    const obj: Record<string, unknown> = {}
+    const global = globalThis as Record<string, unknown>
     for (const key of RegorConfig.__defaultGlobalKeys.split(',')) {
       obj[key] = global[key]
     }
@@ -98,8 +98,8 @@ export class RegorConfig {
     return obj
   }
 
-  addComponent<TProps = Record<any, any>>(
-    ...components: Array<Component<TProps>>
+  addComponent<TContext = IRegorContext>(
+    ...components: Array<Component<TContext>>
   ): void {
     for (const component of components) {
       if (!component.defaultName) {
@@ -109,10 +109,13 @@ export class RegorConfig {
         )
         continue
       }
-      this.__components.set(capitalize(component.defaultName), component)
+      this.__components.set(
+        capitalize(component.defaultName),
+        component as unknown as Component<IRegorContext>,
+      )
       this.__componentsUpperCase.set(
         capitalize(component.defaultName).toLocaleUpperCase(),
-        component,
+        component as unknown as Component<IRegorContext>,
       )
     }
   }

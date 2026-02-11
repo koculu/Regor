@@ -1,0 +1,23 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "ESLint: Scan Entire Project",
+            "command": "yarn lint .",
+            "problemMatcher": {
+                "owner": "eslint",
+                "base": "$eslint-stylish"
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "never",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "group": "build"
+        }
+    ]
+}

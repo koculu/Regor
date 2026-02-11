@@ -40,7 +40,6 @@ const warnings = {
     value: unknown,
     e: Error,
   ) => ({
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     msg: `Failed setting prop "${key}" on <${tag.toLowerCase()}>: value ${value} is invalid.`,
     args: [e],
   }),

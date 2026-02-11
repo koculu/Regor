@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest'
-import { watchEffect, silence, collectRefs, ref } from '../../src'
+
+import { collectRefs, ref, silence, watchEffect } from '../../src'
 
 // silence should prevent watchEffect from tracking refs
 

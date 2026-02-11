@@ -8,7 +8,7 @@ import { type Binder } from './Binder'
 export class DirectiveElement {
   __name: string // r-on @click @submit r-on:click.prevent @submit.prevent  @[event-name].self.camel :src :className.prop .class-name.camel r-if r-for key
 
-  /** Contains: ['@', 'submit'], ['r-on', 'click'], ['@', '[dynamicKey]'] */
+  /** Contains: `['@', 'submit'], ['r-on', 'click'], ['\\@', '[dynamicKey]']` */
   __terms: string[] = []
 
   /** Contains directive flags. ['camel', 'prevent',...] */

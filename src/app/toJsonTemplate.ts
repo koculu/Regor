@@ -18,8 +18,8 @@ export const toJsonTemplate = (
   const attrNames = node.getAttributeNames()
   if (attrNames.length > 0) {
     json.a = Object.fromEntries(
-      attrNames.map((name) => [name, node.getAttribute(name)]),
-    ) as Record<any, any>
+      attrNames.map((name) => [name, node.getAttribute(name) ?? '']),
+    )
   }
 
   const childNodes = getChildNodes(node)

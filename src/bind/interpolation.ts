@@ -15,7 +15,12 @@ export const interpolate = (element: Node, config?: RegorConfig): void => {
     { start: '[[', end: ']]' },
   ]
   for (const textNode of getTextNodes(element, builtInNames.pre, delimiters)) {
-    interpolateTextNode(textNode, builtInNames.text, interpolationRegex, delimiters)
+    interpolateTextNode(
+      textNode,
+      builtInNames.text,
+      interpolationRegex,
+      delimiters,
+    )
   }
 }
 
@@ -80,7 +85,11 @@ const getTextNodes = (
   const textNodes: Node[] = []
   const traverseTextNodes = (node: Node): void => {
     if (node.nodeType === Node.TEXT_NODE) {
-      if (delimiters.some((delimiter) => node.textContent?.includes(delimiter.start))) {
+      if (
+        delimiters.some((delimiter) =>
+          node.textContent?.includes(delimiter.start),
+        )
+      ) {
         textNodes.push(node)
       }
     } else {

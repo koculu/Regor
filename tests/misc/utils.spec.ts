@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest'
-import { flatten, markRaw, isRaw, html, raw, ref, sref } from '../../src'
+
+import { flatten, html, isRaw, markRaw, raw, ref, sref } from '../../src'
 
 test('flatten converts nested refs', () => {
   const obj = ref({ a: ref(1), b: { c: sref(2) } })

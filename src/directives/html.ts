@@ -1,5 +1,5 @@
-import { isFunction } from '../common/is-what'
 import { type Directive } from '../api/types'
+import { isFunction } from '../common/is-what'
 
 /**
  * @internal

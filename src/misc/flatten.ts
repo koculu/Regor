@@ -1,5 +1,5 @@
+import type { ComputedRef, Flat, Ref, SRef } from '../api/types'
 import { isArray, isMap, isObject, isSet } from '../common/is-what'
-import type { Ref, SRef, ComputedRef, Flat } from '../api/types'
 import { unref } from '../reactivity/unref'
 
 export const flatten = <TValueType>(

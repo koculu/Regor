@@ -1,12 +1,6 @@
-import { isArray, isFunction, isNullOrUndefined } from '../common/is-what'
-import { type SRef, type StopObserving, type MountListItem } from '../api/types'
+import { type MountListItem, type SRef, type StopObserving } from '../api/types'
 import { addUnbinder } from '../cleanup/addUnbinder'
 import { removeNode } from '../cleanup/removeNode'
-import { warning, WarningType } from '../log/warnings'
-import { observe } from '../observer/observe'
-import { sref } from '../reactivity/sref'
-import { unref } from '../reactivity/unref'
-import { type Binder } from './Binder'
 import {
   bindChildNodes,
   findElements,
@@ -14,6 +8,12 @@ import {
   toSelector,
   unmount,
 } from '../common/common'
+import { isArray, isFunction, isNullOrUndefined } from '../common/is-what'
+import { warning, WarningType } from '../log/warnings'
+import { observe } from '../observer/observe'
+import { sref } from '../reactivity/sref'
+import { unref } from '../reactivity/unref'
+import { type Binder } from './Binder'
 import { MountList } from './MountList'
 import { setSwitchOwner } from './switch'
 

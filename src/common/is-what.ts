@@ -1,7 +1,7 @@
 /**
  * @internal
  */
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export const isFunction = (value: unknown): value is Function => {
   return typeof value === 'function'
 }
@@ -80,5 +80,5 @@ export const isArray = Array.isArray
 /**
  * @internal
  */
-export const isObject = (val: unknown): val is Record<any, any> =>
+export const isObject = (val: unknown): val is Record<string, unknown> =>
   val !== null && typeof val === 'object'

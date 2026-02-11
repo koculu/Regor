@@ -1,5 +1,5 @@
-import { isMap, isObject, isSet } from '../common/is-what'
 import { type Directive } from '../api/types'
+import { isMap, isObject, isSet } from '../common/is-what'
 import { flatten } from '../misc/flatten'
 
 /**
@@ -13,9 +13,9 @@ export const textDirective: Directive = {
     el.textContent = isSet(value)
       ? JSON.stringify(flatten([...value]))
       : isMap(value)
-      ? JSON.stringify(flatten([...value]))
-      : isObject(value)
-      ? JSON.stringify(flatten(value))
-      : value?.toString() ?? ''
+        ? JSON.stringify(flatten([...value]))
+        : isObject(value)
+          ? JSON.stringify(flatten(value))
+          : (value?.toString() ?? '')
   },
 }

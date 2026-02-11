@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest'
-import { markRaw, isRaw, ref } from '../../src'
+
+import { isRaw, markRaw, ref } from '../../src'
 
 test('markRaw marks object and ref skips conversion', () => {
   const obj = { a: 1 }

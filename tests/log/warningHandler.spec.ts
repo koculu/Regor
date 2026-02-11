@@ -1,4 +1,5 @@
 import { expect, test, vi } from 'vitest'
+
 import { warningHandler } from '../../src'
 import { warning, WarningType } from '../../src/log/warnings'
 

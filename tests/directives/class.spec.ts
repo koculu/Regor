@@ -1,4 +1,5 @@
 import { expect, test } from 'vitest'
+
 import { createApp, html, ref } from '../../src'
 
 test('class directive toggles classes', () => {

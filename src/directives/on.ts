@@ -1,12 +1,12 @@
+import { type Directive, type ParseResult, type Unbinder } from '../api/types'
+import { camelize } from '../common/common'
 import {
   isFunction,
   isNullOrWhitespace,
   isObject,
   isString,
 } from '../common/is-what'
-import { type Directive, type ParseResult, type Unbinder } from '../api/types'
 import { warning, WarningType } from '../log/warnings'
-import { camelize } from '../common/common'
 import { unref } from '../reactivity/unref'
 
 const availableFlags = [

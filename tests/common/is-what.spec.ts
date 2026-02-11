@@ -1,16 +1,17 @@
 import { expect, test } from 'vitest'
+
 import {
+  isArray,
+  isDate,
   isFunction,
-  isString,
-  isUndefined,
+  isMap,
   isNullOrUndefined,
   isNullOrWhitespace,
-  isMap,
-  isSet,
-  isDate,
-  isSymbol,
-  isArray,
   isObject,
+  isSet,
+  isString,
+  isSymbol,
+  isUndefined,
 } from '../../src/common/is-what'
 
 test('primitive type checks', () => {
@@ -38,7 +39,7 @@ test('object type helpers', () => {
   expect(isSet(new Set())).toBe(true)
   expect(isDate(new Date())).toBe(true)
   expect(isSymbol(Symbol('s'))).toBe(true)
-  expect(isArray([1,2])).toBe(true)
+  expect(isArray([1, 2])).toBe(true)
   expect(isObject({})).toBe(true)
   expect(isObject(null)).toBe(false)
 })

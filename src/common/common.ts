@@ -1,8 +1,8 @@
-import { removeNode } from '../cleanup/removeNode'
-import { type Binder } from '../bind/Binder'
-import { isElseNode } from '../bind/IfBinder'
 import { type AnyRef } from '../api/types'
 import { type RegorConfig } from '../app/RegorConfig'
+import { type Binder } from '../bind/Binder'
+import { isElseNode } from '../bind/IfBinder'
+import { removeNode } from '../cleanup/removeNode'
 
 /**
  * @internal
@@ -24,7 +24,7 @@ export const bindChildNodes = (
 ): void => {
   for (const child of childNodes) {
     // r-if binding can remove sibling else nodes
-    !isElseNode(child) && binder.__bindDefault(child as Element)
+    if (!isElseNode(child)) binder.__bindDefault(child as Element)
   }
 }
 

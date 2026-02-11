@@ -1,5 +1,6 @@
-import { isArray, isFunction, isNullOrUndefined } from '../common/is-what'
 import { type AnyRef, type IsLazy, type IsLazyKey } from '../api/types'
+import { isArray, isFunction, isNullOrUndefined } from '../common/is-what'
+import { collectRefs } from '../computed/watchEffect'
 import { isRef } from '../reactivity/isRef'
 import { unref } from '../reactivity/unref'
 import {
@@ -27,7 +28,6 @@ import {
   type UnaryExpression,
   type UpdateExpression,
 } from './jsep/jsep-types'
-import { collectRefs } from '../computed/watchEffect'
 
 const evalBinaryOp = {
   // arrow and assignments placed here for type safety, never executed
@@ -52,9 +52,9 @@ const evalBinaryOp = {
   '|': (a: any, b: any) => a | b,
   '^': (a: any, b: any) => a ^ b,
   '&': (a: any, b: any) => a & b,
-  // eslint-disable-next-line eqeqeq
+
   '==': (a: any, b: any) => a == b,
-  // eslint-disable-next-line eqeqeq
+
   '!=': (a: any, b: any) => a != b,
   '===': (a: any, b: any) => a === b,
   '!==': (a: any, b: any) => a !== b,
@@ -66,7 +66,7 @@ const evalBinaryOp = {
   '<<': (a: any, b: any) => a << b,
   '>>': (a: any, b: any) => a >> b,
   '>>>': (a: any, b: any) => a >>> b,
-  // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+
   '+': (a: any, b: any) => a + b,
   '-': (a: any, b: any) => a - b,
   '*': (a: any, b: any) => a * b,
@@ -99,7 +99,7 @@ const createLazyContext = (
 ): Context | undefined => {
   if (!e) return context
 
-  const ctx: Record<any, any> = Object.create(context ?? {})
+  const ctx: Record<string, unknown> = Object.create(context ?? {})
   ctx.$event = e
   return ctx
 }
@@ -130,7 +130,7 @@ const evalPostUpdate = {
     const v = context[key]
     if (isRef(v)) {
       const r = v()
-      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+
       v(r + 1)
       return r
     }
@@ -157,10 +157,9 @@ const applyAssigment = {
   '+=': (context: Context, key: any, value: any) => {
     const v = context[key]
     if (isRef(v)) {
-      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
       return v(v() + value)
     }
-    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+
     return (context[key] += value)
   },
   '-=': (context: Context, key: any, value: any) => {
@@ -643,7 +642,7 @@ class RegorEval {
     context?: Context,
   ): any {
     return (...args: any[]) => {
-      const ctx: Record<any, any> = Object.create(context ?? {})
+      const ctx: Record<string, unknown> = Object.create(context ?? {})
       const params = expr.params
       if (params) {
         let i = 0
