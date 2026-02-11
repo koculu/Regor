@@ -137,7 +137,7 @@ export class RegorConfig {
       [`${prefix}bind:class`]: classDirective,
       ':ref': refDirective,
       ':value': valueDirective,
-      teleport: teleportDirective,
+      [`${prefix}teleport`]: teleportDirective,
     }
 
     /** These are predefined names referenced in Regor source.
