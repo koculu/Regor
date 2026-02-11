@@ -1,4 +1,4 @@
-import type { MountListItem,SRef } from '../api/types'
+import type { MountListItem, SRef } from '../api/types'
 
 /**
  * @internal

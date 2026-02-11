@@ -21,6 +21,6 @@ const unbindSingle = (node: Node): void => {
     unbinder()
   }
   bindData.unbinders.splice(0)
-   
+
   delete (node as any)[bindDataSymbol]
 }

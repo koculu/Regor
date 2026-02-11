@@ -24,14 +24,13 @@ export const createApp = <TRegorContext extends IRegorContext>(
   template: Template | string = { selector: '#app' },
   config?: RegorConfig,
 ): App<TRegorContext> => {
-  if (isString(template))
-    template = { selector: '#app', template }
+  if (isString(template)) template = { selector: '#app', template }
   if (isScope(context)) context = context.context
   const root = template.element
     ? template.element
     : template.selector
-    ? document.querySelector(template.selector)
-    : null
+      ? document.querySelector(template.selector)
+      : null
   if (!root || !isElement(root)) throw getError(ErrorType.AppRootElementMissing)
   if (!config) config = RegorConfig.getDefault()
 
@@ -54,11 +53,7 @@ export const createApp = <TRegorContext extends IRegorContext>(
     appendChildren(element.childNodes)
     template.element = element
   } else if (template.json) {
-    const element = toFragment(
-      template.json,
-      template.isSVG,
-      config,
-    )
+    const element = toFragment(template.json, template.isSVG, config)
     cleanRoot()
     appendChildren(element.childNodes)
   }

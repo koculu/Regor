@@ -1,4 +1,4 @@
-import { type IRegorContext,type Scope } from '../api/types'
+import { type IRegorContext, type Scope } from '../api/types'
 import { isObject } from '../common/is-what'
 import { callUnmounted } from './callUnmounted'
 import { popScope, pushScope, setScope } from './stack'

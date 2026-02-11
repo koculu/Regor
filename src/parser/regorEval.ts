@@ -52,9 +52,9 @@ const evalBinaryOp = {
   '|': (a: any, b: any) => a | b,
   '^': (a: any, b: any) => a ^ b,
   '&': (a: any, b: any) => a & b,
-   
+
   '==': (a: any, b: any) => a == b,
-   
+
   '!=': (a: any, b: any) => a != b,
   '===': (a: any, b: any) => a === b,
   '!==': (a: any, b: any) => a !== b,
@@ -66,7 +66,7 @@ const evalBinaryOp = {
   '<<': (a: any, b: any) => a << b,
   '>>': (a: any, b: any) => a >> b,
   '>>>': (a: any, b: any) => a >>> b,
-   
+
   '+': (a: any, b: any) => a + b,
   '-': (a: any, b: any) => a - b,
   '*': (a: any, b: any) => a * b,
@@ -130,7 +130,7 @@ const evalPostUpdate = {
     const v = context[key]
     if (isRef(v)) {
       const r = v()
-       
+
       v(r + 1)
       return r
     }
@@ -157,10 +157,9 @@ const applyAssigment = {
   '+=': (context: Context, key: any, value: any) => {
     const v = context[key]
     if (isRef(v)) {
-       
       return v(v() + value)
     }
-     
+
     return (context[key] += value)
   },
   '-=': (context: Context, key: any, value: any) => {

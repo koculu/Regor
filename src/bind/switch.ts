@@ -28,9 +28,8 @@ export const refSwitch = (id: string): void => {
  */
 export const removeSwitch = (id: string): void => {
   if (--switchCounter[id] === 0) {
-     
     delete switches[id]
-     
+
     delete switchCounter[id]
   }
 }

@@ -1,4 +1,4 @@
-import { type MountListItem,type SRef, type StopObserving } from '../api/types'
+import { type MountListItem, type SRef, type StopObserving } from '../api/types'
 import { addUnbinder } from '../cleanup/addUnbinder'
 import { removeNode } from '../cleanup/removeNode'
 import {

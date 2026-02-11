@@ -7,7 +7,7 @@ import {
 } from '../api/types'
 import { isArray, isFunction, isSet, isString } from '../common/is-what'
 import { looseEqual, looseIndexOf, looseToNumber } from '../common/looseEqual'
-import { warning,WarningType } from '../log/warnings'
+import { warning, WarningType } from '../log/warnings'
 import { isRef } from '../reactivity/isRef'
 import { pause } from '../reactivity/pause'
 import { resume } from '../reactivity/resume'
@@ -215,7 +215,6 @@ const handleInputAndTextArea = (
           decimalSeparators.test(value[value.length - 1]) &&
           value.split(decimalSeparators).length === 2
         if (endsWithDecimalSeparator) {
-           
           value += '0'
           value = parseFloat(value)
           if (isNaN(value)) value = ''
