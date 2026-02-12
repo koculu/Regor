@@ -108,6 +108,43 @@ test('should render components with reactive properties', () => {
   )
 })
 
+test('should resolve camelCase dynamic prop bindings on components', () => {
+  const root = document.createElement('div')
+
+  const myComponent = createComponent(html`<div>{{ wordOne }}</div>`, {
+    context: (head) => ({
+      wordOne: head.props.wordOne ?? 'fallback',
+    }),
+    props: ['wordOne'],
+  })
+
+  createApp(
+    {
+      components: { myComponent } as unknown as Record<string, Component>,
+      value: ref('Calc'),
+    },
+    {
+      element: root,
+      template: html`<div>
+        <MyComponent :wordOne="value"></MyComponent>
+        <MyComponent :word-one="value"></MyComponent>
+      </div>`,
+    },
+  )
+
+  htmlEqual(
+    root.innerHTML,
+    html`<div>
+      <!-- begin component: MYCOMPONENT-->
+      <div>Calc</div>
+      <!-- end component: MYCOMPONENT-->
+      <!-- begin component: MYCOMPONENT-->
+      <div>Calc</div>
+      <!-- end component: MYCOMPONENT-->
+    </div>`,
+  )
+})
+
 test('should render empty component', () => {
   const root = document.createElement('div')
 
