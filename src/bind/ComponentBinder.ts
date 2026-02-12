@@ -101,7 +101,9 @@ export class ComponentBinder {
           let definedProps = registeredComponent.props
           if (!definedProps || definedProps.length === 0) return
           definedProps = definedProps.map(camelize)
-
+          const definedPropsByLowerCase = new Map(
+            definedProps.map((definedProp) => [definedProp.toLowerCase(), definedProp]),
+          )
           for (const name of definedProps.concat(definedProps.map(hyphenate))) {
             const value = component.getAttribute(name)
             if (value === null) continue
@@ -113,14 +115,17 @@ export class ComponentBinder {
           for (const [attrName, item] of map.entries()) {
             const [name, option] = item.__terms
             if (!option) continue
-            if (!definedProps.includes(camelize(option))) continue
+            const propName = definedPropsByLowerCase.get(
+              camelize(option).toLowerCase(),
+            )
+            if (!propName) continue
             if (name !== '.' && name !== ':' && name !== bindName) continue
             binder.__bind(
               singlePropDirective,
               component,
               attrName,
               true,
-              option,
+              propName,
               item.__flags,
             )
           }
