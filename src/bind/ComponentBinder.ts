@@ -21,7 +21,6 @@ import { propsOnceDirective } from '../directives/props-once'
 import { singlePropDirective } from '../directives/single-prop'
 import { entangle } from '../reactivity/entangle'
 import { isRef } from '../reactivity/isRef'
-import { unref } from '../reactivity/unref'
 import { type Binder } from './Binder'
 import { addSwitch, refSwitch, removeSwitch, rswitch } from './switch'
 
