@@ -52,7 +52,7 @@ test('should render components with reactive properties', () => {
     root.innerHTML,
     html`<div>
       <!-- begin component: MYCOMPONENT-->
-      <div>My Property 1-prop-2</div>
+      <div>prop-1-prop-2</div>
       <!-- end component: MYCOMPONENT-->
       <!-- begin component: MYCOMPONENT-->
       <div>ok-prop-2</div>
@@ -82,7 +82,7 @@ test('should render components with reactive properties', () => {
     root.innerHTML,
     html`<div>
       <!-- begin component: MYCOMPONENT-->
-      <div>My Property 1-prop-2</div>
+      <div>prop-1-prop-2</div>
       <!-- end component: MYCOMPONENT-->
       <!-- begin component: MYCOMPONENT-->
       <div>yes-prop-2</div>
@@ -145,6 +145,39 @@ test('should resolve camelCase dynamic prop bindings on components', () => {
   )
 })
 
+test('should preserve context values when autoProps is enabled', () => {
+  const root = document.createElement('div')
+
+  const normalize = (href?: string): string => {
+    if (!href) return ''
+    return href.replace(/^\.\//, '/')
+  }
+
+  const myComponent = createComponent<{ href?: string }>(
+    html`<a :href="href"></a>`,
+    {
+      props: ['href'],
+      context: (head) => ({
+        href: normalize(head.props.href),
+      }),
+    },
+  )
+
+  createApp(
+    {
+      components: { myComponent } as unknown as Record<string, Component>,
+    },
+    {
+      element: root,
+      template: html`<MyComponent href="./getting-started"></MyComponent>`,
+    },
+  )
+
+  htmlEqual(
+    root.innerHTML,
+    html`<!-- begin component: MYCOMPONENT--><a href="/getting-started"></a><!-- end component: MYCOMPONENT-->`,
+  )
+})
 test('should render empty component', () => {
   const root = document.createElement('div')
 
