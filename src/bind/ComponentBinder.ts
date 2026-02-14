@@ -102,7 +102,10 @@ export class ComponentBinder {
           if (!definedProps || definedProps.length === 0) return
           definedProps = definedProps.map(camelize)
           const definedPropsByLowerCase = new Map(
-            definedProps.map((definedProp) => [definedProp.toLowerCase(), definedProp]),
+            definedProps.map((definedProp) => [
+              definedProp.toLowerCase(),
+              definedProp,
+            ]),
           )
           for (const name of definedProps.concat(definedProps.map(hyphenate))) {
             const value = component.getAttribute(name)
@@ -160,9 +163,7 @@ export class ComponentBinder {
               // if entangle enabled, entangle the props[ref] to the componentCtx[ref] to provide parent-child data sync.
               if (head.entangle && isRef(compValue) && isRef(propsValue)) {
                 addUnbinder(startOfComponent, entangle(propsValue, compValue))
-              } else if (isRef(compValue)) {
-                compValue(propsValue)
-              } else componentCtx[key] = unref(propsValue)
+              }
             } else componentCtx[key] = propsValue
           }
           head.onAutoPropsAssigned?.()
