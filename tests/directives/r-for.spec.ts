@@ -1,6 +1,12 @@
 import { expect, test } from 'vitest'
-
-import { createApp, html, ref, unref } from '../../src'
+import {
+  createApp,
+  ref,
+  html,
+  unref,
+  createComponent,
+  Component,
+} from '../../src'
 
 test('should mount the people into reactive divs.', () => {
   const root = document.createElement('div')
@@ -247,4 +253,66 @@ test('should handle expressions with spaces', () => {
   expect(
     [...root.querySelectorAll('div')].map((x) => x.textContent),
   ).toStrictEqual(['5', '6'])
+})
+
+test('should support r-for on table custom row and cell components', () => {
+  const root = document.createElement('div')
+
+  const tableCell = createComponent(html`<td><span>{{ value }}</span></td>`, {
+    props: ['value'],
+  })
+
+  const tableCell2 = createComponent(html`<span>{{ value }}</span>`, {
+    props: ['value'],
+  })
+
+  const tableRow = createComponent(
+    html`<tr>
+      <TableCell :value="i" />
+      <td><TableCell2 :value="row.name" /></td>
+      <TableCell :value="row.age" />
+    </tr>`,
+    { props: ['row', 'i'] },
+  )
+
+  const app = createApp(
+    {
+      components: {
+        tableCell,
+        tableCell2,
+        tableRow,
+      } as unknown as Record<string, Component>,
+      rows: ref([
+        { name: 'Alice', age: 25 },
+        { name: 'Bob', age: 30 },
+      ]),
+    },
+    {
+      element: root,
+      template: html`<table>
+        <tbody>
+          <TableRow r-for="row, #i in rows" :row="row" :i="i" />
+        </tbody>
+      </table>`,
+    },
+  )
+  console.log(root.outerHTML)
+  const getCellText = () =>
+    [...root.querySelectorAll('td')].map((x) => x.textContent?.trim())
+
+  expect(getCellText()).toStrictEqual(['0', 'Alice', '25', '1', 'Bob', '30'])
+
+  app.context.rows().push(ref({ name: 'Charlie', age: 22 }))
+
+  expect(getCellText()).toStrictEqual([
+    '0',
+    'Alice',
+    '25',
+    '1',
+    'Bob',
+    '30',
+    '2',
+    'Charlie',
+    '22',
+  ])
 })

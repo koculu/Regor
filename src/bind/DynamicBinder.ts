@@ -49,7 +49,24 @@ export class DynamicBinder {
     let expression = el.getAttribute(this.__is)
     if (!expression) {
       expression = el.getAttribute('is')
-      if (!expression || !expression.startsWith('regor:')) return
+      if (!expression) return
+      if (!expression.startsWith('regor:')) {
+        if (!expression.startsWith('r-')) return
+        const staticName = expression.slice(2).trim().toLowerCase()
+        if (!staticName) return
+        const parent = el.parentNode
+        if (!parent) return
+        const nativeElement = document.createElement(staticName)
+        for (const attr of el.getAttributeNames()) {
+          if (attr === 'is') continue
+          nativeElement.setAttribute(attr, el.getAttribute(attr) as string)
+        }
+        while (el.firstChild) nativeElement.appendChild(el.firstChild)
+        parent.insertBefore(nativeElement, el)
+        el.remove()
+        this.__binder.__bindDefault(nativeElement)
+        return
+      }
       expression = `'${expression.slice(6)}'`
       el.removeAttribute('is')
     }

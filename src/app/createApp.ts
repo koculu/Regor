@@ -18,6 +18,7 @@ import { ErrorType, getError } from '../log/errors'
 import { Parser } from '../parser/Parser'
 import { RegorConfig } from './RegorConfig'
 import { toFragment } from './toFragment'
+import { preprocess } from './preprocess-template'
 
 export const createApp = <TRegorContext extends IRegorContext>(
   context: TRegorContext | Scope<TRegorContext>,
@@ -48,7 +49,7 @@ export const createApp = <TRegorContext extends IRegorContext>(
   if (template.template) {
     const element = document
       .createRange()
-      .createContextualFragment(template.template)
+      .createContextualFragment(preprocess(template.template))
     cleanRoot()
     appendChildren(element.childNodes)
     template.element = element

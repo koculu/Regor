@@ -11,6 +11,7 @@ import { ErrorType, getError } from '../log/errors'
 import { RegorConfig } from './RegorConfig'
 import { toFragment } from './toFragment'
 import { toJsonTemplate } from './toJsonTemplate'
+import { preprocess } from './preprocess-template'
 
 export const createComponent = <TContext = IRegorContext>(
   template: Template | string,
@@ -33,7 +34,7 @@ export const createComponent = <TContext = IRegorContext>(
   } else if (template.template) {
     const element = document
       .createRange()
-      .createContextualFragment(template.template)
+      .createContextualFragment(preprocess(template.template))
     template.element = element
   } else if (template.json) {
     template.element = toFragment(template.json, template.isSVG, options.config)
