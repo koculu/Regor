@@ -14,6 +14,13 @@ test('rewrites tr/td outside tbody into alias hosts', () => {
   )
 })
 
+test('rewrites th outside tbody into alias host', () => {
+  const template = '<tr><th>A</th></tr>'
+  expect(preprocess(template)).toBe(
+    '<trx is="r-tr"><thx is="r-th">A</thx></trx>',
+  )
+})
+
 test('replaces direct tbody child non-tr self-closing tag', () => {
   const template = '<table><tbody>  <TableRow a="1" /> </tbody></table>'
   expect(preprocess(template)).toBe(
@@ -54,5 +61,12 @@ test('should normalize self-closing custom components in aliased tr', () => {
   const template = '<tr><TableCell /></tr>'
   expect(preprocess(template)).toBe(
     '<trx is="r-tr"><TableCell ></TableCell></trx>',
+  )
+})
+
+test('should normalize self-closing kebab-case components in aliased tr', () => {
+  const template = '<tr><table-cell /></tr>'
+  expect(preprocess(template)).toBe(
+    '<trx is="r-tr"><table-cell ></table-cell></trx>',
   )
 })

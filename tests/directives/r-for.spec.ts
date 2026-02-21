@@ -296,7 +296,6 @@ test('should support r-for on table custom row and cell components', () => {
       </table>`,
     },
   )
-  console.log(root.outerHTML)
   const getCellText = () =>
     [...root.querySelectorAll('td')].map((x) => x.textContent?.trim())
 
@@ -315,4 +314,233 @@ test('should support r-for on table custom row and cell components', () => {
     'Charlie',
     '22',
   ])
+})
+
+test('should support table usage with th and td as components', () => {
+  const root = document.createElement('div')
+
+  const tableHeadCell = createComponent(
+    html`<th><span>{{ value }}</span></th>`,
+    {
+      props: ['value'],
+    },
+  )
+  const tableCell = createComponent(html`<td><span>{{ value }}</span></td>`, {
+    props: ['value'],
+  })
+  const headerRow = createComponent(
+    html`<tr>
+      <TableHeadCell r-for="label in headers" :value="label" />
+    </tr>`,
+    { props: ['headers'] },
+  )
+  const tableRow = createComponent(
+    html`<tr>
+      <TableCell :value="row.name" />
+      <TableCell :value="row.age" />
+    </tr>`,
+    { props: ['row'] },
+  )
+
+  const app = createApp(
+    {
+      components: {
+        tableHeadCell,
+        tableCell,
+        headerRow,
+        tableRow,
+      } as unknown as Record<string, Component>,
+      headers: ref(['Name', 'Age']),
+      rows: ref([
+        { name: 'Alice', age: 25 },
+        { name: 'Bob', age: 30 },
+      ]),
+    },
+    {
+      element: root,
+      template: html`<table>
+        <tbody>
+          <HeaderRow :headers="headers" />
+          <TableRow r-for="row in rows" :row="row" />
+        </tbody>
+      </table>`,
+    },
+  )
+
+  const getHeadText = () =>
+    [...root.querySelectorAll('th')].map((x) => x.textContent?.trim())
+  const getCellText = () =>
+    [...root.querySelectorAll('td')].map((x) => x.textContent?.trim())
+
+  expect(getHeadText()).toStrictEqual(['Name', 'Age'])
+  expect(getCellText()).toStrictEqual(['Alice', '25', 'Bob', '30'])
+
+  app.context.rows().push(ref({ name: 'Charlie', age: 22 }))
+
+  expect(getHeadText()).toStrictEqual(['Name', 'Age'])
+  expect(getCellText()).toStrictEqual([
+    'Alice',
+    '25',
+    'Bob',
+    '30',
+    'Charlie',
+    '22',
+  ])
+})
+
+test('should support table usage with thead th components (expected to fail for now)', () => {
+  const root = document.createElement('div')
+
+  const tableHeadCell = createComponent(
+    html`<th><span>{{ value }}</span></th>`,
+    {
+      props: ['value'],
+    },
+  )
+  const tableCell = createComponent(html`<td><span>{{ value }}</span></td>`, {
+    props: ['value'],
+  })
+  const headerRow = createComponent(
+    html`<tr>
+      <TableHeadCell r-for="label in headers" :value="label" />
+    </tr>`,
+    { props: ['headers'] },
+  )
+  const tableRow = createComponent(
+    html`<tr>
+      <TableCell :value="row.name" />
+      <TableCell :value="row.age" />
+    </tr>`,
+    { props: ['row'] },
+  )
+
+  createApp(
+    {
+      components: {
+        tableHeadCell,
+        tableCell,
+        headerRow,
+        tableRow,
+      } as unknown as Record<string, Component>,
+      headers: ref(['Name', 'Age']),
+      rows: ref([
+        { name: 'Alice', age: 25 },
+        { name: 'Bob', age: 30 },
+      ]),
+    },
+    {
+      element: root,
+      template: html`<table>
+        <thead>
+          <HeaderRow :headers="headers" />
+        </thead>
+        <tbody>
+          <TableRow r-for="row in rows" :row="row" />
+        </tbody>
+      </table>`,
+    },
+  )
+
+  const getHeadText = () =>
+    [...root.querySelectorAll('th')].map((x) => x.textContent?.trim())
+  const getCellText = () =>
+    [...root.querySelectorAll('td')].map((x) => x.textContent?.trim())
+
+  expect(getHeadText()).toStrictEqual(['Name', 'Age'])
+  expect(getCellText()).toStrictEqual(['Alice', '25', 'Bob', '30'])
+})
+
+test('should support simple table usage without thead/tbody (expected to fail for now)', () => {
+  const root = document.createElement('div')
+
+  const tableHeadCell = createComponent(
+    html`<th><span>{{ value }}</span></th>`,
+    {
+      props: ['value'],
+    },
+  )
+  const tableCell = createComponent(html`<td><span>{{ value }}</span></td>`, {
+    props: ['value'],
+  })
+  const headerRow = createComponent(
+    html`<tr>
+      <TableHeadCell r-for="label in headers" :value="label" />
+    </tr>`,
+    { props: ['headers'] },
+  )
+  const tableRow = createComponent(
+    html`<tr>
+      <TableCell :value="row.name" />
+      <TableCell :value="row.age" />
+    </tr>`,
+    { props: ['row'] },
+  )
+
+  createApp(
+    {
+      components: {
+        tableHeadCell,
+        tableCell,
+        headerRow,
+        tableRow,
+      } as unknown as Record<string, Component>,
+      headers: ref(['Name', 'Age']),
+      rows: ref([
+        { name: 'Alice', age: 25 },
+        { name: 'Bob', age: 30 },
+      ]),
+    },
+    {
+      element: root,
+      template: html`<table>
+        <HeaderRow :headers="headers" />
+        <TableRow r-for="row in rows" :row="row" />
+      </table>`,
+    },
+  )
+
+  const getHeadText = () =>
+    [...root.querySelectorAll('th')].map((x) => x.textContent?.trim())
+  const getCellText = () =>
+    [...root.querySelectorAll('td')].map((x) => x.textContent?.trim())
+
+  expect(getHeadText()).toStrictEqual(['Name', 'Age'])
+  expect(getCellText()).toStrictEqual(['Alice', '25', 'Bob', '30'])
+})
+
+test('should support table usage with tfoot and component cells', () => {
+  const root = document.createElement('div')
+
+  const tableCell = createComponent(html`<td><span>{{ value }}</span></td>`, {
+    props: ['value'],
+  })
+  const footerRow = createComponent(
+    html`<tr>
+      <TableCell r-for="value in totals" :value="value" />
+    </tr>`,
+    { props: ['totals'] },
+  )
+
+  createApp(
+    {
+      components: {
+        tableCell,
+        footerRow,
+      } as unknown as Record<string, Component>,
+      totals: ref(['Total', '55']),
+    },
+    {
+      element: root,
+      template: html`<table>
+        <tfoot>
+          <FooterRow :totals="totals" />
+        </tfoot>
+      </table>`,
+    },
+  )
+
+  const getCellText = () =>
+    [...root.querySelectorAll('tfoot td')].map((x) => x.textContent?.trim())
+
+  expect(getCellText()).toStrictEqual(['Total', '55'])
 })
