@@ -160,7 +160,7 @@ export type ObserveCallback<TValueType> = (
 
 export type StopObserving = () => void
 
-export declare interface IRegorContext extends Record<string, unknown> {
+export declare interface IRegorContext extends Record<any, any> {
   components?: Record<string, Component>
   mounted?: () => void
   unmounted?: () => void

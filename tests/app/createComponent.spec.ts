@@ -175,7 +175,8 @@ test('should preserve context values when autoProps is enabled', () => {
 
   htmlEqual(
     root.innerHTML,
-    html`<!-- begin component: MYCOMPONENT--><a href="/getting-started"></a><!-- end component: MYCOMPONENT-->`,
+    html`<!-- begin component: MYCOMPONENT--><a href="/getting-started"></a
+      ><!-- end component: MYCOMPONENT-->`,
   )
 })
 test('should render empty component', () => {

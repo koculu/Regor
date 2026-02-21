@@ -98,6 +98,38 @@ HTML:
 </div>
 ```
 
+## Table Templates and Components
+
+Regor preprocesses table-related templates to keep markup valid when using
+components in table structures.
+
+- Supported table containers: `table`, `thead`, `tbody`, `tfoot`.
+- Component tags directly under row containers are normalized to valid hosts.
+- Component tags directly under `<tr>` are normalized to `<td>` hosts (except
+  native `<td>` / `<th>`).
+- Regor preserves valid table markup while supporting component-based rows and
+  cells in table templates.
+
+Example:
+
+```html
+<table>
+  <tbody>
+    <TableRow r-for="row in rows" :row="row" />
+  </tbody>
+</table>
+```
+
+```ts
+const tableRow = createComponent(
+  html`<tr>
+    <TableCell :value="row.name" />
+    <TableCell :value="row.age" />
+  </tr>`,
+  { props: ['row'] },
+)
+```
+
 Define composables:
 
 ```ts

@@ -63,6 +63,10 @@ The `createApp` function returns an object with the following properties:
 
 - The `template` parameter allows you to specify how the initial content or structure of the application should be rendered.
 
+- When using table templates, Regor preprocesses template markup to preserve
+  valid table structure for component-based rows and cells in `table`, `thead`,
+  `tbody`, and `tfoot`.
+
 - The `config` parameter lets you customize Regor's behavior to suit your application's requirements.
 
 - You can use the `unmount` and `unbind` functions to clean up and remove the app from the DOM when it's no longer needed.

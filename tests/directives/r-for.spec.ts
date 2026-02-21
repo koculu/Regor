@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 
-import { createApp, html, ref, unref } from '../../src'
+import { createApp, createComponent, html, ref, sref, unref } from '../../src'
 
 test('should mount the people into reactive divs.', () => {
   const root = document.createElement('div')
@@ -247,4 +247,418 @@ test('should handle expressions with spaces', () => {
   expect(
     [...root.querySelectorAll('div')].map((x) => x.textContent),
   ).toStrictEqual(['5', '6'])
+})
+
+test('should render native tbody rows with r-for and react to updates', () => {
+  const root = document.createElement('div')
+  const app = createApp(
+    {
+      rows: ref([
+        { name: 'Alice', age: 25 },
+        { name: 'Bob', age: 30 },
+      ]),
+    },
+    {
+      element: root,
+      template: html`<table>
+        <tbody>
+          <tr r-for="row in rows">
+            <td>{{ row.name }}</td>
+            <td>{{ row.age }}</td>
+          </tr>
+        </tbody>
+      </table>`,
+    },
+  )
+
+  const getRows = () => [...root.querySelectorAll('tbody tr')]
+  const getCells = () =>
+    [...root.querySelectorAll('tbody td')].map((x) => x.textContent?.trim())
+
+  expect(getRows().length).toBe(2)
+  expect(getCells()).toStrictEqual(['Alice', '25', 'Bob', '30'])
+
+  app.context.rows(
+    [
+      { name: 'Neo', age: 40 },
+      { name: 'Trinity', age: 39 },
+      { name: 'Morpheus', age: 52 },
+    ].map((x) => ref(x)),
+  )
+
+  expect(getRows().length).toBe(3)
+  expect(getCells()).toStrictEqual([
+    'Neo',
+    '40',
+    'Trinity',
+    '39',
+    'Morpheus',
+    '52',
+  ])
+})
+
+test('should support nested r-for in native table cells', () => {
+  const root = document.createElement('div')
+  const app = createApp(
+    {
+      matrix: ref([[1, 2], [3]]),
+    },
+    {
+      element: root,
+      template: html`<table>
+        <tbody>
+          <tr r-for="row, #ri in matrix">
+            <td r-for="cell, #ci in row">{{ ri }}:{{ ci }}={{ cell }}</td>
+          </tr>
+        </tbody>
+      </table>`,
+    },
+  )
+
+  const getRows = () => [...root.querySelectorAll('tbody tr')]
+  const getCells = () =>
+    [...root.querySelectorAll('tbody td')].map((x) => x.textContent?.trim())
+
+  expect(getRows().length).toBe(2)
+  expect(getCells()).toStrictEqual(['0:0=1', '0:1=2', '1:0=3'])
+
+  app.context.matrix(ref([[], [9, 8]]))
+
+  expect(getRows().length).toBe(2)
+  expect(getCells()).toStrictEqual(['1:0=9', '1:1=8'])
+})
+
+test('should support native thead and tfoot with r-for', () => {
+  const root = document.createElement('div')
+  const app = createApp(
+    {
+      headers: sref(['Name', 'Age']),
+      totals: sref(['Total', '55']),
+    },
+    {
+      element: root,
+      template: html`<table>
+        <thead>
+          <tr>
+            <th r-for="h in headers">{{ h }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Alice</td>
+            <td>25</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td r-for="t in totals">{{ t }}</td>
+          </tr>
+        </tfoot>
+      </table>`,
+    },
+  )
+
+  const getHead = () =>
+    [...root.querySelectorAll('thead th')].map((x) => x.textContent?.trim())
+  const getFoot = () =>
+    [...root.querySelectorAll('tfoot td')].map((x) => x.textContent?.trim())
+
+  expect(getHead()).toStrictEqual(['Name', 'Age'])
+  expect(getFoot()).toStrictEqual(['Total', '55'])
+
+  app.context.headers(['Full Name', 'Years'])
+  app.context.totals(['Total', '77'])
+
+  expect(getHead()).toStrictEqual(['Full Name', 'Years'])
+  expect(getFoot()).toStrictEqual(['Total', '77'])
+})
+
+test('should support r-for on table custom row and cell components', () => {
+  const root = document.createElement('div')
+
+  const tableCell = createComponent(html`<td><span>{{ value }}</span></td>`, {
+    props: ['value'],
+  })
+
+  const tableCell2 = createComponent(html`<span>{{ value }}</span>`, {
+    props: ['value'],
+  })
+
+  const tableRow = createComponent(
+    html`<tr>
+      <TableCell :value="i" />
+      <td><TableCell2 :value="row.name" /></td>
+      <TableCell :value="row.age" />
+    </tr>`,
+    { props: ['row', 'i'] },
+  )
+
+  const app = createApp(
+    {
+      components: {
+        tableCell,
+        tableCell2,
+        tableRow,
+      },
+      rows: ref([
+        { name: 'Alice', age: 25 },
+        { name: 'Bob', age: 30 },
+      ]),
+    },
+    {
+      element: root,
+      template: html`<table>
+        <tbody>
+          <TableRow r-for="row, #i in rows" :row="row" :i="i" />
+        </tbody>
+      </table>`,
+    },
+  )
+  const getCellText = () =>
+    [...root.querySelectorAll('td')].map((x) => x.textContent?.trim())
+
+  expect(getCellText()).toStrictEqual(['0', 'Alice', '25', '1', 'Bob', '30'])
+
+  app.context.rows().push(ref({ name: 'Charlie', age: 22 }))
+
+  expect(getCellText()).toStrictEqual([
+    '0',
+    'Alice',
+    '25',
+    '1',
+    'Bob',
+    '30',
+    '2',
+    'Charlie',
+    '22',
+  ])
+})
+
+test('should support table usage with th and td as components', () => {
+  const root = document.createElement('div')
+
+  const tableHeadCell = createComponent(
+    html`<th><span>{{ value }}</span></th>`,
+    {
+      props: ['value'],
+    },
+  )
+  const tableCell = createComponent(html`<td><span>{{ value }}</span></td>`, {
+    props: ['value'],
+  })
+  const headerRow = createComponent(
+    html`<tr>
+      <TableHeadCell r-for="label in headers" :value="label" />
+    </tr>`,
+    { props: ['headers'] },
+  )
+  const tableRow = createComponent(
+    html`<tr>
+      <TableCell :value="row.name" />
+      <TableCell :value="row.age" />
+    </tr>`,
+    { props: ['row'] },
+  )
+
+  const app = createApp(
+    {
+      components: {
+        tableHeadCell,
+        tableCell,
+        headerRow,
+        tableRow,
+      },
+      headers: ref(['Name', 'Age']),
+      rows: ref([
+        { name: 'Alice', age: 25 },
+        { name: 'Bob', age: 30 },
+      ]),
+    },
+    {
+      element: root,
+      template: html`<table>
+        <tbody>
+          <HeaderRow :headers="headers" />
+          <TableRow r-for="row in rows" :row="row" />
+        </tbody>
+      </table>`,
+    },
+  )
+
+  const getHeadText = () =>
+    [...root.querySelectorAll('th')].map((x) => x.textContent?.trim())
+  const getCellText = () =>
+    [...root.querySelectorAll('td')].map((x) => x.textContent?.trim())
+
+  expect(getHeadText()).toStrictEqual(['Name', 'Age'])
+  expect(getCellText()).toStrictEqual(['Alice', '25', 'Bob', '30'])
+
+  app.context.rows().push(ref({ name: 'Charlie', age: 22 }))
+
+  expect(getHeadText()).toStrictEqual(['Name', 'Age'])
+  expect(getCellText()).toStrictEqual([
+    'Alice',
+    '25',
+    'Bob',
+    '30',
+    'Charlie',
+    '22',
+  ])
+})
+
+test('should support table usage with thead th components (expected to fail for now)', () => {
+  const root = document.createElement('div')
+
+  const tableHeadCell = createComponent(
+    html`<th><span>{{ value }}</span></th>`,
+    {
+      props: ['value'],
+    },
+  )
+  const tableCell = createComponent(html`<td><span>{{ value }}</span></td>`, {
+    props: ['value'],
+  })
+  const headerRow = createComponent(
+    html`<tr>
+      <TableHeadCell r-for="label in headers" :value="label" />
+    </tr>`,
+    { props: ['headers'] },
+  )
+  const tableRow = createComponent(
+    html`<tr>
+      <TableCell :value="row.name" />
+      <TableCell :value="row.age" />
+    </tr>`,
+    { props: ['row'] },
+  )
+
+  createApp(
+    {
+      components: {
+        tableHeadCell,
+        tableCell,
+        headerRow,
+        tableRow,
+      },
+      headers: ref(['Name', 'Age']),
+      rows: ref([
+        { name: 'Alice', age: 25 },
+        { name: 'Bob', age: 30 },
+      ]),
+    },
+    {
+      element: root,
+      template: html`<table>
+        <thead>
+          <HeaderRow :headers="headers" />
+        </thead>
+        <tbody>
+          <TableRow r-for="row in rows" :row="row" />
+        </tbody>
+      </table>`,
+    },
+  )
+
+  const getHeadText = () =>
+    [...root.querySelectorAll('th')].map((x) => x.textContent?.trim())
+  const getCellText = () =>
+    [...root.querySelectorAll('td')].map((x) => x.textContent?.trim())
+
+  expect(getHeadText()).toStrictEqual(['Name', 'Age'])
+  expect(getCellText()).toStrictEqual(['Alice', '25', 'Bob', '30'])
+})
+
+test('should support simple table usage without thead/tbody (expected to fail for now)', () => {
+  const root = document.createElement('div')
+
+  const tableHeadCell = createComponent(
+    html`<th><span>{{ value }}</span></th>`,
+    {
+      props: ['value'],
+    },
+  )
+  const tableCell = createComponent(html`<td><span>{{ value }}</span></td>`, {
+    props: ['value'],
+  })
+  const headerRow = createComponent(
+    html`<tr>
+      <TableHeadCell r-for="label in headers" :value="label" />
+    </tr>`,
+    { props: ['headers'] },
+  )
+  const tableRow = createComponent(
+    html`<tr>
+      <TableCell :value="row.name" />
+      <TableCell :value="row.age" />
+    </tr>`,
+    { props: ['row'] },
+  )
+
+  createApp(
+    {
+      components: {
+        tableHeadCell,
+        tableCell,
+        headerRow,
+        tableRow,
+      },
+      headers: ref(['Name', 'Age']),
+      rows: ref([
+        { name: 'Alice', age: 25 },
+        { name: 'Bob', age: 30 },
+      ]),
+    },
+    {
+      element: root,
+      template: html`<table>
+        <HeaderRow :headers="headers" />
+        <TableRow r-for="row in rows" :row="row" />
+      </table>`,
+    },
+  )
+
+  const getHeadText = () =>
+    [...root.querySelectorAll('th')].map((x) => x.textContent?.trim())
+  const getCellText = () =>
+    [...root.querySelectorAll('td')].map((x) => x.textContent?.trim())
+
+  expect(getHeadText()).toStrictEqual(['Name', 'Age'])
+  expect(getCellText()).toStrictEqual(['Alice', '25', 'Bob', '30'])
+})
+
+test('should support table usage with tfoot and component cells', () => {
+  const root = document.createElement('div')
+
+  const tableCell = createComponent(html`<td><span>{{ value }}</span></td>`, {
+    props: ['value'],
+  })
+  const footerRow = createComponent(
+    html`<tr>
+      <TableCell r-for="value in totals" :value="value" />
+    </tr>`,
+    { props: ['totals'] },
+  )
+
+  createApp(
+    {
+      components: {
+        tableCell,
+        footerRow,
+      },
+      totals: ref(['Total', '55']),
+    },
+    {
+      element: root,
+      template: html`<table>
+        <tfoot>
+          <FooterRow :totals="totals" />
+        </tfoot>
+      </table>`,
+    },
+  )
+
+  const getCellText = () =>
+    [...root.querySelectorAll('tfoot td')].map((x) => x.textContent?.trim())
+
+  expect(getCellText()).toStrictEqual(['Total', '55'])
 })

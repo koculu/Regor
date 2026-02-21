@@ -8,6 +8,7 @@ import { interpolate } from '../bind/interpolation'
 import { isHTMLElement } from '../common/common'
 import { isArray, isString } from '../common/is-what'
 import { ErrorType, getError } from '../log/errors'
+import { preprocess } from './preprocess-template'
 import { RegorConfig } from './RegorConfig'
 import { toFragment } from './toFragment'
 import { toJsonTemplate } from './toJsonTemplate'
@@ -33,7 +34,7 @@ export const createComponent = <TContext = IRegorContext>(
   } else if (template.template) {
     const element = document
       .createRange()
-      .createContextualFragment(template.template)
+      .createContextualFragment(preprocess(template.template))
     template.element = element
   } else if (template.json) {
     template.element = toFragment(template.json, template.isSVG, options.config)

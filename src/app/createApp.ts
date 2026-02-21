@@ -16,6 +16,7 @@ import { callUnmounted } from '../composition/callUnmounted'
 import { isScope } from '../composition/useScope'
 import { ErrorType, getError } from '../log/errors'
 import { Parser } from '../parser/Parser'
+import { preprocess } from './preprocess-template'
 import { RegorConfig } from './RegorConfig'
 import { toFragment } from './toFragment'
 
@@ -48,7 +49,7 @@ export const createApp = <TRegorContext extends IRegorContext>(
   if (template.template) {
     const element = document
       .createRange()
-      .createContextualFragment(template.template)
+      .createContextualFragment(preprocess(template.template))
     cleanRoot()
     appendChildren(element.childNodes)
     template.element = element

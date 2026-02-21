@@ -148,6 +148,43 @@ When iterating over lists of items, it's important to provide a unique `key` att
 
 In this example, the `:key` attribute is set to `id`, ensuring that each `<li>` element has a unique identifier based on user's id.
 
+## Table Templates
+
+`r-for` is supported in table templates, including component-based rows and
+cells.
+
+- Supported containers: `table`, `thead`, `tbody`, `tfoot`.
+- Component rows can be rendered from these containers.
+- Component-like direct children of `<tr>` are normalized to cell hosts to keep
+  valid table structure.
+
+Example:
+
+```html
+<table>
+  <tbody>
+    <TableRow r-for="row in rows" :row="row" />
+  </tbody>
+</table>
+```
+
+```ts
+const tableCell = createComponent(html`<td><span>{{ value }}</span></td>`, {
+  props: ['value'],
+})
+
+const tableRow = createComponent(
+  html`<tr>
+    <TableCell :value="row.name" />
+    <TableCell :value="row.age" />
+  </tr>`,
+  { props: ['row'] },
+)
+```
+
+Regor keeps table templates valid across `table`, `thead`, `tbody`, and `tfoot`
+while supporting component-based rows and cells.
+
 ## Notes
 
 - The `r-for` directive is a powerful tool for rendering dynamic lists and iterables.
