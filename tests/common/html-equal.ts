@@ -1,7 +1,7 @@
 import { expect } from 'vitest'
 
 export const removeSpaces = (str: string) =>
-  str.replace(/\s+/g, ' ').replace(/>\s+</g, '><').trim()
+  str.replace(/\s+/g, ' ').replace(/\s+>/g, '>').replace(/>\s+</g, '><').trim()
 
 export const htmlEqual = (
   actual: string,
