@@ -7,6 +7,7 @@ import {
   createComponent,
   Component,
   sref,
+  IRegorContext,
 } from '../../src'
 
 test('should mount the people into reactive divs.', () => {
@@ -406,7 +407,7 @@ test('should support r-for on table custom row and cell components', () => {
         tableCell,
         tableCell2,
         tableRow,
-      } as unknown as Record<string, Component>,
+      },
       rows: ref([
         { name: 'Alice', age: 25 },
         { name: 'Bob', age: 30 },
@@ -474,7 +475,7 @@ test('should support table usage with th and td as components', () => {
         tableCell,
         headerRow,
         tableRow,
-      } as unknown as Record<string, Component>,
+      },
       headers: ref(['Name', 'Age']),
       rows: ref([
         { name: 'Alice', age: 25 },
@@ -546,7 +547,7 @@ test('should support table usage with thead th components (expected to fail for 
         tableCell,
         headerRow,
         tableRow,
-      } as unknown as Record<string, Component>,
+      },
       headers: ref(['Name', 'Age']),
       rows: ref([
         { name: 'Alice', age: 25 },
@@ -608,7 +609,7 @@ test('should support simple table usage without thead/tbody (expected to fail fo
         tableCell,
         headerRow,
         tableRow,
-      } as unknown as Record<string, Component>,
+      },
       headers: ref(['Name', 'Age']),
       rows: ref([
         { name: 'Alice', age: 25 },
@@ -651,7 +652,7 @@ test('should support table usage with tfoot and component cells', () => {
       components: {
         tableCell,
         footerRow,
-      } as unknown as Record<string, Component>,
+      },
       totals: ref(['Total', '55']),
     },
     {
