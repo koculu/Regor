@@ -10,7 +10,7 @@
  *
  * High-level behavior:
  * 1) Single-pass scan over the template string.
- *    - We find each '<...>' tag, keep text between tags untouched, and preserve comments.
+ *    - We find each `<...>` tag, keep text between tags untouched, and preserve comments.
  * 2) Maintain a lightweight tag stack to infer structural context.
  *    - Each stack entry stores:
  *      - replacementHost: rewritten host tag name (or null if unchanged)
@@ -19,11 +19,11 @@
  * 3) Apply table-focused rewrites based on current context.
  *
  * Context model:
- * - tableScopeDepth > 0 means we are inside one of: table, thead, tbody, tfoot.
+ * - `tableScopeDepth > 0` means we are inside one of: table, thead, tbody, tfoot.
  * - Outside table scope (tableScopeDepth === 0):
- *   - <tr> -> <trx is="r-tr">
- *   - <td> -> <tdx is="r-td">
- *   - <th> -> <thx is="r-th">
+ *   - `<tr> -> <trx is="r-tr">`
+ *   - `<td> -> <tdx is="r-td">`
+ *   - `<th> -> <thx is="r-th">`
  *   This aliasing avoids invalid native table nodes in non-table contexts while still
  *   enabling later runtime conversion through DynamicBinder.
  *
@@ -44,15 +44,15 @@
  *
  * Self-closing normalization under <tr>:
  * - For self-closing tags directly under effective <tr>, we emit explicit closing tags:
- *   <X ... /> -> <X ...></X>
+ *   `<X ... /> -> <X ...></X>`
  * - This avoids parser collapsing/mis-nesting issues in table rows when custom tags are
  *   authored as self-closing components.
  *
  * Notes on implementation strategy:
  * - This is intentionally string-based and fast (no intermediate DOM parsing).
  * - It is designed for pragmatic table/component compatibility, not full HTML parsing.
- * - Quotes inside tag attributes are respected when searching for tag end ('>').
- * - Special tags like <! ...> and <? ...> are passed through unchanged.
+ * - Quotes inside tag attributes are respected when searching for tag end (`>`).
+ * - Special tags like `<! ...>` and `<? ...>` are passed through unchanged.
  */
 const isNameChar = (ch: string): boolean => {
   const c = ch.charCodeAt(0)

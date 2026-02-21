@@ -16,9 +16,9 @@ import { callUnmounted } from '../composition/callUnmounted'
 import { isScope } from '../composition/useScope'
 import { ErrorType, getError } from '../log/errors'
 import { Parser } from '../parser/Parser'
+import { preprocess } from './preprocess-template'
 import { RegorConfig } from './RegorConfig'
 import { toFragment } from './toFragment'
-import { preprocess } from './preprocess-template'
 
 export const createApp = <TRegorContext extends IRegorContext>(
   context: TRegorContext | Scope<TRegorContext>,

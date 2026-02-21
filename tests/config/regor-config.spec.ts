@@ -42,7 +42,6 @@ test('ComponentHead.unmount removes child nodes', () => {
   expect(container.contains(span)).toBe(false)
 })
 
-
 test('setDirectives registers teleport with configured prefix', () => {
   const config = new RegorConfig()
 
