@@ -6,6 +6,7 @@ import {
   unref,
   createComponent,
   Component,
+  sref,
 } from '../../src'
 
 test('should mount the people into reactive divs.', () => {
@@ -253,6 +254,130 @@ test('should handle expressions with spaces', () => {
   expect(
     [...root.querySelectorAll('div')].map((x) => x.textContent),
   ).toStrictEqual(['5', '6'])
+})
+
+test('should render native tbody rows with r-for and react to updates', () => {
+  const root = document.createElement('div')
+  const app = createApp(
+    {
+      rows: ref([
+        { name: 'Alice', age: 25 },
+        { name: 'Bob', age: 30 },
+      ]),
+    },
+    {
+      element: root,
+      template: html`<table>
+        <tbody>
+          <tr r-for="row in rows">
+            <td>{{ row.name }}</td>
+            <td>{{ row.age }}</td>
+          </tr>
+        </tbody>
+      </table>`,
+    },
+  )
+
+  const getRows = () => [...root.querySelectorAll('tbody tr')]
+  const getCells = () =>
+    [...root.querySelectorAll('tbody td')].map((x) => x.textContent?.trim())
+
+  expect(getRows().length).toBe(2)
+  expect(getCells()).toStrictEqual(['Alice', '25', 'Bob', '30'])
+
+  app.context.rows(
+    [
+      { name: 'Neo', age: 40 },
+      { name: 'Trinity', age: 39 },
+      { name: 'Morpheus', age: 52 },
+    ].map((x) => ref(x)),
+  )
+
+  expect(getRows().length).toBe(3)
+  expect(getCells()).toStrictEqual([
+    'Neo',
+    '40',
+    'Trinity',
+    '39',
+    'Morpheus',
+    '52',
+  ])
+})
+
+test('should support nested r-for in native table cells', () => {
+  const root = document.createElement('div')
+  const app = createApp(
+    {
+      matrix: ref([[1, 2], [3]]),
+    },
+    {
+      element: root,
+      template: html`<table>
+        <tbody>
+          <tr r-for="row, #ri in matrix">
+            <td r-for="cell, #ci in row">{{ ri }}:{{ ci }}={{ cell }}</td>
+          </tr>
+        </tbody>
+      </table>`,
+    },
+  )
+
+  const getRows = () => [...root.querySelectorAll('tbody tr')]
+  const getCells = () =>
+    [...root.querySelectorAll('tbody td')].map((x) => x.textContent?.trim())
+
+  expect(getRows().length).toBe(2)
+  expect(getCells()).toStrictEqual(['0:0=1', '0:1=2', '1:0=3'])
+
+  app.context.matrix(ref([[], [9, 8]]))
+
+  expect(getRows().length).toBe(2)
+  expect(getCells()).toStrictEqual(['1:0=9', '1:1=8'])
+})
+
+test('should support native thead and tfoot with r-for', () => {
+  const root = document.createElement('div')
+  const app = createApp(
+    {
+      headers: sref(['Name', 'Age']),
+      totals: sref(['Total', '55']),
+    },
+    {
+      element: root,
+      template: html`<table>
+        <thead>
+          <tr>
+            <th r-for="h in headers">{{ h }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Alice</td>
+            <td>25</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td r-for="t in totals">{{ t }}</td>
+          </tr>
+        </tfoot>
+      </table>`,
+    },
+  )
+
+  const getHead = () =>
+    [...root.querySelectorAll('thead th')].map((x) => x.textContent?.trim())
+  const getFoot = () =>
+    [...root.querySelectorAll('tfoot td')].map((x) => x.textContent?.trim())
+
+  expect(getHead()).toStrictEqual(['Name', 'Age'])
+  expect(getFoot()).toStrictEqual(['Total', '55'])
+
+  app.context.headers(['Full Name', 'Years'])
+  app.context.totals(['Total', '77'])
+
+  expect(getHead()).toStrictEqual(['Full Name', 'Years'])
+  expect(getFoot()).toStrictEqual(['Total', '77'])
 })
 
 test('should support r-for on table custom row and cell components', () => {
