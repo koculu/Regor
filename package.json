@@ -11,7 +11,7 @@
   "scripts": {
     "build": "yarn tsx scripts/bundle.ts && yarn dts",
     "dts": "yarn dts-bundle-generator src/index.ts -o dist/regor.d.ts",
-    "lint": "yarn eslint src/**/*.ts",
+    "lint": "yarn eslint src/**/*.ts tests/**/*.ts",
     "watch": "yarn tsx scripts/bundle.ts --watch",
     "format": "yarn prettier --write \"**/*.ts\"",
     "test": "vitest"
