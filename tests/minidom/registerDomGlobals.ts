@@ -52,22 +52,14 @@ export function registerDomGlobals(
   assignGlobal(globals, 'Node', win.Node)
   assignGlobal(globals, 'Element', win.Element)
   assignGlobal(globals, 'HTMLElement', win.HTMLElement)
-  assignGlobal(
-    globals,
-    'HTMLSlotElement',
-    (document as Document).createElement('slot').constructor,
-  )
+  assignGlobal(globals, 'HTMLSlotElement', win.HTMLSlotElement)
   assignGlobal(globals, 'DocumentFragment', win.DocumentFragment)
   assignGlobal(globals, 'CustomEvent', win.CustomEvent)
   assignGlobal(globals, 'Event', win.Event)
   assignGlobal(globals, 'MouseEvent', win.MouseEvent)
-  assignGlobal(globals, 'Comment', createCommentConstructor(document))
+  assignGlobal(globals, 'Comment', win.Comment)
   assignGlobal(globals, 'Text', win.Text)
-  assignGlobal(
-    globals,
-    'HTMLTemplateElement',
-    (document as Document).createElement('template').constructor,
-  )
+  assignGlobal(globals, 'HTMLTemplateElement', win.HTMLTemplateElement)
 
   const windowCss = win.CSS as { escape?: unknown } | undefined
   assignGlobal(
@@ -106,14 +98,4 @@ export function ensureDomGlobals(): () => void {
   if (globals.document && globals.window) return () => {}
   const { document, window } = parseHtml('<html><body></body></html>')
   return registerDomGlobals(window, document)
-}
-
-function createCommentConstructor(document: unknown): typeof Comment {
-  const doc = document as Document
-  const prototype = Object.getPrototypeOf(doc.createComment(''))
-  const CommentShim = function Comment(this: Comment, data?: string) {
-    return doc.createComment(data ?? '')
-  } as unknown as typeof Comment
-  CommentShim.prototype = prototype
-  return CommentShim
 }
