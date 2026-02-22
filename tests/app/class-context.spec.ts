@@ -659,9 +659,7 @@ test('known issue: named slot content should render with class component context
   expect(root.querySelector('.extra')?.textContent).toBe('x')
 })
 
-test.fails(
-  'known issue: r-for with r-if on same node should update without binder errors',
-  () => {
+test('r-for with r-if on same node should update without binder errors', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     try {
       class ListApp {
@@ -702,5 +700,4 @@ test.fails(
     } finally {
       errorSpy.mockRestore()
     }
-  },
-)
+})
