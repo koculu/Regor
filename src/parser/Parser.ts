@@ -136,8 +136,8 @@ export class Parser {
             stopObserverList.push(stopObserving)
           }
         }
-        value(evaluated.map((x) => x.value))
         result.refs = evaluated.map((x) => x.ref)
+        value(evaluated.map((x) => x.value))
       }
       refresh()
     } catch (e) {

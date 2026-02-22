@@ -146,20 +146,20 @@ const attachDOMChangeListener = (
     number: f1.number || f2.number,
     trim: f1.trim || f2.trim,
   }
-  const modelRef = parseResult.refs[0]
-  if (!modelRef) {
+  if (!parseResult.refs[0]) {
     warning(WarningType.ModelRequiresRef, el)
     return () => {}
   }
+  const getModelRef = (): AnyRef | undefined => parseResult.refs[0]
   const isAnInput = isInput(el)
   if (isAnInput && isCheckBox(el)) {
-    return handleCheckBox(el, modelRef)
+    return handleCheckBox(el, getModelRef)
   } else if (isAnInput && isRadio(el)) {
-    return handleRadio(el, modelRef)
+    return handleRadio(el, getModelRef)
   } else if (isAnInput || isTextArea(el)) {
-    return handleInputAndTextArea(el, flags, modelRef, parsedValue)
+    return handleInputAndTextArea(el, flags, getModelRef, parsedValue)
   } else if (isSelect(el)) {
-    return handleSelect(el, modelRef, parsedValue)
+    return handleSelect(el, getModelRef, parsedValue)
   } else {
     warning(WarningType.ModelNotSupportOnElement, el)
     return () => {}
@@ -171,7 +171,7 @@ const decimalSeparators = /[.,' ·٫]/
 const handleInputAndTextArea = (
   el: HTMLInputElement | HTMLTextAreaElement,
   flags: ModelFlags,
-  modelRef: AnyRef,
+  getModelRef: () => AnyRef | undefined,
   parsedValue: SRef<unknown[]>,
 ): Unbinder => {
   const isLazy = flags.lazy
@@ -203,6 +203,8 @@ const handleInputAndTextArea = (
   }
 
   const listener = (event: Event): void => {
+    const modelRef = getModelRef()
+    if (!modelRef) return
     const target = event.target as any
     if (!target || target.composing) return
     let value = target.value
@@ -237,13 +239,18 @@ const handleInputAndTextArea = (
   return unbinder
 }
 
-const handleCheckBox = (el: HTMLInputElement, modelRef: AnyRef): Unbinder => {
+const handleCheckBox = (
+  el: HTMLInputElement,
+  getModelRef: () => AnyRef | undefined,
+): Unbinder => {
   const eventType = 'change'
   const unbinder = (): void => {
     el.removeEventListener(eventType, listener)
   }
 
   const listener = (): void => {
+    const modelRef = getModelRef()
+    if (!modelRef) return
     const elementValue = getValue(el)
     const checked = el.checked
     const modelValue = modelRef()
@@ -314,13 +321,18 @@ const getCheckboxChecked = (
   return looseEqual(value, true)
 }
 
-const handleRadio = (el: HTMLInputElement, modelRef: AnyRef): Unbinder => {
+const handleRadio = (
+  el: HTMLInputElement,
+  getModelRef: () => AnyRef | undefined,
+): Unbinder => {
   const eventType = 'change'
   const unbinder = (): void => {
     el.removeEventListener(eventType, listener)
   }
 
   const listener = (): void => {
+    const modelRef = getModelRef()
+    if (!modelRef) return
     const elementValue = getValue(el)
     modelRef(elementValue)
   }
@@ -330,7 +342,7 @@ const handleRadio = (el: HTMLInputElement, modelRef: AnyRef): Unbinder => {
 
 const handleSelect = (
   el: HTMLSelectElement,
-  modelRef: AnyRef,
+  getModelRef: () => AnyRef | undefined,
   parsedValue: SRef<unknown[]>,
 ): Unbinder => {
   const eventType = 'change'
@@ -338,6 +350,8 @@ const handleSelect = (
     el.removeEventListener(eventType, listener)
   }
   const listener = (): void => {
+    const modelRef = getModelRef()
+    if (!modelRef) return
     const flags = getFlags(parsedValue()[1])
     const number = flags.number
     const selectedValue = Array.prototype.filter
