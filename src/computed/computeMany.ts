@@ -13,7 +13,7 @@ import { sref } from '../reactivity/sref'
 import { trigger } from '../reactivity/trigger'
 import { type ComputedOnce } from './computed'
 
-type SourceValues<TSources extends readonly AnyRef[]> = {
+type ComputeManySourceValues<TSources extends readonly AnyRef[]> = {
   [TIndex in keyof TSources]: UnwrapRef<TSources[TIndex]>
 }
 
@@ -22,7 +22,7 @@ export const computeMany = <
   TReturnType,
 >(
   sources: TSources,
-  compute: (...values: SourceValues<TSources>) => TReturnType,
+  compute: (...values: ComputeManySourceValues<TSources>) => TReturnType,
 ): ComputedRef<UnwrapRef<TReturnType>> => {
   const status: ComputedOnce<TReturnType> = {}
   let computer: any
@@ -43,7 +43,7 @@ export const computeMany = <
 
 const computeManyOnce = <TSources extends readonly AnyRef[], TReturnType>(
   sources: TSources,
-  compute: (...values: SourceValues<TSources>) => TReturnType,
+  compute: (...values: ComputeManySourceValues<TSources>) => TReturnType,
   status: ComputedOnce<TReturnType>,
 ): ComputedRef<UnwrapRef<TReturnType>> => {
   const result =
@@ -61,7 +61,9 @@ const computeManyOnce = <TSources extends readonly AnyRef[], TReturnType>(
       trigger(result)
       return
     }
-    const values = sources.map((source) => source()) as SourceValues<TSources>
+    const values = sources.map((source) =>
+      source(),
+    ) as ComputeManySourceValues<TSources>
     result(compute(...values) as UnwrapRef<TReturnType>)
     ++i
   }
