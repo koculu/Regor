@@ -140,7 +140,9 @@ test('r-model input type number retargets through component prop after selected 
     },
     {
       element: root,
-      template: html`<HostInputField :model="selectedHost.port"></HostInputField>`,
+      template: html`<HostInputField
+        :model="selectedHost.port"
+      ></HostInputField>`,
     },
   )
 
@@ -640,7 +642,9 @@ test('regression: selecting host from list should not overwrite previous host it
     },
     {
       element: root,
-      template: html`<HostInputField :model="selectedHost.hostname"></HostInputField>`,
+      template: html`<HostInputField
+        :model="selectedHost.hostname"
+      ></HostInputField>`,
     },
   )
 

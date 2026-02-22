@@ -692,9 +692,14 @@ test('should not throw when adding first tenant after selectedHost replacement',
       element: root,
       template: html`<div class="form-block__field">
         <span class="form-block__label">Tenants</span>
-        <div class="form-block__meta" r-for="tenantValue in selectedHost.tenants">
+        <div
+          class="form-block__meta"
+          r-for="tenantValue in selectedHost.tenants"
+        >
           <input class="form-block__input" type="text" r-model="tenantValue" />
-          <button type="button" @click="removeTenant(tenantValue)">Remove</button>
+          <button type="button" @click="removeTenant(tenantValue)">
+            Remove
+          </button>
         </div>
         <button type="button" @click="addTenant">Add tenant</button>
       </div>`,
@@ -702,7 +707,9 @@ test('should not throw when adding first tenant after selectedHost replacement',
   )
 
   const getTenantInputs = () =>
-    root.querySelectorAll('input.form-block__input') as NodeListOf<HTMLInputElement>
+    root.querySelectorAll(
+      'input.form-block__input',
+    ) as NodeListOf<HTMLInputElement>
 
   expect(getTenantInputs().length).toBe(1)
   selectedHost(hostItems()[1]())
@@ -765,16 +772,20 @@ test('should start from selected host tenants when adding first tenant via compo
     },
     {
       element: root,
-      template: html`<HostTenantsField :selectedHost="selectedHost"></HostTenantsField>`,
+      template: html`<HostTenantsField
+        :selectedHost="selectedHost"
+      ></HostTenantsField>`,
     },
   )
 
   const getTenantInputs = () =>
-    root.querySelectorAll('input.form-block__input') as NodeListOf<HTMLInputElement>
+    root.querySelectorAll(
+      'input.form-block__input',
+    ) as NodeListOf<HTMLInputElement>
   const getAddButton = () =>
-    [...root.querySelectorAll('button')].find((x) => x.textContent === 'Add tenant') as
-      | HTMLButtonElement
-      | undefined
+    [...root.querySelectorAll('button')].find(
+      (x) => x.textContent === 'Add tenant',
+    ) as HTMLButtonElement | undefined
 
   expect(getTenantInputs().length).toBe(1)
   selectedHost(hostItems()[1]())
