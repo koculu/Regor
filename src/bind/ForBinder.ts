@@ -181,7 +181,7 @@ export class ForBinder {
     const updateDom = (newValues: any): void => {
       const beginParent = commentBegin.parentNode
       const endParent = commentEnd.parentNode
-      if (!beginParent || !endParent || beginParent !== endParent) return
+      if (!beginParent || !endParent) return
       let len = mountList.__length
       if (isFunction(newValues)) newValues = newValues()
       const unrefedNewValue = unref(newValues[0])
