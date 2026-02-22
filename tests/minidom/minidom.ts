@@ -38,9 +38,12 @@ export type MiniWindow = {
   HTMLTemplateElement: typeof MiniHTMLTemplateElement
   CustomEvent: typeof MiniCustomEvent
   Event: typeof MiniEvent
+  MouseEvent: typeof MiniMouseEvent
   Comment: typeof MiniComment
   Text: typeof MiniText
   CSS: { escape: (value: string) => string }
+  localStorage: MiniStorage
+  sessionStorage: MiniStorage
 }
 
 export function parseHtml(html: string) {
@@ -60,6 +63,8 @@ export function parseFragment(html: string, document?: MiniDocument) {
 }
 
 function createWindow(document: MiniDocument): MiniWindow {
+  const localStorage = new MiniStorage()
+  const sessionStorage = new MiniStorage()
   const window: MiniWindow = {
     window: undefined as unknown as MiniWindow,
     document,
@@ -71,9 +76,12 @@ function createWindow(document: MiniDocument): MiniWindow {
     HTMLTemplateElement: MiniHTMLTemplateElement,
     CustomEvent: MiniCustomEvent,
     Event: MiniEvent,
+    MouseEvent: MiniMouseEvent,
     Comment: MiniComment,
     Text: MiniText,
     CSS: { escape: cssEscape },
+    localStorage,
+    sessionStorage,
   }
   window.window = window
   return window
@@ -90,6 +98,7 @@ class MiniNode {
   parentNode: MiniNode | null = null
   _ownerDocument: MiniDocument | null = null
   childNodes: MiniNode[] = []
+  private listeners?: Map<string, Set<(event: MiniEvent) => void>>
 
   constructor(type: NodeType) {
     this.nodeType = type
@@ -172,6 +181,16 @@ class MiniNode {
     }
   }
 
+  contains(node: MiniNode | null): boolean {
+    if (!node) return false
+    let current: MiniNode | null = node
+    while (current) {
+      if (current === this) return true
+      current = current.parentNode
+    }
+    return false
+  }
+
   cloneNode(deep?: boolean): MiniNode {
     void deep
     return new MiniNode(this.nodeType)
@@ -186,21 +205,70 @@ class MiniNode {
   }
 
   addEventListener(type: string, listener: (...args: unknown[]) => void): void {
-    void type
-    void listener
+    if (!type || !listener) return
+    const normalizedType = String(type).toLowerCase()
+    if (!this.listeners) this.listeners = new Map()
+    let bucket = this.listeners.get(normalizedType)
+    if (!bucket) {
+      bucket = new Set()
+      this.listeners.set(normalizedType, bucket)
+    }
+    bucket.add(listener as (event: MiniEvent) => void)
   }
 
   removeEventListener(
     type: string,
     listener: (...args: unknown[]) => void,
   ): void {
-    void type
-    void listener
+    if (!type || !listener || !this.listeners) return
+    const normalizedType = String(type).toLowerCase()
+    const bucket = this.listeners.get(normalizedType)
+    if (!bucket) return
+    bucket.delete(listener as (event: MiniEvent) => void)
+    if (bucket.size === 0) this.listeners.delete(normalizedType)
+    if (this.listeners.size === 0) this.listeners = undefined
   }
 
   dispatchEvent(event: MiniEvent): boolean {
-    void event
-    return true
+    if (!event || !event.type) return true
+    if (!event.target) event.target = this
+    const normalizedType = event.type.toLowerCase()
+    this.dispatchToListeners(normalizedType, event)
+    if (!event.bubbles || event.propagationStopped) return !event.defaultPrevented
+
+    let cursor = this.parentNode
+    let hasAncestorListeners = false
+    while (cursor) {
+      if (cursor.hasListenersForType(normalizedType)) {
+        hasAncestorListeners = true
+        break
+      }
+      cursor = cursor.parentNode
+    }
+    if (!hasAncestorListeners) return !event.defaultPrevented
+
+    cursor = this.parentNode
+    while (cursor) {
+      cursor.dispatchToListeners(normalizedType, event)
+      if (event.propagationStopped) break
+      cursor = cursor.parentNode
+    }
+    return !event.defaultPrevented
+  }
+
+  private hasListenersForType(type: string): boolean {
+    const bucket = this.listeners?.get(type)
+    return !!bucket && bucket.size > 0
+  }
+
+  private dispatchToListeners(type: string, event: MiniEvent): void {
+    const bucket = this.listeners?.get(type)
+    if (!bucket || bucket.size === 0) return
+    event.currentTarget = this
+    for (const listener of [...bucket]) {
+      listener(event)
+      if (event.immediatePropagationStopped) break
+    }
   }
 
   get innerText(): string {
@@ -333,9 +401,11 @@ class MiniElement extends MiniNode {
   private attributes = new Map<string, string>()
   private syncingStyleFromAttribute = false
   private syncingStyleToAttribute = false
+  private internalValue = ''
+  private internalChecked = false
+  private internalSelected = false
   classList: ClassList
   style: StyleDeclaration
-  value: string = ''
 
   constructor(tagName: string) {
     super(NodeType.ELEMENT_NODE)
@@ -372,6 +442,9 @@ class MiniElement extends MiniNode {
       return
     }
     this.attributes.set(key, normalized)
+    if (key === 'value') this.internalValue = normalized
+    if (key === 'checked') this.internalChecked = true
+    if (key === 'selected') this.internalSelected = true
   }
 
   removeAttribute(name: string) {
@@ -388,6 +461,8 @@ class MiniElement extends MiniNode {
       return
     }
     this.attributes.delete(key)
+    if (key === 'checked') this.internalChecked = false
+    if (key === 'selected') this.internalSelected = false
   }
 
   private syncStyleAttribute(cssText: string) {
@@ -433,6 +508,78 @@ class MiniElement extends MiniNode {
     this.setAttribute('class', String(value))
   }
 
+  get type(): string {
+    return this.getAttribute('type') ?? ''
+  }
+
+  set type(value: string) {
+    if (!value) this.removeAttribute('type')
+    else this.setAttribute('type', String(value))
+  }
+
+  get value(): string {
+    if (this.tagName === 'OPTION') {
+      const attrValue = this.getAttribute('value')
+      if (attrValue != null) return attrValue
+      return this.textContent
+    }
+    return this.internalValue
+  }
+
+  set value(value: unknown) {
+    this.internalValue = value == null ? '' : String(value)
+    if (this.tagName === 'OPTION') this.setAttribute('value', this.internalValue)
+  }
+
+  get checked(): boolean {
+    return this.internalChecked
+  }
+
+  set checked(value: boolean) {
+    this.internalChecked = !!value
+    if (this.internalChecked) this.attributes.set('checked', '')
+    else this.attributes.delete('checked')
+  }
+
+  get selected(): boolean {
+    return this.internalSelected
+  }
+
+  set selected(value: boolean) {
+    this.internalSelected = !!value
+    if (this.internalSelected) this.attributes.set('selected', '')
+    else this.attributes.delete('selected')
+  }
+
+  get multiple(): boolean {
+    return this.hasAttribute('multiple')
+  }
+
+  set multiple(value: boolean) {
+    if (value) this.setAttribute('multiple', '')
+    else this.removeAttribute('multiple')
+  }
+
+  get options(): MiniElement[] {
+    if (this.tagName !== 'SELECT') return []
+    return this.querySelectorAll('option')
+  }
+
+  get selectedIndex(): number {
+    const options = this.options
+    for (let i = 0; i < options.length; i += 1) {
+      if ((options[i] as MiniElement).selected) return i
+    }
+    return -1
+  }
+
+  set selectedIndex(value: number) {
+    const options = this.options
+    for (let i = 0; i < options.length; i += 1) {
+      ;(options[i] as MiniElement).selected = i === value
+    }
+  }
+
   get nextElementSibling(): MiniElement | null {
     if (!this.parentNode) return null
     const siblings = this.parentNode.childNodes
@@ -470,7 +617,7 @@ class MiniElement extends MiniNode {
   }
 
   override get textContent(): string {
-    return this.childNodes.map((node) => node.textContent).join('')
+    return collectTextContent(this)
   }
 
   override set textContent(value: string) {
@@ -495,6 +642,12 @@ class MiniElement extends MiniNode {
       if (matchesCompiledSelector(this, compiled)) return true
     }
     return false
+  }
+
+  click(): void {
+    this.dispatchEvent(
+      new MiniMouseEvent('click', { bubbles: true, cancelable: true, button: 0 }),
+    )
   }
 
   override cloneNode(deep?: boolean): MiniNode {
@@ -607,16 +760,103 @@ class MiniComment extends MiniNode {
 
 class MiniEvent {
   type: string
-  constructor(type: string) {
+  bubbles: boolean
+  cancelable: boolean
+  defaultPrevented: boolean
+  target: MiniNode | null
+  currentTarget: MiniNode | null
+  propagationStopped: boolean
+  immediatePropagationStopped: boolean
+
+  constructor(
+    type: string,
+    init?: {
+      bubbles?: boolean
+      cancelable?: boolean
+    },
+  ) {
     this.type = type
+    this.bubbles = !!init?.bubbles
+    this.cancelable = !!init?.cancelable
+    this.defaultPrevented = false
+    this.target = null
+    this.currentTarget = null
+    this.propagationStopped = false
+    this.immediatePropagationStopped = false
+  }
+
+  preventDefault(): void {
+    if (this.cancelable) this.defaultPrevented = true
+  }
+
+  stopPropagation(): void {
+    this.propagationStopped = true
+  }
+
+  stopImmediatePropagation(): void {
+    this.immediatePropagationStopped = true
+    this.propagationStopped = true
   }
 }
 
 class MiniCustomEvent extends MiniEvent {
   detail: unknown
-  constructor(type: string, detail?: unknown) {
+  constructor(
+    type: string,
+    init?: { detail?: unknown; bubbles?: boolean; cancelable?: boolean } | unknown,
+  ) {
+    if (init && typeof init === 'object' && !Array.isArray(init)) {
+      const obj = init as {
+        detail?: unknown
+        bubbles?: boolean
+        cancelable?: boolean
+      }
+      super(type, { bubbles: obj.bubbles, cancelable: obj.cancelable })
+      this.detail = obj.detail
+      return
+    }
     super(type)
-    this.detail = detail
+    this.detail = init
+  }
+}
+
+class MiniMouseEvent extends MiniEvent {
+  button: number
+  constructor(
+    type: string,
+    init?: { button?: number; bubbles?: boolean; cancelable?: boolean },
+  ) {
+    super(type, init)
+    this.button = init?.button ?? 0
+  }
+}
+
+class MiniStorage {
+  private map = new Map<string, string>()
+
+  get length(): number {
+    return this.map.size
+  }
+
+  clear(): void {
+    this.map.clear()
+  }
+
+  getItem(key: string): string | null {
+    return this.map.get(String(key)) ?? null
+  }
+
+  key(index: number): string | null {
+    if (index < 0 || index >= this.map.size) return null
+    return [...this.map.keys()][index] ?? null
+  }
+
+  removeItem(key: string): void {
+    this.map.delete(String(key))
+  }
+
+  setItem(key: string, value: string): void {
+    this.map.set(String(key), String(value))
   }
 }
 
@@ -657,6 +897,10 @@ class ClassList {
 
   contains(token: string) {
     return this.getTokens().includes(token)
+  }
+
+  get length() {
+    return this.getTokens().length
   }
 }
 
@@ -722,8 +966,10 @@ function createStyleDeclaration(onChange?: (cssText: string) => void) {
         if (STYLE_INDEX_PATTERN.test(prop)) {
           return target.item(Number.parseInt(prop, 10))
         }
+        if (prop in target) return Reflect.get(target, prop, receiver)
         const key = normalizeStylePropertyName(prop)
         if (key && key in state) return state[key]
+        if (key) return ''
       }
       return Reflect.get(target, prop, receiver)
     },
@@ -1129,6 +1375,15 @@ function escapeText(value: string) {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
+}
+
+function collectTextContent(node: MiniNode): string {
+  if (node instanceof MiniText) return node.data
+  if (node instanceof MiniComment) return ''
+  if (node instanceof MiniHTMLTemplateElement) {
+    return node.content.childNodes.map((child) => collectTextContent(child)).join('')
+  }
+  return node.childNodes.map((child) => collectTextContent(child)).join('')
 }
 
 function escapeAttribute(value: string) {

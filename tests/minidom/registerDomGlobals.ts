@@ -11,10 +11,13 @@ type GlobalKey =
   | 'DocumentFragment'
   | 'CustomEvent'
   | 'Event'
+  | 'MouseEvent'
   | 'Comment'
   | 'Text'
   | 'HTMLTemplateElement'
   | 'CSS'
+  | 'localStorage'
+  | 'sessionStorage'
 
 export function registerDomGlobals(
   window: unknown,
@@ -32,10 +35,13 @@ export function registerDomGlobals(
     'DocumentFragment',
     'CustomEvent',
     'Event',
+    'MouseEvent',
     'Comment',
     'Text',
     'HTMLTemplateElement',
     'CSS',
+    'localStorage',
+    'sessionStorage',
   ]
 
   for (const key of keys) original[key] = globals[key]
@@ -54,6 +60,7 @@ export function registerDomGlobals(
   assignGlobal(globals, 'DocumentFragment', win.DocumentFragment)
   assignGlobal(globals, 'CustomEvent', win.CustomEvent)
   assignGlobal(globals, 'Event', win.Event)
+  assignGlobal(globals, 'MouseEvent', win.MouseEvent)
   assignGlobal(globals, 'Comment', createCommentConstructor(document))
   assignGlobal(globals, 'Text', win.Text)
   assignGlobal(
@@ -70,6 +77,8 @@ export function registerDomGlobals(
       ? windowCss
       : { escape: cssEscape },
   )
+  assignGlobal(globals, 'localStorage', win.localStorage)
+  assignGlobal(globals, 'sessionStorage', win.sessionStorage)
 
   return () => {
     for (const key of keys) globals[key] = original[key]
