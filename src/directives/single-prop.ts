@@ -105,6 +105,7 @@ export const singlePropDirective: Directive = {
         }
 
         if (isModelBridge(value)) {
+          if (ctxKey === value) return
           if (isRef(ctxKey)) {
             syncRefs(value, ctxKey)
           } else {

@@ -662,3 +662,127 @@ test('should support table usage with tfoot and component cells', () => {
 
   expect(getCellText()).toStrictEqual(['Total', '55'])
 })
+
+test('should not throw when adding first tenant after selectedHost replacement', () => {
+  const root = document.createElement('div')
+  const hostItems = ref([
+    { hostname: 'host-a', tenants: ['a-1'] },
+    { hostname: 'host-b', tenants: [] },
+  ])
+  const selectedHost = ref(hostItems()[0]())
+
+  const addTenant = (): void => {
+    const tenants = selectedHost().tenants()
+    tenants.push(ref(`tenant-${tenants.length + 1}`))
+  }
+  const removeTenant = (tenantValue: any): void => {
+    const tenants = selectedHost().tenants()
+    const index = tenants.findIndex((x: any) => x === tenantValue)
+    if (index >= 0) tenants.splice(index, 1)
+  }
+
+  createApp(
+    {
+      hostItems,
+      selectedHost,
+      addTenant,
+      removeTenant,
+    },
+    {
+      element: root,
+      template: html`<div class="form-block__field">
+        <span class="form-block__label">Tenants</span>
+        <div class="form-block__meta" r-for="tenantValue in selectedHost.tenants">
+          <input class="form-block__input" type="text" r-model="tenantValue" />
+          <button type="button" @click="removeTenant(tenantValue)">Remove</button>
+        </div>
+        <button type="button" @click="addTenant">Add tenant</button>
+      </div>`,
+    },
+  )
+
+  const getTenantInputs = () =>
+    root.querySelectorAll('input.form-block__input') as NodeListOf<HTMLInputElement>
+
+  expect(getTenantInputs().length).toBe(1)
+  selectedHost(hostItems()[1]())
+  expect(getTenantInputs().length).toBe(0)
+
+  expect(() => addTenant()).not.toThrow()
+  expect(getTenantInputs().length).toBe(1)
+  expect(getTenantInputs()[0].value).toBe('tenant-1')
+
+  expect(() => addTenant()).not.toThrow()
+  expect(getTenantInputs().length).toBe(2)
+})
+
+test('should start from selected host tenants when adding first tenant via component prop after replacement', () => {
+  const root = document.createElement('div')
+  const hostItems = ref([
+    { hostname: 'host-a', tenants: ['a-1'] },
+    { hostname: 'host-b', tenants: [] },
+  ])
+  const selectedHost = ref(hostItems()[0]())
+
+  const hostTenantsField = createComponent(
+    html`<div class="form-block__field">
+      <span class="form-block__label">Tenants</span>
+      <div class="form-block__meta" r-for="tenantValue in selectedHost.tenants">
+        <input class="form-block__input" type="text" r-model="tenantValue" />
+        <button type="button" @click="removeTenant(tenantValue)">Remove</button>
+      </div>
+      <button type="button" @click="addTenant">Add tenant</button>
+    </div>`,
+    {
+      props: ['selectedHost'],
+      context: () => {
+        const ctx: Record<string, any> = {}
+        const getTenants = (): any[] => {
+          const host = unref(ctx.selectedHost)
+          return unref(host.tenants)
+        }
+        ctx.addTenant = () => {
+          const tenants = getTenants()
+          tenants.push(ref(`tenant-${tenants.length + 1}`))
+        }
+        ctx.removeTenant = (tenantValue: any) => {
+          const tenants = getTenants()
+          const index = tenants.findIndex((x: any) => x === tenantValue)
+          if (index >= 0) tenants.splice(index, 1)
+        }
+        return ctx
+      },
+    },
+  )
+
+  createApp(
+    {
+      hostItems,
+      selectedHost,
+      components: {
+        hostTenantsField,
+      },
+    },
+    {
+      element: root,
+      template: html`<HostTenantsField :selectedHost="selectedHost"></HostTenantsField>`,
+    },
+  )
+
+  const getTenantInputs = () =>
+    root.querySelectorAll('input.form-block__input') as NodeListOf<HTMLInputElement>
+  const getAddButton = () =>
+    [...root.querySelectorAll('button')].find((x) => x.textContent === 'Add tenant') as
+      | HTMLButtonElement
+      | undefined
+
+  expect(getTenantInputs().length).toBe(1)
+  selectedHost(hostItems()[1]())
+
+  const addButton = getAddButton()
+  if (!addButton) throw new Error('missing add button')
+
+  expect(() => addButton.click()).not.toThrow()
+  const valuesAfterFirstAdd = [...getTenantInputs()].map((x) => x.value)
+  expect(valuesAfterFirstAdd).toStrictEqual(['tenant-1'])
+})
