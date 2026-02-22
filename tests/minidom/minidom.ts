@@ -234,7 +234,8 @@ class MiniNode {
     if (!event.target) event.target = this
     const normalizedType = event.type.toLowerCase()
     this.dispatchToListeners(normalizedType, event)
-    if (!event.bubbles || event.propagationStopped) return !event.defaultPrevented
+    if (!event.bubbles || event.propagationStopped)
+      return !event.defaultPrevented
 
     let cursor = this.parentNode
     let hasAncestorListeners = false
@@ -528,7 +529,8 @@ class MiniElement extends MiniNode {
 
   set value(value: unknown) {
     this.internalValue = value == null ? '' : String(value)
-    if (this.tagName === 'OPTION') this.setAttribute('value', this.internalValue)
+    if (this.tagName === 'OPTION')
+      this.setAttribute('value', this.internalValue)
   }
 
   get checked(): boolean {
@@ -646,7 +648,11 @@ class MiniElement extends MiniNode {
 
   click(): void {
     this.dispatchEvent(
-      new MiniMouseEvent('click', { bubbles: true, cancelable: true, button: 0 }),
+      new MiniMouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+        button: 0,
+      }),
     )
   }
 
@@ -803,7 +809,9 @@ class MiniCustomEvent extends MiniEvent {
   detail: unknown
   constructor(
     type: string,
-    init?: { detail?: unknown; bubbles?: boolean; cancelable?: boolean } | unknown,
+    init?:
+      | { detail?: unknown; bubbles?: boolean; cancelable?: boolean }
+      | unknown,
   ) {
     if (init && typeof init === 'object' && !Array.isArray(init)) {
       const obj = init as {
@@ -1381,7 +1389,9 @@ function collectTextContent(node: MiniNode): string {
   if (node instanceof MiniText) return node.data
   if (node instanceof MiniComment) return ''
   if (node instanceof MiniHTMLTemplateElement) {
-    return node.content.childNodes.map((child) => collectTextContent(child)).join('')
+    return node.content.childNodes
+      .map((child) => collectTextContent(child))
+      .join('')
   }
   return node.childNodes.map((child) => collectTextContent(child)).join('')
 }
