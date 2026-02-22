@@ -273,7 +273,7 @@ export interface Template {
   isSVG?: boolean
 }
 
-export interface App<TRegorContext extends IRegorContext> {
+export interface App<TRegorContext extends IRegorContext | object> {
   context: TRegorContext
   unmount: () => void
   unbind: () => void
@@ -284,7 +284,9 @@ export interface App<TRegorContext extends IRegorContext> {
  *
  * @typeparam TContext - The type of context accepted by the component.
  */
-export interface Component<TContext extends IRegorContext = IRegorContext> {
+export interface Component<
+  TContext extends IRegorContext | object = IRegorContext,
+> {
   /**
    * A function that returns the Regor context associated with the component.
    *
@@ -319,7 +321,7 @@ export type OnMounted = () => void
 export type OnUnmounted = () => void
 
 export interface CreateComponentOptions<
-  TContext extends IRegorContext = IRegorContext,
+  TContext extends IRegorContext | object = IRegorContext,
 > {
   useInterpolation?: boolean
 

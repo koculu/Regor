@@ -20,7 +20,9 @@ import { preprocess } from './preprocess-template'
 import { RegorConfig } from './RegorConfig'
 import { toFragment } from './toFragment'
 
-export const createApp = <TRegorContext extends IRegorContext = IRegorContext>(
+export const createApp = <
+  TRegorContext extends IRegorContext | object = IRegorContext,
+>(
   context: TRegorContext | Scope<TRegorContext>,
   template: Template | string = { selector: '#app' },
   config?: RegorConfig,
@@ -60,14 +62,14 @@ export const createApp = <TRegorContext extends IRegorContext = IRegorContext>(
   }
 
   if (config.useInterpolation) interpolate(root, config)
-  const app = new RegorApp(context, root, config)
+  const app = new RegorApp(context as IRegorContext, root, config)
   app.__bind()
   addUnbinder(root, () => {
-    callUnmounted(context)
+    callUnmounted(context as IRegorContext)
   })
-  callMounted(context)
+  callMounted(context as IRegorContext)
   return {
-    context,
+    context: context as TRegorContext,
     unmount: () => {
       removeNode(root)
     },
