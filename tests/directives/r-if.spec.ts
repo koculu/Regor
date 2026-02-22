@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 
-import { Component, createApp, createComponent, html, ref } from '../../src'
+import { createApp, createComponent, html, ref } from '../../src'
 
 test('r-if/r-else toggles after selectedHost replacement without component', () => {
   const root = document.createElement('div')
@@ -130,7 +130,7 @@ test('r-if/r-else propagates through 3 nested components across selectedHost rep
       selectedHost,
       components: {
         outerHostStatus,
-      } as unknown as Record<string, Component>,
+      },
     },
     {
       element: root,

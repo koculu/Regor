@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 
-import { Component, createApp, createComponent, html, ref } from '../../src'
+import { createApp, createComponent, html, ref } from '../../src'
 
 test('r-model expression flag int converts input to integer', () => {
   const root = document.createElement('div')
@@ -584,7 +584,7 @@ test('three nested components keep :model two-way binding across replacements', 
       selectedHost,
       components: {
         outerInputField,
-      } as unknown as Record<string, Component>,
+      },
     },
     {
       element: root,

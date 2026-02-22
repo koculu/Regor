@@ -1,14 +1,6 @@
 import { expect, test } from 'vitest'
 
-import {
-  Component,
-  createApp,
-  createComponent,
-  html,
-  ref,
-  sref,
-  unref,
-} from '../../src'
+import { createApp, createComponent, html, ref, sref, unref } from '../../src'
 
 test('should mount the people into reactive divs.', () => {
   const root = document.createElement('div')
@@ -917,7 +909,7 @@ test('repro with hosts-like component hierarchy and table selection path', async
         hostInputField,
         hostTenantsField,
         hostTableRow,
-      } as unknown as Record<string, Component>,
+      },
     },
     {
       element: root,
