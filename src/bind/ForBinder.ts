@@ -131,11 +131,16 @@ export class ForBinder {
       const mountItem = MountList.__createItem(result.index, newValue)
       parser.__scoped(capturedContext, () => {
         parser.__push(result.ctx)
+        const insertParent = (commentEnd.parentNode ??
+          commentBegin.parentNode) as HTMLElement | null
+        if (!insertParent) {
+          throw new Error('[r-for] cannot mount: missing anchor parent')
+        }
         let start = nextSibling.previousSibling as ChildNode
         const childNodes: ChildNode[] = []
         for (const x of nodes) {
           const node = x.cloneNode(true)
-          parent.insertBefore(node, nextSibling)
+          insertParent.insertBefore(node, nextSibling)
           childNodes.push(node as ChildNode)
         }
         bindChildNodes(binder, childNodes)
