@@ -59,6 +59,110 @@ test('r-model number flag converts to number', () => {
   expect(num()).toBe('')
 })
 
+test('r-model with input type number converts to number without number flag', () => {
+  const root = document.createElement('div')
+  const amount = ref(0)
+  createApp(
+    { amount },
+    { element: root, template: html`<input type="number" r-model="amount" />` },
+  )
+  const input = root.querySelector('input') as HTMLInputElement
+  input.value = '12.5'
+  input.dispatchEvent(new Event('input'))
+  expect(amount()).toBe(12.5)
+})
+
+test('r-model with input type number sets empty string for invalid input', () => {
+  const root = document.createElement('div')
+  const amount = ref(0)
+  createApp(
+    { amount },
+    { element: root, template: html`<input type="number" r-model="amount" />` },
+  )
+  const input = root.querySelector('input') as HTMLInputElement
+  input.value = 'foo'
+  input.dispatchEvent(new Event('input'))
+  expect(amount()).toBe('')
+})
+
+test('r-model with input type number reflects model updates in DOM', () => {
+  const root = document.createElement('div')
+  const amount = ref(0)
+  createApp(
+    { amount },
+    { element: root, template: html`<input type="number" r-model="amount" />` },
+  )
+  const input = root.querySelector('input') as HTMLInputElement
+
+  amount(42.75)
+  expect(input.value).toBe('42.75')
+})
+
+test('r-model input type number retargets after selected ref replacement without component', () => {
+  const root = document.createElement('div')
+  const selectedHost = ref({ port: 1 })
+
+  createApp(
+    { selectedHost },
+    {
+      element: root,
+      template: html`<input type="number" r-model="selectedHost.port" />`,
+    },
+  )
+
+  const input = root.querySelector('input') as HTMLInputElement | null
+  if (!input) throw new Error('missing input')
+
+  selectedHost(ref({ port: 2 }))
+  expect(input.value).toBe('2')
+  selectedHost().port(3)
+  expect(input.value).toBe('3')
+
+  input.value = '4'
+  input.dispatchEvent(new Event('input'))
+  expect(selectedHost().port()).toBe(4)
+})
+
+test('r-model input type number retargets through component prop after selected ref replacement', () => {
+  const root = document.createElement('div')
+  const selectedHost = ref({ port: 1 })
+  const hostInputField = createComponent(
+    html`<input type="number" r-model="model" />`,
+    ['model'],
+  )
+
+  createApp(
+    {
+      selectedHost,
+      components: {
+        hostInputField,
+      },
+    },
+    {
+      element: root,
+      template: html`<HostInputField :model="selectedHost.port"></HostInputField>`,
+    },
+  )
+
+  const input = root.querySelector('input') as HTMLInputElement | null
+  if (!input) throw new Error('missing input')
+
+  selectedHost(ref({ port: 2 }))
+  expect(input.value).toBe('2')
+  selectedHost().port(3)
+  expect(input.value).toBe('3')
+
+  input.value = '4'
+  input.dispatchEvent(new Event('input'))
+  expect(selectedHost().port()).toBe(4)
+
+  selectedHost(ref({ port: 5 }))
+  expect(input.value).toBe('5')
+  input.value = '6'
+  input.dispatchEvent(new Event('input'))
+  expect(selectedHost().port()).toBe(6)
+})
+
 test('r-model with checkboxes populates array', () => {
   const root = document.createElement('div')
   const selected = ref<string[]>([])
@@ -516,4 +620,40 @@ test('three nested components keep :model two-way binding across replacements', 
   expect(selectedHost().hostname()).toBe('child-gamma')
   selectedHost().hostname('new-value-2')
   expect(input.value).toBe('new-value-2')
+})
+
+test('regression: selecting host from list should not overwrite previous host item values', () => {
+  const root = document.createElement('div')
+  const hostItems = ref([{ hostname: 'host-a' }, { hostname: 'host-b' }])
+  const selectedHost = ref(hostItems()[0]())
+  const hostInputField = createComponent(
+    html`<input type="text" r-model="model" />`,
+    ['model'],
+  )
+
+  createApp(
+    {
+      selectedHost,
+      components: {
+        hostInputField,
+      },
+    },
+    {
+      element: root,
+      template: html`<HostInputField :model="selectedHost.hostname"></HostInputField>`,
+    },
+  )
+
+  const input = root.querySelector('input') as HTMLInputElement | null
+  if (!input) throw new Error('missing input')
+
+  expect(hostItems()[0]().hostname()).toBe('host-a')
+  expect(hostItems()[1]().hostname()).toBe('host-b')
+  expect(input.value).toBe('host-a')
+
+  // Switching selection should not mutate existing host item data.
+  selectedHost(hostItems()[1]())
+  expect(input.value).toBe('host-b')
+  expect(hostItems()[1]().hostname()).toBe('host-b')
+  expect(hostItems()[0]().hostname()).toBe('host-a')
 })
