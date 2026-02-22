@@ -1,19 +1,23 @@
 import {
   type AnyRef,
-  type ObserveCallback,
   type StopObserving,
+  type UnwrapRef,
 } from '../api/types'
 import { onUnmounted } from '../composition/onUnmounted'
 import { observe } from './observe'
 
-export const observeMany = (
-  sources: AnyRef[],
-  observer: ObserveCallback<any[]>,
+type SourceValues<TSources extends readonly AnyRef[]> = {
+  [TIndex in keyof TSources]: UnwrapRef<TSources[TIndex]>
+}
+
+export const observeMany = <const TSources extends readonly AnyRef[]>(
+  sources: TSources,
+  observer: (values: SourceValues<TSources>) => void,
   init?: boolean,
 ): StopObserving => {
   const stopObservingList: StopObserving[] = []
   const callObserver = (): void => {
-    observer(sources.map((y) => y()))
+    observer(sources.map((source) => source()) as SourceValues<TSources>)
   }
   for (const source of sources) {
     stopObservingList.push(observe(source, callObserver))

@@ -13,9 +13,16 @@ import { sref } from '../reactivity/sref'
 import { trigger } from '../reactivity/trigger'
 import { type ComputedOnce } from './computed'
 
-export const computeMany = <TReturnType>(
-  sources: AnyRef[],
-  compute: (...values: any[]) => TReturnType,
+type SourceValues<TSources extends readonly AnyRef[]> = {
+  [TIndex in keyof TSources]: UnwrapRef<TSources[TIndex]>
+}
+
+export const computeMany = <
+  const TSources extends readonly AnyRef[],
+  TReturnType,
+>(
+  sources: TSources,
+  compute: (...values: SourceValues<TSources>) => TReturnType,
 ): ComputedRef<UnwrapRef<TReturnType>> => {
   const status: ComputedOnce<TReturnType> = {}
   let computer: any
@@ -23,7 +30,7 @@ export const computeMany = <TReturnType>(
     if (args.length <= 2 && 0 in args)
       throw getError(ErrorType.ComputedIsReadOnly)
     if (computer && !status.isStopped) return computer(...args)
-    computer = computeManyOnce(sources, compute, status)
+    computer = computeManyOnce<TSources, TReturnType>(sources, compute, status)
     return computer(...args)
   }) as ComputedRef<UnwrapRef<TReturnType>>
 
@@ -34,9 +41,9 @@ export const computeMany = <TReturnType>(
   return result
 }
 
-const computeManyOnce = <TReturnType>(
-  sources: AnyRef[],
-  compute: (...values: any[]) => TReturnType,
+const computeManyOnce = <TSources extends readonly AnyRef[], TReturnType>(
+  sources: TSources,
+  compute: (...values: SourceValues<TSources>) => TReturnType,
   status: ComputedOnce<TReturnType>,
 ): ComputedRef<UnwrapRef<TReturnType>> => {
   const result =
@@ -47,14 +54,15 @@ const computeManyOnce = <TReturnType>(
   status.ref = result
   status.isStopped = false
   let i = 0
-  const callback = (_: any): void => {
+  const callback = (_: unknown): void => {
     if (i > 0) {
       result.stop()
       status.isStopped = true
       trigger(result)
       return
     }
-    result(compute(...sources.map((x) => x())) as UnwrapRef<TReturnType>)
+    const values = sources.map((source) => source()) as SourceValues<TSources>
+    result(compute(...values) as UnwrapRef<TReturnType>)
     ++i
   }
   const stopObservingList: StopObserving[] = []

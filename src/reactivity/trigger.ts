@@ -4,7 +4,7 @@ import { isRef } from './isRef'
 
 export const trigger = <TValueType extends AnyRef>(
   source: TValueType,
-  eventSource?: any,
+  eventSource?: unknown,
   isRecursive?: boolean,
 ): void => {
   if (!isRef(source)) return

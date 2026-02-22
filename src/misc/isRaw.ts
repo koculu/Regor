@@ -1,5 +1,5 @@
 import { rawSymbol } from '../reactivity/refSymbols'
 
-export const isRaw = (value: any): boolean => {
-  return !!value && value[rawSymbol] === 1
+export const isRaw = (value: unknown): boolean => {
+  return !!value && (value as Record<symbol, unknown>)[rawSymbol] === 1
 }
