@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest'
+import { expect, test, vi } from 'vitest'
 
 import { createApp, createComponent, html, ref, sref, unref } from '../../src'
 
@@ -44,6 +44,47 @@ test('should mount the people into reactive divs.', () => {
   people[0]().name.value = 'Ali'
   people[0]().age.value = 40
   testContent()
+})
+
+test('regression: r-for + r-if churn should not error before or after unmount', () => {
+  const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+  try {
+    const root = document.createElement('div')
+    const app = createApp(
+      {
+        show: ref(true),
+        items: ref([{ name: 'a' }, { name: 'b' }]),
+      },
+      {
+        element: root,
+        template: html`<section>
+          <p r-for="item in items" r-if="show">{{ item.name }}</p>
+        </section>`,
+      },
+    )
+
+    expect(root.querySelectorAll('p').length).toBe(2)
+
+    app.context.show(false)
+    expect(root.querySelectorAll('p').length).toBe(0)
+
+    app.context.items().push(ref({ name: 'c' }))
+    expect(root.querySelectorAll('p').length).toBe(0)
+
+    app.context.show(true)
+    expect(root.querySelectorAll('p').length).toBe(3)
+
+    app.context.show(false)
+    app.unmount()
+
+    expect(() => {
+      app.context.items().push(ref({ name: 'd' }))
+      app.context.show(true)
+    }).not.toThrow()
+    expect(errorSpy).not.toHaveBeenCalled()
+  } finally {
+    errorSpy.mockRestore()
+  }
 })
 
 test('should mount nested r-for.', () => {

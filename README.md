@@ -271,8 +271,6 @@ Special thanks to the Vue team and its community for creating a thriving ecosyst
 
 Regor also utilizes [**Jsep**](https://github.com/EricSmekens/jsep), a fast and lightweight JavaScript expression parser. Jsep's contribution to Regor's functionality is greatly appreciated.
 
-Additionally, we would like to acknowledge the [**happy-dom**](https://github.com/capricorn86/happy-dom) library, which played a significant role in our testing process.
-
 We also extend a warm welcome to any future contributors who join the Regor project. Your contributions will play a vital role in shaping the framework's growth and evolution.
 
 Thank you to everyone who has contributed, inspired, and supported Regor's development journey. Your dedication and passion are invaluable.
