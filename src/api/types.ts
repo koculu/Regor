@@ -28,30 +28,29 @@ type RawTypes =
   | Promise<unknown>
   | Error
 
-declare const RefSymbol: unique symbol
-
 declare const RawSymbol: unique symbol
 
 declare const ScopeSymbol: unique symbol
 
-export type AnyRef = (
-  newValue?: any,
-  eventSource?: any,
-) => any & { [RefSymbol]: true }
+type BivariantAnyRefCall = {
+  bivarianceHack(newValue?: unknown, eventSource?: unknown): unknown
+}['bivarianceHack']
+
+export type AnyRef = BivariantAnyRefCall
 
 export type Ref<TValueType> = ((
   newValue?:
     | RefContent<TValueType>
     | Ref<RefParam<TValueType>>
     | SRef<RefContent<TValueType>>,
-  eventSource?: any,
+  eventSource?: unknown,
 ) => RefContent<TValueType>) & {
   value: RefContent<TValueType>
 }
 
 export type SRef<TValueType> = ((
   newValue?: TValueType | SRef<TValueType>,
-  eventSource?: any,
+  eventSource?: unknown,
 ) => SRefContent<TValueType>) & {
   value: SRefContent<TValueType>
 }
@@ -155,7 +154,7 @@ export type Flat<TValueType> =
 
 export type ObserveCallback<TValueType> = (
   newValue: TValueType,
-  eventSource?: any,
+  eventSource?: unknown,
 ) => void
 
 export type StopObserving = () => void
@@ -182,10 +181,10 @@ export interface Directive {
   /** Called on every value change. */
   onChange?: (
     el: HTMLElement,
-    values: any[],
-    previousValues?: any[],
-    option?: any,
-    previousOption?: any,
+    values: unknown[],
+    previousValues?: unknown[],
+    option?: unknown,
+    previousOption?: unknown,
     flags?: string[],
   ) => void
 
@@ -369,10 +368,10 @@ export interface ComposableScope {
  */
 export type SRefSignature<TValueType> = (
   newValue?: TValueType,
-  eventSource?: any,
+  eventSource?: unknown,
   operation?: RefOperation,
   observer?: ObserveCallback<TValueType>,
-) => any
+) => unknown
 
 /**
  * @internal

@@ -112,7 +112,7 @@ export const sref = <TValueType>(
       if (0 in args) {
         if (refObj._value === newValue) return newValue
         if (isRef(newValue)) {
-          newValue = newValue()
+          newValue = newValue() as TValueType
           if (refObj._value === newValue) return newValue
         }
 

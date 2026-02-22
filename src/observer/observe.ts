@@ -17,7 +17,7 @@ export const observe = <TValueType extends AnyRef>(
 ): StopObserving => {
   if (!isRef(source))
     throw getError(ErrorType.RequiresRefSourceArgument, 'observe')
-  if (init) observer(source())
+  if (init) observer(source() as UnwrapRef<TValueType>)
   const srefImpl = source as unknown as SRefSignature<UnwrapRef<TValueType>>
   const stop = srefImpl(
     undefined,
