@@ -1,6 +1,14 @@
 import { expect, test } from 'vitest'
 
-import { createApp, createComponent, html, ref, sref, unref } from '../../src'
+import {
+  Component,
+  createApp,
+  createComponent,
+  html,
+  ref,
+  sref,
+  unref,
+} from '../../src'
 
 test('should mount the people into reactive divs.', () => {
   const root = document.createElement('div')
@@ -796,4 +804,139 @@ test('should start from selected host tenants when adding first tenant via compo
   expect(() => addButton.click()).not.toThrow()
   const valuesAfterFirstAdd = [...getTenantInputs()].map((x) => x.value)
   expect(valuesAfterFirstAdd).toStrictEqual(['tenant-1'])
+})
+
+test('repro with hosts-like component hierarchy and table selection path', async () => {
+  const root = document.createElement('div')
+
+  const hosts = ref<any[]>([])
+  const selectedHost = ref({
+    hostname: '',
+    hostId: 0,
+    tenants: ['0'],
+    googleAuth: { clientId: '', clientSecret: '', scopes: ['openid'] },
+    staticRoutes: [{ prefix: '/', directory: '/tmp' }],
+  })
+
+  const selectHost = (hostname: string): void => {
+    const host = hosts().find((item) => item().hostname() === hostname)
+    if (!host) return
+    selectedHost(host)
+  }
+
+  const refreshHosts = async (): Promise<void> => {
+    await Promise.resolve()
+    hosts(
+      [
+        {
+          hostname: 'host-a',
+          hostId: 1,
+          tenants: ['a-1'],
+          googleAuth: { clientId: 'a', clientSecret: 'a', scopes: ['openid'] },
+          staticRoutes: [{ prefix: '/', directory: '/a' }],
+        },
+        {
+          hostname: 'host-b',
+          hostId: 2,
+          tenants: [],
+          googleAuth: { clientId: 'b', clientSecret: 'b', scopes: ['openid'] },
+          staticRoutes: [{ prefix: '/', directory: '/b' }],
+        },
+      ].map((x) => ref(x)),
+    )
+    selectHost('host-a')
+  }
+
+  const hostInputField = createComponent(
+    html`<input type="text" r-model="model" />`,
+    ['model'],
+  )
+
+  const hostTenantsField = createComponent(
+    html`<div>
+      <div class="tenant-row" r-for="tenantValue in selectedHost.tenants">
+        <input type="text" r-model="tenantValue" />
+      </div>
+      <button type="button" @click="addTenant">Add tenant</button>
+    </div>`,
+  )
+
+  const hostEditor = createComponent(
+    html`<div>
+      <HostInputField :model="selectedHost.hostname"></HostInputField>
+      <HostTenantsField></HostTenantsField>
+    </div>`,
+    {
+      context: () => ({
+        selectedHost,
+        addTenant: () => {
+          selectedHost().tenants([...selectedHost().tenants(), ref('')])
+        },
+      }),
+    },
+  )
+
+  const hostTableRow = createComponent(
+    html`<tr @click="selectHost(host.hostname)">
+      <td>{{ host.hostname }}</td>
+      <td>
+        <span r-for="tenantValue in host.tenants">{{ tenantValue }}</span>
+      </td>
+    </tr>`,
+    {
+      props: ['host'],
+      context: () => ({
+        selectHost,
+      }),
+    },
+  )
+
+  const hostsClientApp = createComponent(
+    html`<section>
+      <table>
+        <tbody>
+          <HostTableRow r-for="host in hosts" :host="host"></HostTableRow>
+        </tbody>
+      </table>
+      <HostEditor></HostEditor>
+    </section>`,
+    {
+      context: () => ({
+        hosts,
+      }),
+    },
+  )
+
+  createApp(
+    {
+      hosts,
+      selectedHost,
+      components: {
+        hostsClientApp,
+        hostEditor,
+        hostInputField,
+        hostTenantsField,
+        hostTableRow,
+      } as unknown as Record<string, Component>,
+    },
+    {
+      element: root,
+      template: html`<HostsClientApp></HostsClientApp>`,
+    },
+  )
+
+  await refreshHosts()
+
+  const hostRows = root.querySelectorAll('tbody tr')
+  if (hostRows.length < 2) throw new Error('missing host rows')
+  ;(hostRows[1] as HTMLTableRowElement).click()
+
+  const addButton = [...root.querySelectorAll('button')].find(
+    (x) => x.textContent === 'Add tenant',
+  ) as HTMLButtonElement | undefined
+  if (!addButton) throw new Error('missing add button')
+
+  expect(() => addButton.click()).not.toThrow()
+  const tenantInputs = root.querySelectorAll('.tenant-row input')
+  expect(tenantInputs.length).toBe(1)
 })
