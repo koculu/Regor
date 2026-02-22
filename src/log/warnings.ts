@@ -62,4 +62,6 @@ export const warning = (type: WarningType, ...args: unknown[]): void => {
   else handler(item, ...item.args)
 }
 
-export const warningHandler = { warning: console.warn }
+export const warningHandler: { warning: (...data: unknown[]) => void } = {
+  warning: console.warn,
+}

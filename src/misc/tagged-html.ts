@@ -1,6 +1,6 @@
 export const html = (
   templates: TemplateStringsArray,
-  ...args: any[]
+  ...args: unknown[]
 ): string => {
   let result = ''
   const tpl = templates

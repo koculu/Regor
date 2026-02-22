@@ -1,13 +1,16 @@
 import { type BindData } from '../api/types'
 import { bindDataSymbol } from './bindDataSymbol'
 
-export const getBindData = (node: any): BindData => {
-  const bindData = node[bindDataSymbol]
+type BindableNode = { [bindDataSymbol]?: BindData }
+
+export const getBindData = (node: object): BindData => {
+  const bindableNode = node as BindableNode
+  const bindData = bindableNode[bindDataSymbol]
   if (bindData) return bindData as BindData
   const newBindData: BindData = {
     unbinders: [],
     data: {},
   }
-  node[bindDataSymbol] = newBindData
+  bindableNode[bindDataSymbol] = newBindData
   return newBindData
 }

@@ -108,7 +108,7 @@ const evalPrefixUpdate = {
   '++': (context: Context, key: any) => {
     const v = context[key]
     if (isRef(v)) {
-      let r = v()
+      let r = v() as any
       v(++r)
       return r
     }
@@ -117,7 +117,7 @@ const evalPrefixUpdate = {
   '--': (context: Context, key: any) => {
     const v = context[key]
     if (isRef(v)) {
-      let r = v()
+      let r = v() as any
       v(--r)
       return r
     }
@@ -129,7 +129,7 @@ const evalPostUpdate = {
   '++': (context: Context, key: any) => {
     const v = context[key]
     if (isRef(v)) {
-      const r = v()
+      const r = v() as any
 
       v(r + 1)
       return r
@@ -139,7 +139,7 @@ const evalPostUpdate = {
   '--': (context: Context, key: any) => {
     const v = context[key]
     if (isRef(v)) {
-      const r = v()
+      const r = v() as any
       v(r - 1)
       return r
     }
@@ -157,7 +157,7 @@ const applyAssigment = {
   '+=': (context: Context, key: any, value: any) => {
     const v = context[key]
     if (isRef(v)) {
-      return v(v() + value)
+      return v((v() as any) + value)
     }
 
     return (context[key] += value)
@@ -165,77 +165,77 @@ const applyAssigment = {
   '-=': (context: Context, key: any, value: any) => {
     const v = context[key]
     if (isRef(v)) {
-      return v(v() - value)
+      return v((v() as any) - value)
     }
     return (context[key] -= value)
   },
   '*=': (context: Context, key: any, value: any) => {
     const v = context[key]
     if (isRef(v)) {
-      return v(v() * value)
+      return v((v() as any) * value)
     }
     return (context[key] *= value)
   },
   '/=': (context: Context, key: any, value: any) => {
     const v = context[key]
     if (isRef(v)) {
-      return v(v() / value)
+      return v((v() as any) / value)
     }
     return (context[key] /= value)
   },
   '%=': (context: Context, key: any, value: any) => {
     const v = context[key]
     if (isRef(v)) {
-      return v(v() % value)
+      return v((v() as any) % value)
     }
     return (context[key] %= value)
   },
   '**=': (context: Context, key: any, value: any) => {
     const v = context[key]
     if (isRef(v)) {
-      return v(v() ** value)
+      return v((v() as any) ** value)
     }
     return (context[key] **= value)
   },
   '<<=': (context: Context, key: any, value: any) => {
     const v = context[key]
     if (isRef(v)) {
-      return v(v() << value)
+      return v((v() as any) << value)
     }
     return (context[key] <<= value)
   },
   '>>=': (context: Context, key: any, value: any) => {
     const v = context[key]
     if (isRef(v)) {
-      return v(v() >> value)
+      return v((v() as any) >> value)
     }
     return (context[key] >>= value)
   },
   '>>>=': (context: Context, key: any, value: any) => {
     const v = context[key]
     if (isRef(v)) {
-      return v(v() >>> value)
+      return v((v() as any) >>> value)
     }
     return (context[key] >>>= value)
   },
   '|=': (context: Context, key: any, value: any) => {
     const v = context[key]
     if (isRef(v)) {
-      return v(v() | value)
+      return v((v() as any) | value)
     }
     return (context[key] |= value)
   },
   '&=': (context: Context, key: any, value: any) => {
     const v = context[key]
     if (isRef(v)) {
-      return v(v() & value)
+      return v((v() as any) & value)
     }
     return (context[key] &= value)
   },
   '^=': (context: Context, key: any, value: any) => {
     const v = context[key]
     if (isRef(v)) {
-      return v(v() ^ value)
+      return v((v() as any) ^ value)
     }
     return (context[key] ^= value)
   },

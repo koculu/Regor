@@ -28,30 +28,29 @@ type RawTypes =
   | Promise<unknown>
   | Error
 
-declare const RefSymbol: unique symbol
-
 declare const RawSymbol: unique symbol
 
 declare const ScopeSymbol: unique symbol
 
-export type AnyRef = (
-  newValue?: any,
-  eventSource?: any,
-) => any & { [RefSymbol]: true }
+type BivariantAnyRefCall = {
+  bivarianceHack(newValue?: unknown, eventSource?: unknown): unknown
+}['bivarianceHack']
+
+export type AnyRef = BivariantAnyRefCall
 
 export type Ref<TValueType> = ((
   newValue?:
     | RefContent<TValueType>
     | Ref<RefParam<TValueType>>
     | SRef<RefContent<TValueType>>,
-  eventSource?: any,
+  eventSource?: unknown,
 ) => RefContent<TValueType>) & {
   value: RefContent<TValueType>
 }
 
 export type SRef<TValueType> = ((
   newValue?: TValueType | SRef<TValueType>,
-  eventSource?: any,
+  eventSource?: unknown,
 ) => SRefContent<TValueType>) & {
   value: SRefContent<TValueType>
 }
@@ -155,7 +154,7 @@ export type Flat<TValueType> =
 
 export type ObserveCallback<TValueType> = (
   newValue: TValueType,
-  eventSource?: any,
+  eventSource?: unknown,
 ) => void
 
 export type StopObserving = () => void
@@ -182,10 +181,10 @@ export interface Directive {
   /** Called on every value change. */
   onChange?: (
     el: HTMLElement,
-    values: any[],
-    previousValues?: any[],
-    option?: any,
-    previousOption?: any,
+    values: unknown[],
+    previousValues?: unknown[],
+    option?: unknown,
+    previousOption?: unknown,
     flags?: string[],
   ) => void
 
@@ -339,7 +338,7 @@ export interface CreateComponentOptions<
    * The props defined in the props list can be used with :foo or r-bind:foo syntax.
    * `<MyComponent :prop-kebab-1="1" r-bind:prop-kebab-2="x ? 1 : 0" :props="{ propFoo3: true, propFoo4: x ? 'a' : 'b' }></MyComponent>`
    * It is required to define prop-kebab-1 and prop-kebab-2 in the props list camelized.
-   * It is not required to define propFoo3 and propFoo4 in the props list because it uses :props binding. :props binding enables binding to any property of component regardless it is explicitly defined in props list.
+   * It is not required to define propFoo3 and propFoo4 in the props list because it uses :props binding. :props binding enables binding to arbitrary component properties regardless they are explicitly defined in props list.
    */
   props?: string[]
 
@@ -369,10 +368,10 @@ export interface ComposableScope {
  */
 export type SRefSignature<TValueType> = (
   newValue?: TValueType,
-  eventSource?: any,
+  eventSource?: unknown,
   operation?: RefOperation,
   observer?: ObserveCallback<TValueType>,
-) => any
+) => unknown
 
 /**
  * @internal
