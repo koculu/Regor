@@ -21,9 +21,13 @@ test('observeMany infers tuple source types in callback', () => {
   const createdAt = ref(new Date('2025-01-01T00:00:00.000Z'))
 
   const calls: string[] = []
-  const stop = observeMany([label, count, createdAt], ([l, c, d]) => {
-    calls.push(`${l}:${c}:${d.getUTCFullYear()}`)
-  }, true)
+  const stop = observeMany(
+    [label, count, createdAt],
+    ([l, c, d]) => {
+      calls.push(`${l}:${c}:${d.getUTCFullYear()}`)
+    },
+    true,
+  )
 
   expect(calls).toStrictEqual(['v1:2:2025'])
 

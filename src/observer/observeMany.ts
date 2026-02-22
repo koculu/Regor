@@ -1,8 +1,4 @@
-import {
-  type AnyRef,
-  type StopObserving,
-  type UnwrapRef,
-} from '../api/types'
+import { type AnyRef, type StopObserving, type UnwrapRef } from '../api/types'
 import { onUnmounted } from '../composition/onUnmounted'
 import { observe } from './observe'
 
