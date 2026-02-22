@@ -32,6 +32,7 @@ export const singlePropDirective: Directive = {
           if (isRef(ctxKey)) {
             stopEntangle()
             stopEntangle = entangle(value, ctxKey)
+            return
           }
           ctx[key] = value
           return

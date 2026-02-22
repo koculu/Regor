@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 
-import { createApp, html, ref } from '../../src'
+import { Component, createApp, createComponent, html, ref } from '../../src'
 
 test('r-model expression flag int converts input to integer', () => {
   const root = document.createElement('div')
@@ -109,4 +109,411 @@ test('r-model with select multiple populates set', () => {
   optionX.selected = false
   select.dispatchEvent(new Event('change'))
   expect(Array.from(opts())).toStrictEqual(['y'])
+})
+
+test('demonstrates stale model target through component prop after selected ref replacement', () => {
+  const root = document.createElement('div')
+  const selectedHost = ref({ hostname: 'alpha' })
+  const hostInputField = createComponent(
+    html`<input type="text" r-model="model" />`,
+    ['model'],
+  )
+
+  createApp(
+    {
+      selectedHost,
+      components: {
+        hostInputField,
+      },
+    },
+    {
+      element: root,
+      template: html`<HostInputField
+        :model="selectedHost.hostname"
+      ></HostInputField>`,
+    },
+  )
+
+  const input = root.querySelector('input') as HTMLInputElement | null
+  if (!input) throw new Error('missing input')
+
+  selectedHost(ref({ hostname: 'beta' }))
+  expect(input.value).toBe('beta')
+  selectedHost().hostname('new-value')
+  expect(input.value).toBe('new-value')
+  input.value = 'updated-beta'
+  input.dispatchEvent(new Event('input'))
+
+  // This currently fails: model keeps targeting the old hostname ref created before selectedHost replacement.
+  expect(selectedHost().hostname()).toBe('updated-beta')
+})
+
+test('demonstrates stale model target after selected ref replacement without component', () => {
+  const root = document.createElement('div')
+  const selectedHost = ref({ hostname: 'alpha' })
+
+  createApp(
+    { selectedHost },
+    {
+      element: root,
+      template: html`<input type="text" r-model="selectedHost.hostname" />`,
+    },
+  )
+
+  const input = root.querySelector('input') as HTMLInputElement | null
+  if (!input) throw new Error('missing input')
+
+  selectedHost(ref({ hostname: 'beta' }))
+  expect(input.value).toBe('beta')
+  selectedHost().hostname('new-value')
+  expect(input.value).toBe('new-value')
+  input.value = 'updated-beta'
+  input.dispatchEvent(new Event('input'))
+
+  // Mirrors the component case but with a direct binding target.
+  expect(selectedHost().hostname()).toBe('updated-beta')
+})
+
+test('r-model through component prop tracks writes after selected ref replacement', () => {
+  const root = document.createElement('div')
+  const selectedHost = ref({ hostname: 'alpha' })
+  const hostInputField = createComponent(
+    html`<input type="text" r-model="model" />`,
+    ['model'],
+  )
+
+  createApp(
+    {
+      selectedHost,
+      components: {
+        hostInputField,
+      },
+    },
+    {
+      element: root,
+      template: html`<HostInputField
+        :model="selectedHost.hostname"
+      ></HostInputField>`,
+    },
+  )
+
+  const input = root.querySelector('input') as HTMLInputElement | null
+  if (!input) throw new Error('missing input')
+
+  selectedHost(ref({ hostname: 'beta' }))
+  expect(input.value).toBe('beta')
+  selectedHost().hostname('new-value')
+  expect(input.value).toBe('new-value')
+  input.value = 'updated-beta'
+  input.dispatchEvent(new Event('input'))
+  expect(selectedHost().hostname()).toBe('updated-beta')
+
+  input.value = 'updated-beta-2'
+  input.dispatchEvent(new Event('input'))
+  expect(selectedHost().hostname()).toBe('updated-beta-2')
+})
+
+test('r-model through component prop keeps parent-to-input sync after selected ref replacement', () => {
+  const root = document.createElement('div')
+  const selectedHost = ref({ hostname: 'alpha' })
+  const hostInputField = createComponent(
+    html`<input type="text" r-model="model" />`,
+    ['model'],
+  )
+
+  createApp(
+    {
+      selectedHost,
+      components: {
+        hostInputField,
+      },
+    },
+    {
+      element: root,
+      template: html`<HostInputField
+        :model="selectedHost.hostname"
+      ></HostInputField>`,
+    },
+  )
+
+  const input = root.querySelector('input') as HTMLInputElement | null
+  if (!input) throw new Error('missing input')
+
+  selectedHost(ref({ hostname: 'beta' }))
+  expect(input.value).toBe('beta')
+  selectedHost().hostname('from-parent')
+
+  expect(input.value).toBe('from-parent')
+})
+
+test('r-model direct binding tracks latest ref across multiple selected ref replacements', () => {
+  const root = document.createElement('div')
+  const selectedHost = ref({ hostname: 'alpha' })
+
+  createApp(
+    { selectedHost },
+    {
+      element: root,
+      template: html`<input type="text" r-model="selectedHost.hostname" />`,
+    },
+  )
+
+  const input = root.querySelector('input') as HTMLInputElement | null
+  if (!input) throw new Error('missing input')
+
+  selectedHost(ref({ hostname: 'beta' }))
+  expect(input.value).toBe('beta')
+  selectedHost().hostname('new-value')
+  expect(input.value).toBe('new-value')
+  input.value = 'updated-beta'
+  input.dispatchEvent(new Event('input'))
+  expect(selectedHost().hostname()).toBe('updated-beta')
+
+  selectedHost(ref({ hostname: 'gamma' }))
+  expect(input.value).toBe('gamma')
+  selectedHost().hostname('new-value-2')
+  expect(input.value).toBe('new-value-2')
+  input.value = 'updated-gamma'
+  input.dispatchEvent(new Event('input'))
+  expect(selectedHost().hostname()).toBe('updated-gamma')
+})
+
+test('edge case: r-model through component prop breaks after second selected ref replacement', () => {
+  const root = document.createElement('div')
+  const selectedHost = ref({ hostname: 'alpha' })
+  const hostInputField = createComponent(
+    html`<input type="text" r-model="model" />`,
+    ['model'],
+  )
+
+  createApp(
+    {
+      selectedHost,
+      components: {
+        hostInputField,
+      },
+    },
+    {
+      element: root,
+      template: html`<HostInputField
+        :model="selectedHost.hostname"
+      ></HostInputField>`,
+    },
+  )
+
+  const input = root.querySelector('input') as HTMLInputElement | null
+  if (!input) throw new Error('missing input')
+
+  selectedHost(ref({ hostname: 'beta' }))
+  expect(input.value).toBe('beta')
+  selectedHost().hostname('new-value')
+  expect(input.value).toBe('new-value')
+  input.value = 'updated-beta'
+  input.dispatchEvent(new Event('input'))
+  expect(selectedHost().hostname()).toBe('updated-beta')
+
+  selectedHost(ref({ hostname: 'gamma' }))
+  expect(input.value).toBe('gamma')
+  selectedHost().hostname('new-value-2')
+  expect(input.value).toBe('new-value-2')
+  input.value = 'updated-gamma'
+  input.dispatchEvent(new Event('input'))
+
+  // Current behavior: this fails; write no longer targets latest ref after second replacement.
+  expect(selectedHost().hostname()).toBe('updated-gamma')
+})
+
+test('two-way component model binding syncs parent and child without replacement', () => {
+  const root = document.createElement('div')
+  const selectedHost = ref({ hostname: 'alpha' })
+  const hostInputField = createComponent(
+    html`<input type="text" r-model="model" />`,
+    ['model'],
+  )
+
+  createApp(
+    {
+      selectedHost,
+      components: {
+        hostInputField,
+      },
+    },
+    {
+      element: root,
+      template: html`<HostInputField
+        :model="selectedHost.hostname"
+      ></HostInputField>`,
+    },
+  )
+
+  const input = root.querySelector('input') as HTMLInputElement | null
+  if (!input) throw new Error('missing input')
+
+  selectedHost().hostname('from-parent')
+  expect(input.value).toBe('from-parent')
+
+  input.value = 'from-child'
+  input.dispatchEvent(new Event('input'))
+  expect(selectedHost().hostname()).toBe('from-child')
+})
+
+test('two-way component model binding survives alternating parent and child updates after replacement', () => {
+  const root = document.createElement('div')
+  const selectedHost = ref({ hostname: 'alpha' })
+  const hostInputField = createComponent(
+    html`<input type="text" r-model="model" />`,
+    ['model'],
+  )
+
+  createApp(
+    {
+      selectedHost,
+      components: {
+        hostInputField,
+      },
+    },
+    {
+      element: root,
+      template: html`<HostInputField
+        :model="selectedHost.hostname"
+      ></HostInputField>`,
+    },
+  )
+
+  const input = root.querySelector('input') as HTMLInputElement | null
+  if (!input) throw new Error('missing input')
+
+  selectedHost(ref({ hostname: 'beta' }))
+  expect(input.value).toBe('beta')
+  selectedHost().hostname('parent-beta')
+  expect(input.value).toBe('parent-beta')
+
+  input.value = 'child-beta'
+  input.dispatchEvent(new Event('input'))
+  expect(selectedHost().hostname()).toBe('child-beta')
+
+  selectedHost().hostname('parent-beta-2')
+  expect(input.value).toBe('parent-beta-2')
+})
+
+test('two-way component model binding stays connected across multiple replacements', () => {
+  const root = document.createElement('div')
+  const selectedHost = ref({ hostname: 'alpha' })
+  const hostInputField = createComponent(
+    html`<input type="text" r-model="model" />`,
+    ['model'],
+  )
+
+  createApp(
+    {
+      selectedHost,
+      components: {
+        hostInputField,
+      },
+    },
+    {
+      element: root,
+      template: html`<HostInputField
+        :model="selectedHost.hostname"
+      ></HostInputField>`,
+    },
+  )
+
+  const input = root.querySelector('input') as HTMLInputElement | null
+  if (!input) throw new Error('missing input')
+
+  selectedHost(ref({ hostname: 'beta' }))
+  expect(input.value).toBe('beta')
+  selectedHost().hostname('new-value')
+  expect(input.value).toBe('new-value')
+  input.value = 'child-beta'
+  input.dispatchEvent(new Event('input'))
+  expect(selectedHost().hostname()).toBe('child-beta')
+
+  selectedHost(ref({ hostname: 'gamma' }))
+  expect(input.value).toBe('gamma')
+  selectedHost().hostname('new-value-2')
+  expect(input.value).toBe('new-value-2')
+  selectedHost().hostname('parent-gamma')
+  expect(input.value).toBe('parent-gamma')
+
+  input.value = 'child-gamma'
+  input.dispatchEvent(new Event('input'))
+  expect(selectedHost().hostname()).toBe('child-gamma')
+})
+
+test('three nested components keep :model two-way binding across replacements', () => {
+  const root = document.createElement('div')
+  const selectedHost = ref({ hostname: 'alpha' })
+
+  const leafInputField = createComponent(
+    html`<input type="text" r-model="model" />`,
+    ['model'],
+  )
+  const middleInputField = createComponent(
+    html`<LeafInputField :model="model"></LeafInputField>`,
+    {
+      props: ['model'],
+      context: () => ({
+        components: {
+          leafInputField,
+        },
+      }),
+    },
+  )
+  const outerInputField = createComponent(
+    html`<MiddleInputField :model="model"></MiddleInputField>`,
+    {
+      props: ['model'],
+      context: () => ({
+        components: {
+          middleInputField,
+        },
+      }),
+    },
+  )
+
+  createApp(
+    {
+      selectedHost,
+      components: {
+        outerInputField,
+      } as unknown as Record<string, Component>,
+    },
+    {
+      element: root,
+      template: html`<OuterInputField
+        :model="selectedHost.hostname"
+      ></OuterInputField>`,
+    },
+  )
+
+  const input = root.querySelector('input') as HTMLInputElement | null
+  if (!input) throw new Error('missing input')
+
+  selectedHost().hostname('parent-alpha')
+  expect(input.value).toBe('parent-alpha')
+
+  input.value = 'child-alpha'
+  input.dispatchEvent(new Event('input'))
+  expect(selectedHost().hostname()).toBe('child-alpha')
+
+  selectedHost(ref({ hostname: 'beta' }))
+  expect(input.value).toBe('beta')
+  selectedHost().hostname('parent-beta')
+  expect(input.value).toBe('parent-beta')
+
+  input.value = 'child-beta'
+  input.dispatchEvent(new Event('input'))
+  expect(selectedHost().hostname()).toBe('child-beta')
+  selectedHost().hostname('new-value')
+  expect(input.value).toBe('new-value')
+
+  selectedHost(ref({ hostname: 'gamma' }))
+  expect(input.value).toBe('gamma')
+  input.value = 'child-gamma'
+  input.dispatchEvent(new Event('input'))
+  expect(selectedHost().hostname()).toBe('child-gamma')
+  selectedHost().hostname('new-value-2')
+  expect(input.value).toBe('new-value-2')
 })
