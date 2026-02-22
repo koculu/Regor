@@ -660,44 +660,44 @@ test('known issue: named slot content should render with class component context
 })
 
 test('r-for with r-if on same node should update without binder errors', () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-    try {
-      class ListApp {
-        show = ref(true)
-        items = ref([{ name: 'a' }, { name: 'b' }])
+  const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+  try {
+    class ListApp {
+      show = ref(true)
+      items = ref([{ name: 'a' }, { name: 'b' }])
 
-        toggle = (): void => {
-          this.show(!this.show())
-        }
-
-        add = (): void => {
-          this.items().push(ref({ name: 'c' }))
-        }
+      toggle = (): void => {
+        this.show(!this.show())
       }
 
-      const root = document.createElement('div')
-      createApp(
-        useScope(() => new ListApp()),
-        {
-          element: root,
-          template: html`<section>
-            <button id="toggle" @click="toggle">toggle</button>
-            <button id="add" @click="add">add</button>
-            <p r-for="item in items" r-if="show">{{ item.name }}</p>
-          </section>`,
-        },
-      )
-
-      expect(root.querySelectorAll('p').length).toBe(2)
-      ;(root.querySelector('#toggle') as HTMLButtonElement).click()
-      expect(root.querySelectorAll('p').length).toBe(0)
-      ;(root.querySelector('#add') as HTMLButtonElement).click()
-      ;(root.querySelector('#toggle') as HTMLButtonElement).click()
-
-      // Expected behavior after fix: no internal binder error and 3 items rendered.
-      expect(errorSpy).not.toHaveBeenCalled()
-      expect(root.querySelectorAll('p').length).toBe(3)
-    } finally {
-      errorSpy.mockRestore()
+      add = (): void => {
+        this.items().push(ref({ name: 'c' }))
+      }
     }
+
+    const root = document.createElement('div')
+    createApp(
+      useScope(() => new ListApp()),
+      {
+        element: root,
+        template: html`<section>
+          <button id="toggle" @click="toggle">toggle</button>
+          <button id="add" @click="add">add</button>
+          <p r-for="item in items" r-if="show">{{ item.name }}</p>
+        </section>`,
+      },
+    )
+
+    expect(root.querySelectorAll('p').length).toBe(2)
+    ;(root.querySelector('#toggle') as HTMLButtonElement).click()
+    expect(root.querySelectorAll('p').length).toBe(0)
+    ;(root.querySelector('#add') as HTMLButtonElement).click()
+    ;(root.querySelector('#toggle') as HTMLButtonElement).click()
+
+    // Expected behavior after fix: no internal binder error and 3 items rendered.
+    expect(errorSpy).not.toHaveBeenCalled()
+    expect(root.querySelectorAll('p').length).toBe(3)
+  } finally {
+    errorSpy.mockRestore()
+  }
 })
