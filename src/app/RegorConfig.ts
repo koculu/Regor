@@ -98,7 +98,7 @@ export class RegorConfig {
     return obj
   }
 
-  addComponent<TContext extends IRegorContext = IRegorContext>(
+  addComponent<TContext extends IRegorContext | object = IRegorContext>(
     ...components: Array<Component<TContext>>
   ): void {
     for (const component of components) {

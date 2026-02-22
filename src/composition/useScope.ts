@@ -5,16 +5,16 @@ import { popScope, pushScope, setScope } from './stack'
 
 const scopeSymbol = Symbol('scope')
 
-export const useScope = <TRegorContext extends IRegorContext>(
+export const useScope = <TRegorContext extends IRegorContext | object>(
   context: () => TRegorContext,
 ): Scope<TRegorContext> => {
   try {
     pushScope()
     const ctx = context()
-    setScope(ctx)
+    setScope(ctx as IRegorContext)
     const result = {
       context: ctx,
-      unmount: () => callUnmounted(ctx),
+      unmount: () => callUnmounted(ctx as IRegorContext),
       [scopeSymbol]: 1,
     } as unknown as Scope<TRegorContext>
     ;(result as any)[scopeSymbol] = 1
