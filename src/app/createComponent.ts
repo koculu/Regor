@@ -13,7 +13,7 @@ import { RegorConfig } from './RegorConfig'
 import { toFragment } from './toFragment'
 import { toJsonTemplate } from './toJsonTemplate'
 
-export const createComponent = <TContext = IRegorContext>(
+export const createComponent = <TContext extends IRegorContext = IRegorContext>(
   template: Template | string,
   options: CreateComponentOptions<TContext> | string[] = {},
 ): Component<TContext> => {

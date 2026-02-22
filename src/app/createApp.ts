@@ -20,7 +20,7 @@ import { preprocess } from './preprocess-template'
 import { RegorConfig } from './RegorConfig'
 import { toFragment } from './toFragment'
 
-export const createApp = <TRegorContext extends IRegorContext>(
+export const createApp = <TRegorContext extends IRegorContext = IRegorContext>(
   context: TRegorContext | Scope<TRegorContext>,
   template: Template | string = { selector: '#app' },
   config?: RegorConfig,

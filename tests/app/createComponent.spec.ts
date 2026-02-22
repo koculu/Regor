@@ -1,7 +1,6 @@
 import { test } from 'vitest'
 
 import {
-  Component,
   createApp,
   createComponent,
   html,
@@ -27,7 +26,7 @@ test('should render components with reactive properties', () => {
 
   const app = createApp(
     {
-      components: { myComponent } as unknown as Record<string, Component>,
+      components: { myComponent },
       message: ref('ok'),
     },
     {
@@ -120,7 +119,7 @@ test('should resolve camelCase dynamic prop bindings on components', () => {
 
   createApp(
     {
-      components: { myComponent } as unknown as Record<string, Component>,
+      components: { myComponent },
       value: ref('Calc'),
     },
     {
@@ -165,7 +164,7 @@ test('should preserve context values when autoProps is enabled', () => {
 
   createApp(
     {
-      components: { myComponent } as unknown as Record<string, Component>,
+      components: { myComponent },
     },
     {
       element: root,
@@ -269,7 +268,7 @@ test('should render nested component with reactive properties', () => {
 
   createApp<MyApp>(
     {
-      components: { myComponent } as unknown as Record<string, Component>,
+      components: { myComponent },
       treeItem,
     },
     {

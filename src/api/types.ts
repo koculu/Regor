@@ -284,14 +284,14 @@ export interface App<TRegorContext extends IRegorContext> {
  *
  * @typeparam TContext - The type of context accepted by the component.
  */
-export interface Component<TContext = IRegorContext> {
+export interface Component<TContext extends IRegorContext = IRegorContext> {
   /**
    * A function that returns the Regor context associated with the component.
    *
    * @param head - Provides information on component mount.
    * @returns The component context.
    */
-  context: (head: ComponentHead<TContext>) => TContext
+  context(head: ComponentHead<TContext>): TContext
 
   /**
    * The template for the component.
@@ -318,7 +318,9 @@ export interface Component<TContext = IRegorContext> {
 export type OnMounted = () => void
 export type OnUnmounted = () => void
 
-export interface CreateComponentOptions<TContext = IRegorContext> {
+export interface CreateComponentOptions<
+  TContext extends IRegorContext = IRegorContext,
+> {
   useInterpolation?: boolean
 
   config?: RegorConfig
@@ -326,7 +328,7 @@ export interface CreateComponentOptions<TContext = IRegorContext> {
   /**
    * A function that defines the Regor context for the component.
    */
-  context?: (head: ComponentHead<TContext>) => TContext
+  context?(head: ComponentHead<TContext>): TContext
 
   inheritAttrs?: boolean
 
