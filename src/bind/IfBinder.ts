@@ -9,7 +9,6 @@ import {
   unmount,
 } from '../common/common'
 import { warning, WarningType } from '../log/warnings'
-import { observe } from '../observer/observe'
 import { type Binder } from './Binder'
 import { setSwitchOwner } from './switch'
 
@@ -193,7 +192,9 @@ export class IfBinder {
       }
       addUnbinder(commentBegin, unbinder)
 
-      const stopObserving = observe(value, refresh)
+      const stopObserving = (
+        parseResult.subscribe ? parseResult.subscribe(refresh) : () => {}
+      ) as StopObserving
       stopObserverList.push(stopObserving)
 
       return [
@@ -268,7 +269,9 @@ export class IfBinder {
     addUnbinder(commentBegin, unbinder)
 
     refresh()
-    const stopObserving = observe(value, refresh)
+    const stopObserving = (
+      parseResult.subscribe ? parseResult.subscribe(refresh) : () => {}
+    ) as StopObserving
     stopObserverList.push(stopObserving)
   }
 }

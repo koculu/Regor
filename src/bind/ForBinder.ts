@@ -10,7 +10,6 @@ import {
 } from '../common/common'
 import { isArray, isFunction, isNullOrUndefined } from '../common/is-what'
 import { warning, WarningType } from '../log/warnings'
-import { observe } from '../observer/observe'
 import { sref } from '../reactivity/sref'
 import { unref } from '../reactivity/unref'
 import { type Binder } from './Binder'
@@ -18,6 +17,7 @@ import { MountList } from './MountList'
 import { setSwitchOwner } from './switch'
 
 const forMarker = Symbol('r-for')
+const noIndexRef = ((_: number) => -1) as SRef<number>
 
 /**
  * @internal
@@ -95,15 +95,26 @@ export class ForBinder {
       warning(WarningType.InvalidForExpression, this.__for, forPath, el)
       return
     }
-    // TODO: key binding requires expression evaluation on each step.
-    // For now, :key="id" is supported but :key="item.id" is not.
     const nameKey = this.__binder.__config.__builtInNames.key
     const nameKeyBind = this.__binder.__config.__builtInNames.keyBind
-    const key = el.getAttribute(nameKey) ?? el.getAttribute(nameKeyBind)
+    /**
+     * r-for key handling is path-based for speed.
+     *
+     * - `key` and `:key` are treated identically here.
+     * - The value is NOT evaluated as a full directive expression.
+     * - Supported key forms:
+     *   - `id` (single property on current item)
+     *   - dotted property paths (any depth), e.g. `row.id`, `row.meta.id`, `a.b.c.d`
+     * - For alias-like dotted keys (`row.id`), a fallback strips the first segment
+     *   when needed so keys still resolve against the current item shape.
+     * - Not supported as key syntax:
+     *   - arbitrary JS expressions (e.g. `row.id + '-' + row.type`)
+     *   - function calls / computed expressions
+     */
+    const keyExpression =
+      el.getAttribute(nameKey) ?? el.getAttribute(nameKeyBind)
     el.removeAttribute(nameKey)
     el.removeAttribute(nameKeyBind)
-    const getKey = key ? (v: any) => unref(unref(v)?.[key]) : (v: any) => v
-    const areEqual = (a: any, b: any): boolean => getKey(a) === getKey(b)
 
     const nodes = getNodes(el)
     const parent = el.parentNode as HTMLElement
@@ -122,6 +133,12 @@ export class ForBinder {
     const binder = this.__binder
     const parser = binder.__parser
     const capturedContext = parser.__capture()
+    const singleCapturedContext = capturedContext.length === 1
+    const rowContexts = singleCapturedContext
+      ? [undefined as any, capturedContext[0]]
+      : undefined
+    const getKey = this.__createKeyGetter(keyExpression)
+    const areEqual = (a: any, b: any): boolean => getKey(a) === getKey(b)
     const mountNewValue = (
       i: number,
       newValue: any,
@@ -129,17 +146,17 @@ export class ForBinder {
     ): MountListItem => {
       const result = config.createContext(newValue, i)
       const mountItem = MountList.__createItem(result.index, newValue)
-      parser.__scoped(capturedContext, () => {
-        parser.__push(result.ctx)
+      const renderInContext = (): void => {
         const insertParent =
           ((commentEnd.parentNode ??
             commentBegin.parentNode) as HTMLElement | null) ?? parent
         let start = nextSibling.previousSibling as ChildNode
         const childNodes: ChildNode[] = []
-        for (const x of nodes) {
-          const node = x.cloneNode(true)
+        // Perf improvement note: Do not try to create fragment to insert all nodes at once. It is not faster!
+        for (let j = 0; j < nodes.length; ++j) {
+          const node = nodes[j].cloneNode(true) as ChildNode
           insertParent.insertBefore(node, nextSibling)
-          childNodes.push(node as ChildNode)
+          childNodes.push(node)
         }
         bindChildNodes(binder, childNodes)
         start = start.nextSibling as ChildNode
@@ -147,7 +164,16 @@ export class ForBinder {
           mountItem.items.push(start)
           start = start.nextSibling as ChildNode
         }
-      })
+      }
+      if (rowContexts) {
+        rowContexts[0] = result.ctx
+        parser.__scoped(rowContexts, renderInContext)
+      } else {
+        parser.__scoped(capturedContext, () => {
+          parser.__push(result.ctx)
+          renderInContext()
+        })
+      }
       return mountItem
     }
 
@@ -266,7 +292,9 @@ export class ForBinder {
     }
 
     const observeTailChanges = (): void => {
-      stopObserving = observe(value, updateDom)
+      stopObserving = (
+        parseResult.subscribe ? parseResult.subscribe(updateDom) : () => {}
+      ) as StopObserving
     }
 
     const unbinder = (): void => {
@@ -336,7 +364,10 @@ export class ForBinder {
             ctx[k] = unrefValue[k]
           }
         }
-        const result = { ctx, index: sref(-1) }
+        const result: { ctx: any; index: SRef<number> } = {
+          ctx,
+          index: noIndexRef,
+        }
         if (index) {
           result.index = ctx[
             index.startsWith('#') ? index.substring(1) : index
@@ -345,5 +376,39 @@ export class ForBinder {
         return result
       },
     }
+  }
+
+  __createKeyGetter(keyExpression: string | null): (v: any) => unknown {
+    // Fast key resolver for r-for:
+    // - plain key: direct property lookup
+    // - dotted key: compiled path walk
+    // This intentionally avoids parser/evaluator overhead in hot diff paths.
+    if (!keyExpression) return (v: any) => v
+    const expression = keyExpression.trim()
+    if (!expression) return (v: any) => v
+    if (expression.includes('.')) {
+      const path = this.__compilePath(expression)
+      const fallbackPath = path.length > 1 ? path.slice(1) : undefined
+      return (v: any) => {
+        const base = unref(v)
+        const primary = this.__walkPath(base, path)
+        if (primary !== undefined || !fallbackPath) return primary
+        // Supports alias-prefixed keys like "row.id" without carrying alias metadata.
+        return this.__walkPath(base, fallbackPath)
+      }
+    }
+    return (v: any) => unref(unref(v)?.[expression])
+  }
+
+  __compilePath(path: string): string[] {
+    return path.split('.').filter((x) => x.length > 0)
+  }
+
+  __walkPath(source: any, path: string[]): unknown {
+    let value = source
+    for (const part of path) {
+      value = unref(value)?.[part]
+    }
+    return unref(value)
   }
 }

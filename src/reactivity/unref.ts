@@ -1,6 +1,9 @@
 import { type UnwrapRef } from '../api/types'
-import { isRef } from './isRef'
+import { srefSymbol } from './refSymbols'
 
 export const unref = <TValueType>(value: TValueType): UnwrapRef<TValueType> => {
-  return (isRef(value) ? value() : value) as UnwrapRef<TValueType>
+  const anyValue = value as any
+  return (
+    anyValue != null && anyValue[srefSymbol] === 1 ? anyValue() : anyValue
+  ) as UnwrapRef<TValueType>
 }

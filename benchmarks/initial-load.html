@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Regor vs Vue Initial Load Benchmark</title>
+    <style>
+      :root {
+        --bg: #0f172a;
+        --panel: #111827;
+        --fg: #e5e7eb;
+        --muted: #9ca3af;
+        --accent: #22c55e;
+      }
+      body {
+        margin: 0;
+        font-family: Consolas, 'Courier New', monospace;
+        background: radial-gradient(circle at 0% 0%, #1e293b 0, var(--bg) 45%);
+        color: var(--fg);
+      }
+      .wrap {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+      .panel {
+        background: color-mix(in srgb, var(--panel) 92%, black);
+        border: 1px solid #1f2937;
+        border-radius: 12px;
+        padding: 16px;
+      }
+      h1 {
+        margin: 0 0 12px;
+        font-size: 20px;
+      }
+      p {
+        color: var(--muted);
+      }
+      button {
+        background: var(--accent);
+        color: #052e16;
+        border: 0;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      button:disabled {
+        opacity: 0.6;
+        cursor: default;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 16px;
+      }
+      th,
+      td {
+        border-bottom: 1px solid #1f2937;
+        padding: 8px;
+        text-align: left;
+      }
+      .roots {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-top: 16px;
+      }
+      .rootbox {
+        min-height: 120px;
+        max-height: 260px;
+        overflow: auto;
+      }
+      .note {
+        margin-top: 12px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .active {
+        color: #86efac;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <section class="panel">
+        <h1>Initial Load Benchmark: Regor vs Vue</h1>
+        <p>Measures mount time only.</p>
+        <button id="run-regor">Run Regor</button>
+        <button id="run-vue">Run Vue</button>
+        <button id="run">Run Both</button>
+        <table id="results">
+          <thead>
+            <tr>
+              <th>Framework</th>
+              <th>Mount Median</th>
+              <th>Mount P90</th>
+              <th>Rows Final</th>
+              <th>Samples</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div id="log" class="note"></div>
+        <div class="roots">
+          <div class="panel rootbox">
+            <strong>Regor Root</strong>
+            <div id="regor-root"></div>
+          </div>
+          <div class="panel rootbox">
+            <strong>Vue Root</strong>
+            <div id="vue-root"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <script type="module" src="/benchmarks/dist/initial-load.js"></script>
+  </body>
+</html>

@@ -209,6 +209,10 @@ export type Unbinder = () => void
 export interface ParseResult {
   value: SRef<unknown[]>
   stop: StopObserving
+  subscribe?: (
+    observer: ObserveCallback<unknown[]>,
+    init?: boolean,
+  ) => StopObserving
   refs: Array<AnyRef | undefined>
   context: Record<string, unknown>
 }

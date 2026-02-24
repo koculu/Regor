@@ -36,6 +36,7 @@ import { ref } from '../reactivity/ref'
  * - Preserves nested propagation while avoiding previous-source overwrite.
  */
 const modelBridgeSymbol = Symbol('modelBridge')
+const noop: Unbinder = () => {}
 const isModelBridge = (value: unknown): boolean =>
   !!(value as Record<symbol, unknown>)?.[modelBridgeSymbol]
 const markModelBridge = (value: AnyRef): void => {
@@ -60,21 +61,21 @@ export const singlePropDirective: Directive = {
     _dynamicOption?: ParseResult,
     _flags?: string[],
   ): Unbinder => {
-    if (!option) return () => {}
+    if (!option) return noop
     const key = camelize(option)
     let currentSource: AnyRef | undefined
     let bridge: AnyRef | undefined
-    let stopEntangle: Unbinder = () => {}
+    let stopEntangle: Unbinder = noop
 
     const resetSync = (): void => {
       stopEntangle()
-      stopEntangle = () => {}
+      stopEntangle = noop
       currentSource = undefined
       bridge = undefined
     }
     const clearEntangle = (): void => {
       stopEntangle()
-      stopEntangle = () => {}
+      stopEntangle = noop
     }
     const syncRefs = (source: AnyRef, target: AnyRef): void => {
       if (currentSource === source) return

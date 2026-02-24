@@ -1,6 +1,6 @@
 {
   "name": "regor",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "description": "A modern UI framework for web and desktop applications, inspired by Vue's concepts and powered by simplicity and flexibility.",
   "author": "Ahmed Yasin Koculu",
   "license": "MIT",
@@ -10,11 +10,18 @@
   "types": "dist/regor.d.ts",
   "scripts": {
     "build": "yarn tsx scripts/bundle.ts && yarn dts",
+    "bench:build": "yarn tsx benchmarks/build.ts",
+    "bench:serve": "yarn bench:build && yarn tsx benchmarks/server.ts",
+    "perf": "yarn tsx benchmarks/minidom/perf.ts",
+    "perf:record": "yarn tsx benchmarks/minidom/perf.ts record",
+    "perf:check": "yarn tsx benchmarks/minidom/perf.ts check",
+    "perf:profile": "yarn tsx benchmarks/minidom/profile.ts",
     "dts": "yarn dts-bundle-generator src/index.ts -o dist/regor.d.ts",
     "lint": "yarn eslint src/**/*.ts tests/**/*.ts",
     "watch": "yarn tsx scripts/bundle.ts --watch",
     "format": "yarn prettier --write \"**/*.ts\"",
-    "test": "vitest"
+    "test": "vitest",
+    "coverage": "yarn vitest run --coverage --coverage.include='src/**/*.ts' --coverage.reporter=text-summary --coverage.reporter=text"
   },
   "files": [
     "dist"
@@ -35,6 +42,7 @@
     "@eslint/js": "^9.39.2",
     "@stylistic/eslint-plugin": "^5.7.1",
     "@types/node": "^25.2.1",
+    "@vitest/coverage-istanbul": "3.2.3",
     "dts-bundle-generator": "^9.5.1",
     "esbuild": "^0.25.5",
     "eslint": "^9.39.2",

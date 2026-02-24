@@ -94,7 +94,7 @@ export const onDirective: Directive = {
           unbinders.push(attachEventListener(el, eventType, method, flags))
         }
       } else {
-        warning(WarningType.BindingRequiresObjectExpressions, name, el)
+        warning(WarningType.BindingRequiresObjectExpressions, 'r-on', el)
       }
     }
     return unbinder
@@ -150,7 +150,7 @@ export const attachEventListener = (
   flags: any,
 ): Unbinder => {
   if (isNullOrWhitespace(eventType)) {
-    warning(WarningType.MissingEventType, name, el)
+    warning(WarningType.MissingEventType, 'r-on', el)
     return () => {}
   }
 

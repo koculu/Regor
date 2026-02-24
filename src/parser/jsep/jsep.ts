@@ -3,13 +3,22 @@
 // Copyright (c) 2013 Stephen Oney, https://ericsmekens.github.io/jsep/
 // Modifications:
 // - removed plugin code
-// - include required plugins directly in main Jsep classs.
+// - include required plugin behavior directly in the main Jsep class
 // - converted javascript to typescript
 // - converted expression type from string to enum
 // - reduced code size
+// - optimized for parser throughput:
+//   - removed dynamic hook dispatch from hot paths
+//   - parse arrow/assignment nodes directly (no AST-wide fixup passes)
+//   - replaced substring operator scans with char-code matching
+//   - reduced per-token allocations in prefix/postfix parsing
+//   - switched numeric/string/template literal scanning to index-based parsing
+//     with late materialization to reduce string concatenation allocations
 
 import type {
   ArrayExpression,
+  ArrowExpression,
+  AssignmentExpression,
   BinaryExpression,
   Compound,
   Expression,
@@ -18,7 +27,7 @@ import type {
   TemplateLiteral,
   UnaryExpression,
 } from './jsep-types'
-import { ExpressionType, HookType } from './jsep-types'
+import { ExpressionType } from './jsep-types'
 
 const TAB_CODE = 9
 const LF_CODE = 10
@@ -43,16 +52,10 @@ const BTICK_CODE = 96 // `
 const FSLASH_CODE = 47 // '/'
 const BSLASH_CODE = 92 // '\\'
 
-const updateNodeTypes = [ExpressionType.Identifier, ExpressionType.Member]
-const updateOperators = [PLUS_CODE, MINUS_CODE]
-
-const unaryOps = {
-  '-': 1,
-  '!': 1,
-  '~': 1,
-  '+': 1,
-  new: 1,
-}
+const updateNodeTypes = new Set([
+  ExpressionType.Identifier,
+  ExpressionType.Member,
+])
 
 const assignmentOps = {
   '=': 2.5,
@@ -102,10 +105,8 @@ const binaryOps = {
 const assignmentOperatorKeys = Object.keys(assignmentOps)
 const assigmentOperatorsSet = new Set(assignmentOperatorKeys)
 
-const rightAssociative = new Set<BinaryOperator>()
-rightAssociative.add('=>')
+const rightAssociative = new Set<BinaryOperator>(['=>'])
 assignmentOperatorKeys.forEach((x) => rightAssociative.add(x as BinaryOperator))
-const additionalIdentifierChars = new Set<string>(['$', '_'])
 
 const literals = {
   true: true,
@@ -114,14 +115,6 @@ const literals = {
 }
 
 const thisStr = 'this'
-
-function getMaxKeyLen(obj: any): number {
-  return Math.max(0, ...Object.keys(obj).map((k) => k.length))
-}
-
-const maxUnopLen = getMaxKeyLen(unaryOps)
-
-const maxBinopLen = getMaxKeyLen(binaryOps)
 
 interface HookResult {
   node?: Expression | false
@@ -135,7 +128,7 @@ export type BinaryOperator = keyof typeof binaryOps
 /**
  * @internal
  */
-export type UnaryOperator = keyof typeof unaryOps
+export type UnaryOperator = '-' | '!' | '~' | '+' | 'new'
 
 /**
  * @internal
@@ -163,44 +156,15 @@ const msgVariablesCannotStartWithANumber =
   'Variable names cannot start with a number ('
 const msgUnclosedQuoteAfter = msgUnclosed + 'quote after "'
 
-enum HookCallType {
-  All,
-  Single,
-}
-
 const isDecimalDigit = (ch: number): boolean => {
   return ch >= 48 && ch <= 57 // 0...9
 }
 
 const binaryPrecedence = (opVal: BinaryOperator): number => {
-  return binaryOps[opVal] || 0
+  return binaryOps[opVal]
 }
 
-type HookFunction = (env: HookResult) => void
 class Jsep {
-  __hooks: {
-    [K in HookType]: HookFunction[]
-  } = {
-    [HookType.gobbleExpression]: [this.__gobbleEmptyArrowArg],
-    [HookType.afterExpression]: [
-      this.__fixBinaryArrow,
-      this.__fixAssignmentOperators,
-      this.__gobbleTernary,
-    ],
-    [HookType.gobbleToken]: [
-      this.__gobbleObjectExpression,
-      this.__gobbleUpdatePrefix,
-      this.__gobbleSpread,
-      this.__gobbleTemplateLiteral,
-      this.__gobbleRegexLiteral,
-    ],
-    [HookType.afterToken]: [
-      this.__gobbleNew,
-      this.__gobbleUpdatePostfix,
-      this.__gobbleTaggedTemplateIdentifier,
-    ],
-  }
-
   __expr: string
 
   __index: number
@@ -223,14 +187,13 @@ class Jsep {
   }
 
   __isIdentifierStart(ch: number): boolean {
-    const char = String.fromCharCode(ch)
     return (
       (ch >= 65 && ch <= 90) || // A...Z
       (ch >= 97 && ch <= 122) || // a...z
-      (ch >= 128 && !(char in binaryOps)) ||
-      // any non-ASCII that is not an operator
-      additionalIdentifierChars.has(char)
-    ) // additional characters
+      ch === 36 || // $
+      ch === 95 || // _
+      ch >= 128
+    )
   }
 
   __isIdentifierPart(ch: number): boolean {
@@ -239,22 +202,6 @@ class Jsep {
 
   __getError(message: string): Error {
     return new Error(`${message} at character ${this.__index}`)
-  }
-
-  __runHook(
-    hookType: HookType,
-    hookCalltype: HookCallType,
-    node?: Expression | false,
-  ): GobbleResult {
-    const hook = this.__hooks[hookType]
-    if (!hook) return node
-    const env: HookResult = { node }
-    const hookFn = (f: HookFunction): void => {
-      f.call(this, env)
-    }
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    hookCalltype === HookCallType.All ? hook.forEach(hookFn) : hook.find(hookFn)
-    return env.node
   }
 
   __gobbleSpaces(): void {
@@ -311,10 +258,9 @@ class Jsep {
 
   __gobbleExpression(): GobbleResult {
     const node =
-      this.__runHook(HookType.gobbleExpression, HookCallType.Single) ??
-      this.__gobbleBinaryExpression()
+      this.__gobbleEmptyArrowArgNode() ?? this.__gobbleBinaryExpression()
     this.__gobbleSpaces()
-    return this.__runHook(HookType.afterExpression, HookCallType.All, node)
+    return this.__gobbleTernaryNode(node)
   }
 
   /**
@@ -325,28 +271,139 @@ class Jsep {
    */
   __gobbleBinaryOp(): false | BinaryOperator {
     this.__gobbleSpaces()
-    let index = this.__index
     const expr = this.__expr
-    let toCheck = expr.substr(index, maxBinopLen)
-    let tcLen = toCheck.length
+    const index = this.__index
+    const c1 = expr.charCodeAt(index)
+    const c2 = expr.charCodeAt(index + 1)
+    const c3 = expr.charCodeAt(index + 2)
+    const c4 = expr.charCodeAt(index + 3)
 
-    while (tcLen > 0) {
-      // Don't accept a binary op when it is an identifier.
-      // Binary ops that start with a identifier-valid character must be followed
-      // by a non identifier-part valid character
-      if (
-        toCheck in binaryOps &&
-        (!this.__isIdentifierStart(this.__code) ||
-          (index + toCheck.length < expr.length &&
-            !this.__isIdentifierPart(expr.charCodeAt(index + toCheck.length))))
-      ) {
-        index += tcLen
-        this.__index = index
-        return toCheck as BinaryOperator
+    if (isNaN(c1)) return false
+
+    let op: BinaryOperator | false = false
+    let opLen = 0
+
+    if (c1 === 62 && c2 === 62 && c3 === 62 && c4 === 61) {
+      op = '>>>='
+      opLen = 4
+    } else if (c1 === 61 && c2 === 61 && c3 === 61) {
+      op = '==='
+      opLen = 3
+    } else if (c1 === 33 && c2 === 61 && c3 === 61) {
+      op = '!=='
+      opLen = 3
+    } else if (c1 === 62 && c2 === 62 && c3 === 62) {
+      op = '>>>'
+      opLen = 3
+    } else if (c1 === 60 && c2 === 60 && c3 === 61) {
+      op = '<<='
+      opLen = 3
+    } else if (c1 === 62 && c2 === 62 && c3 === 61) {
+      op = '>>='
+      opLen = 3
+    } else if (c1 === 42 && c2 === 42 && c3 === 61) {
+      op = '**='
+      opLen = 3
+    } else if (c1 === 61 && c2 === 62) {
+      op = '=>'
+      opLen = 2
+    } else if (c1 === 124 && c2 === 124) {
+      op = '||'
+      opLen = 2
+    } else if (c1 === 63 && c2 === 63) {
+      op = '??'
+      opLen = 2
+    } else if (c1 === 38 && c2 === 38) {
+      op = '&&'
+      opLen = 2
+    } else if (c1 === 61 && c2 === 61) {
+      op = '=='
+      opLen = 2
+    } else if (c1 === 33 && c2 === 61) {
+      op = '!='
+      opLen = 2
+    } else if (c1 === 60 && c2 === 61) {
+      op = '<='
+      opLen = 2
+    } else if (c1 === 62 && c2 === 61) {
+      op = '>='
+      opLen = 2
+    } else if (c1 === 60 && c2 === 60) {
+      op = '<<'
+      opLen = 2
+    } else if (c1 === 62 && c2 === 62) {
+      op = '>>'
+      opLen = 2
+    } else if (c1 === 43 && c2 === 61) {
+      op = '+='
+      opLen = 2
+    } else if (c1 === 45 && c2 === 61) {
+      op = '-='
+      opLen = 2
+    } else if (c1 === 42 && c2 === 61) {
+      op = '*='
+      opLen = 2
+    } else if (c1 === 47 && c2 === 61) {
+      op = '/='
+      opLen = 2
+    } else if (c1 === 37 && c2 === 61) {
+      op = '%='
+      opLen = 2
+    } else if (c1 === 38 && c2 === 61) {
+      op = '&='
+      opLen = 2
+    } else if (c1 === 94 && c2 === 61) {
+      op = '^='
+      opLen = 2
+    } else if (c1 === 124 && c2 === 61) {
+      op = '|='
+      opLen = 2
+    } else if (c1 === 42 && c2 === 42) {
+      op = '**'
+      opLen = 2
+    } else if (c1 === 105 && c2 === 110) {
+      if (!this.__isIdentifierPart(expr.charCodeAt(index + 2))) {
+        op = 'in'
+        opLen = 2
       }
-      toCheck = toCheck.substr(0, --tcLen)
+    } else if (c1 === 61) {
+      op = '='
+      opLen = 1
+    } else if (c1 === 124) {
+      op = '|'
+      opLen = 1
+    } else if (c1 === 94) {
+      op = '^'
+      opLen = 1
+    } else if (c1 === 38) {
+      op = '&'
+      opLen = 1
+    } else if (c1 === 60) {
+      op = '<'
+      opLen = 1
+    } else if (c1 === 62) {
+      op = '>'
+      opLen = 1
+    } else if (c1 === 43) {
+      op = '+'
+      opLen = 1
+    } else if (c1 === 45) {
+      op = '-'
+      opLen = 1
+    } else if (c1 === 42) {
+      op = '*'
+      opLen = 1
+    } else if (c1 === 47) {
+      op = '/'
+      opLen = 1
+    } else if (c1 === 37) {
+      op = '%'
+      opLen = 1
     }
-    return false
+
+    if (!op) return false
+    this.__index += opLen
+    return op
   }
 
   /**
@@ -358,7 +415,7 @@ class Jsep {
       biop: BinaryOperator | false,
       prec: number,
       biopInfo: {
-        value: BinaryOperator | false
+        value: BinaryOperator
         prec: number
         right_a: boolean
       },
@@ -401,11 +458,6 @@ class Jsep {
     while ((biop = this.__gobbleBinaryOp())) {
       prec = binaryPrecedence(biop)
 
-      if (prec === 0) {
-        this.__index -= biop.length
-        break
-      }
-
       biopInfo = {
         value: biop,
         prec,
@@ -425,12 +477,11 @@ class Jsep {
         right = stack.pop()
         biop = (stack.pop() as typeof biopInfo).value
         left = stack.pop()
-        node = {
-          type: ExpressionType.Binary,
-          operator: biop,
-          left,
-          right,
-        }
+        node = this.__createBinaryNode(
+          biop as BinaryOperator,
+          left as Expression,
+          right as Expression,
+        )
         stack.push(node)
       }
 
@@ -447,12 +498,11 @@ class Jsep {
     node = stack[i] as GobbleResult
 
     while (i > 1) {
-      node = {
-        type: ExpressionType.Binary,
-        operator: (stack[i - 1] as typeof biopInfo).value,
-        left: stack[i - 2],
-        right: node,
-      }
+      node = this.__createBinaryNode(
+        (stack[i - 1] as typeof biopInfo).value as BinaryOperator,
+        stack[i - 2] as Expression,
+        node as Expression,
+      )
       i -= 2
     }
 
@@ -464,13 +514,10 @@ class Jsep {
    * e.g. `foo.bar(baz)`, `1`, `"abc"`, `(a % 2)` (because it's in parenthesis)
    */
   __gobbleToken(): false | Expression | undefined {
-    let toCheck, tcLen, node: GobbleResult
-
+    let node: GobbleResult
     this.__gobbleSpaces()
-    node = this.__runHook(HookType.gobbleToken, HookCallType.Single)
-    if (node) {
-      return this.__runHook(HookType.afterToken, HookCallType.All, node)
-    }
+    node = this.__gobbleTokenFromPrefix()
+    if (node) return this.__postProcessToken(node)
 
     const ch = this.__code
 
@@ -485,34 +532,17 @@ class Jsep {
     } else if (ch === OBRACK_CODE) {
       node = this.__gobbleArray()
     } else {
-      toCheck = this.__expr.substr(this.__index, maxUnopLen)
-      tcLen = toCheck.length
-
-      while (tcLen > 0) {
-        // Don't accept an unary op when it is an identifier.
-        // Unary ops that start with a identifier-valid character must be followed
-        // by a non identifier-part valid character
-        if (
-          Object.prototype.hasOwnProperty.call(unaryOps, toCheck) &&
-          (!this.__isIdentifierStart(this.__code) ||
-            (this.__index + toCheck.length < this.__expr.length &&
-              !this.__isIdentifierPart(
-                this.__expr.charCodeAt(this.__index + toCheck.length),
-              )))
-        ) {
-          this.__index += tcLen
-          const argument = this.__gobbleToken()
-          if (!argument) {
-            throw this.__getError(msgMissingUnaryOp)
-          }
-          return this.__runHook(HookType.afterToken, HookCallType.All, {
-            type: ExpressionType.Unary,
-            operator: toCheck,
-            argument,
-          })
+      const unary = this.__gobbleUnaryOp()
+      if (unary) {
+        const argument = this.__gobbleToken()
+        if (!argument) {
+          throw this.__getError(msgMissingUnaryOp)
         }
-
-        toCheck = toCheck.substr(0, --tcLen)
+        return this.__postProcessToken({
+          type: ExpressionType.Unary,
+          operator: unary,
+          argument,
+        })
       }
 
       if (this.__isIdentifierStart(ch)) {
@@ -533,11 +563,115 @@ class Jsep {
     }
 
     if (!node) {
-      return this.__runHook(HookType.afterToken, HookCallType.All, false)
+      return false
     }
 
     node = this.__gobbleTokenProperty(node)
-    return this.__runHook(HookType.afterToken, HookCallType.All, node)
+    return this.__postProcessToken(node)
+  }
+
+  __createBinaryNode(
+    operator: BinaryOperator,
+    left: Expression,
+    right: Expression,
+  ): BinaryExpression | AssignmentExpression | ArrowExpression {
+    if (operator === '=>') {
+      const params =
+        left.type === ExpressionType.Sequence
+          ? (left.expressions as any)
+          : [left]
+      return {
+        type: ExpressionType.Arrow,
+        params,
+        body: right,
+      }
+    }
+
+    if (assigmentOperatorsSet.has(operator)) {
+      return {
+        type: ExpressionType.Assignment,
+        operator: operator as AssignmentOperator,
+        left,
+        right,
+      }
+    }
+
+    return {
+      type: ExpressionType.Binary,
+      operator,
+      left,
+      right,
+    }
+  }
+
+  __gobbleTokenFromPrefix(): GobbleResult {
+    const env: HookResult = { node: false }
+    this.__gobbleObjectExpression(env)
+    if (env.node) return env.node
+    this.__gobbleUpdatePrefix(env)
+    if (env.node) return env.node
+    this.__gobbleSpread(env)
+    if (env.node) return env.node
+    this.__gobbleTemplateLiteral(env)
+    if (env.node) return env.node
+    this.__gobbleRegexLiteral(env)
+    return env.node
+  }
+
+  __postProcessToken(node: Expression): Expression {
+    const env: HookResult = { node }
+    this.__gobbleNew(env)
+    this.__gobbleUpdatePostfix(env)
+    this.__gobbleTaggedTemplateIdentifier(env)
+    return env.node as Expression
+  }
+
+  __gobbleUnaryOp(): UnaryOperator | false {
+    const expr = this.__expr
+    const index = this.__index
+    const c1 = expr.charCodeAt(index)
+    const c2 = expr.charCodeAt(index + 1)
+    const c3 = expr.charCodeAt(index + 2)
+    const c4 = expr.charCodeAt(index + 3)
+
+    if (c1 === MINUS_CODE) {
+      this.__index++
+      return '-'
+    }
+    if (c1 === 33) {
+      this.__index++
+      return '!'
+    }
+    if (c1 === 126) {
+      this.__index++
+      return '~'
+    }
+    if (c1 === PLUS_CODE) {
+      this.__index++
+      return '+'
+    }
+    if (
+      c1 === 110 &&
+      c2 === 101 &&
+      c3 === 119 &&
+      !this.__isIdentifierPart(c4)
+    ) {
+      this.__index += 3
+      return 'new'
+    }
+    return false
+  }
+
+  __gobbleEmptyArrowArgNode(): GobbleResult {
+    const env: HookResult = {}
+    this.__gobbleEmptyArrowArg(env)
+    return env.node
+  }
+
+  __gobbleTernaryNode(node: GobbleResult): GobbleResult {
+    const env: HookResult = { node }
+    this.__gobbleTernary(env)
+    return env.node
   }
 
   /**
@@ -588,7 +722,7 @@ class Jsep {
           arguments: this.__gobbleArguments(CPAREN_CODE),
           callee: node,
         }
-      } else if (ch === PERIOD_CODE || optional) {
+      } else {
         if (optional) {
           this.__index--
         }
@@ -617,45 +751,46 @@ class Jsep {
    * keep track of everything in the numeric literal and then calling `parseFloat` on that string
    */
   __gobbleNumericLiteral(): Literal {
-    let number = ''
-    let ch
+    const expr = this.__expr
+    const start = this.__index
+    let index = start
 
-    while (isDecimalDigit(this.__code)) {
-      number += this.__expr.charAt(this.__index++)
+    while (isDecimalDigit(expr.charCodeAt(index))) {
+      index++
     }
 
-    if (this.__isCode(PERIOD_CODE)) {
+    if (expr.charCodeAt(index) === PERIOD_CODE) {
       // can start with a decimal marker
-      number += this.__expr.charAt(this.__index++)
-
-      while (isDecimalDigit(this.__code)) {
-        number += this.__expr.charAt(this.__index++)
+      index++
+      while (isDecimalDigit(expr.charCodeAt(index))) {
+        index++
       }
     }
 
-    ch = this.__char
-
-    if (ch === 'e' || ch === 'E') {
+    const exponentCode = expr.charCodeAt(index)
+    if (exponentCode === 101 || exponentCode === 69) {
       // exponent marker
-      number += this.__expr.charAt(this.__index++)
-      ch = this.__char
-
-      if (ch === '+' || ch === '-') {
+      index++
+      const signCode = expr.charCodeAt(index)
+      if (signCode === PLUS_CODE || signCode === MINUS_CODE) {
         // exponent sign
-        number += this.__expr.charAt(this.__index++)
+        index++
       }
-
-      while (isDecimalDigit(this.__code)) {
+      const exponentStart = index
+      while (isDecimalDigit(expr.charCodeAt(index))) {
         // exponent itself
-        number += this.__expr.charAt(this.__index++)
+        index++
       }
-
-      if (!isDecimalDigit(this.__expr.charCodeAt(this.__index - 1))) {
+      if (exponentStart === index) {
+        this.__index = index
+        const number = expr.slice(start, index)
         throw this.__getError(msgExpectedExponent + number + this.__char + ')')
       }
     }
 
-    const chCode = this.__code
+    this.__index = index
+    const number = expr.slice(start, index)
+    const chCode = expr.charCodeAt(index)
 
     // Check to make sure this isn't a variable name that start with a number (123abc)
     if (this.__isIdentifierStart(chCode)) {
@@ -681,56 +816,70 @@ class Jsep {
    * e.g. `"hello world"`, `'this is\nJSEP'`
    */
   __gobbleStringLiteral(): Literal {
-    let str = ''
+    const expr = this.__expr
+    const length = expr.length
     const startIndex = this.__index
-    const quote = this.__expr.charAt(this.__index++)
+    const quoteCode = expr.charCodeAt(this.__index++)
+    let index = this.__index
+    let segmentStart = index
+    const cookedParts: string[] = []
+    let hadEscape = false
     let closed = false
 
-    while (this.__index < this.__expr.length) {
-      let ch = this.__expr.charAt(this.__index++)
-
-      if (ch === quote) {
+    while (index < length) {
+      const code = expr.charCodeAt(index)
+      if (code === quoteCode) {
         closed = true
+        this.__index = index + 1
         break
-      } else if (ch === '\\') {
-        // Check for all of the common escape codes
-        ch = this.__expr.charAt(this.__index++)
-
-        switch (ch) {
-          case 'n':
-            str += '\n'
-            break
-          case 'r':
-            str += '\r'
-            break
-          case 't':
-            str += '\t'
-            break
-          case 'b':
-            str += '\b'
-            break
-          case 'f':
-            str += '\f'
-            break
-          case 'v':
-            str += '\x0B'
-            break
-          default:
-            str += ch
-        }
+      }
+      if (code === BSLASH_CODE) {
+        if (!hadEscape) hadEscape = true
+        cookedParts.push(expr.slice(segmentStart, index))
+        const escCode = expr.charCodeAt(index + 1)
+        cookedParts.push(this.__decodeEscapedChar(escCode))
+        index += 2
+        segmentStart = index
       } else {
-        str += ch
+        index++
       }
     }
 
+    const str = hadEscape
+      ? cookedParts.join('') + expr.slice(segmentStart, closed ? index : length)
+      : expr.slice(segmentStart, closed ? index : length)
+
     if (!closed) {
+      this.__index = index
       throw this.__getError(msgUnclosedQuoteAfter + str + '"')
     }
 
     return {
       type: ExpressionType.Literal,
       value: str,
-      raw: this.__expr.substring(startIndex, this.__index),
+      raw: expr.substring(startIndex, this.__index),
+    }
+  }
+
+  __decodeEscapedChar(code: number): string {
+    switch (code) {
+      case 110:
+        return '\n'
+      case 114:
+        return '\r'
+      case 116:
+        return '\t'
+      case 98:
+        return '\b'
+      case 102:
+        return '\f'
+      case 118:
+        return '\x0B'
+      default:
+        if (isNaN(code)) {
+          return ''
+        }
+        return String.fromCharCode(code)
     }
   }
 
@@ -806,7 +955,7 @@ class Jsep {
           // missing argument
           if (termination === CPAREN_CODE) {
             throw this.__getError(msgUnexpectedToken + ',')
-          } else if (termination === CBRACK_CODE) {
+          } else {
             for (let arg = args.length; arg < separatorCount; arg++) {
               args.push(null)
             }
@@ -926,7 +1075,7 @@ class Jsep {
             shorthand: false,
           })
           this.__gobbleSpaces()
-        } else if (key) {
+        } else {
           // spread, assignment (object destructuring with defaults), etc.
           properties.push(key)
         }
@@ -942,9 +1091,8 @@ class Jsep {
   __gobbleUpdatePrefix(env: HookResult): void {
     const code = this.__code
     if (
-      updateOperators.some(
-        (c) => c === code && c === this.__expr.charCodeAt(this.__index + 1),
-      )
+      (code === PLUS_CODE || code === MINUS_CODE) &&
+      code === this.__expr.charCodeAt(this.__index + 1)
     ) {
       this.__index += 2
       const expr = (env.node = {
@@ -953,39 +1101,39 @@ class Jsep {
         argument: this.__gobbleTokenProperty(this.__gobbleIdentifier()),
         prefix: true,
       })
-      if (!expr.argument || !updateNodeTypes.includes(expr.argument.type)) {
+      if (!expr.argument || !updateNodeTypes.has(expr.argument.type)) {
         throw this.__getError(msgUnexpected + expr.operator)
       }
     }
   }
 
   __gobbleUpdatePostfix(env: HookResult): void {
-    if (env.node) {
-      const code = this.__code
-      if (
-        updateOperators.some(
-          (c) => c === code && c === this.__expr.charCodeAt(this.__index + 1),
+    const node = env.node as Expression
+    const code = this.__code
+    if (
+      (code === PLUS_CODE || code === MINUS_CODE) &&
+      code === this.__expr.charCodeAt(this.__index + 1)
+    ) {
+      if (!updateNodeTypes.has(node.type)) {
+        throw this.__getError(
+          msgUnexpected + (code === PLUS_CODE ? '++' : '--'),
         )
-      ) {
-        if (!updateNodeTypes.includes(env.node.type)) {
-          throw this.__getError(msgUnexpected + env.node.operator)
-        }
-        this.__index += 2
-        env.node = {
-          type: ExpressionType.Update,
-          operator: code === PLUS_CODE ? '++' : '--',
-          argument: env.node,
-          prefix: false,
-        }
+      }
+      this.__index += 2
+      env.node = {
+        type: ExpressionType.Update,
+        operator: code === PLUS_CODE ? '++' : '--',
+        argument: node,
+        prefix: false,
       }
     }
   }
 
   __gobbleSpread(env: HookResult): void {
     if (
-      [0, 1, 2].every(
-        (i) => this.__expr.charCodeAt(this.__index + i) === PERIOD_CODE,
-      )
+      this.__expr.charCodeAt(this.__index) === PERIOD_CODE &&
+      this.__expr.charCodeAt(this.__index + 1) === PERIOD_CODE &&
+      this.__expr.charCodeAt(this.__index + 2) === PERIOD_CODE
     ) {
       this.__index += 3
       env.node = {
@@ -1019,24 +1167,6 @@ class Jsep {
           test,
           consequent,
           alternate,
-        }
-
-        // check for operators of higher priority than ternary (i.e. assignment)
-        // jsep sets || at 1, and assignment at 0.9, and conditional should be between them
-        if (
-          test.operator &&
-          binaryOps[test.operator as BinaryOperator] <= 0.9
-        ) {
-          let newTest = test as BinaryExpression
-          while (
-            newTest.right.operator &&
-            binaryOps[newTest.right.operator as BinaryOperator] <= 0.9
-          ) {
-            newTest = newTest.right as BinaryExpression
-          }
-          env.node.test = newTest.right
-          newTest.right = env.node
-          env.node = test
         }
       } else {
         throw this.__getError(msgExpectedColon)
@@ -1072,55 +1202,9 @@ class Jsep {
     }
   }
 
-  __fixBinaryArrow(env: HookResult): void {
-    this.__updateBinariesToArrows(env.node)
-  }
-
-  __updateBinariesToArrows(node?: Expression | false): void {
-    if (!node) return
-    Object.values(node).forEach((val) => {
-      if (val && typeof val === 'object') {
-        this.__updateBinariesToArrows(val as Expression | false)
-      }
-    })
-
-    if (node.operator === '=>') {
-      node.type = ExpressionType.Arrow
-      node.params = node.left ? [node.left] : null
-      node.body = node.right
-      if (
-        node.params &&
-        (node.params as any)[0].type === ExpressionType.Sequence
-      ) {
-        node.params = (node.params as any)[0].expressions
-      }
-      delete node.left
-      delete node.right
-      delete node.operator
-    }
-  }
-
-  __fixAssignmentOperators(env: HookResult): void {
-    if (env.node) this.__updateBinariesToAssignments(env.node)
-  }
-
-  __updateBinariesToAssignments(node: Record<string, any>): void {
-    if (assigmentOperatorsSet.has(node.operator)) {
-      node.type = ExpressionType.Assignment
-      this.__updateBinariesToAssignments(node.left)
-      this.__updateBinariesToAssignments(node.right)
-    } else if (!node.operator) {
-      Object.values(node).forEach((val) => {
-        if (val && typeof val === 'object') {
-          this.__updateBinariesToAssignments(val)
-        }
-      })
-    }
-  }
-
   __gobbleTaggedTemplateIdentifier(env: HookResult): void {
-    if (!env.node) return
-    const type = env.node.type
+    const node = env.node as Expression
+    const type = node.type
     const condition =
       (type === ExpressionType.Identifier || type === ExpressionType.Member) &&
       this.__isCode(BTICK_CODE)
@@ -1128,82 +1212,86 @@ class Jsep {
 
     env.node = {
       type: ExpressionType.TaggedTemplateExpression,
-      tag: env.node,
+      tag: node,
       quasi: this.__gobbleTemplateLiteral(env),
     }
   }
 
   __gobbleTemplateLiteral(env: HookResult): TemplateLiteral | undefined {
     if (!this.__isCode(BTICK_CODE)) return
+    const expr = this.__expr
+    const length = expr.length
     const node: TemplateLiteral = {
       type: ExpressionType.TemplateLiteral,
       quasis: [],
       expressions: [],
     }
-    let cooked = ''
-    let raw = ''
-    let closed = false
-    const length = this.__expr.length
-    const pushQuasi = (): number =>
-      node.quasis.push({
+    let segmentStart = ++this.__index
+    const rawParts: string[] = []
+    const cookedParts: string[] = []
+    let hasEscape = false
+
+    const pushQuasi = (tail: boolean): number => {
+      if (!hasEscape) {
+        const value = expr.slice(segmentStart, this.__index)
+        return node.quasis.push({
+          type: ExpressionType.TemplateElement,
+          value: {
+            raw: value,
+            cooked: value,
+          },
+          tail,
+        })
+      }
+
+      rawParts.push(expr.slice(segmentStart, this.__index))
+      cookedParts.push(expr.slice(segmentStart, this.__index))
+      const raw = rawParts.join('')
+      const cooked = cookedParts.join('')
+      rawParts.length = 0
+      cookedParts.length = 0
+      hasEscape = false
+      return node.quasis.push({
         type: ExpressionType.TemplateElement,
         value: {
           raw,
           cooked,
         },
-        tail: closed,
+        tail,
       })
+    }
 
     while (this.__index < length) {
-      let ch = this.__expr.charAt(++this.__index)
+      const code = expr.charCodeAt(this.__index)
 
-      if (ch === '`') {
+      if (code === BTICK_CODE) {
+        pushQuasi(true)
         this.__index += 1
-        closed = true
-        pushQuasi()
-
         env.node = node
         return node
-      } else if (ch === '$' && this.__expr.charAt(this.__index + 1) === '{') {
+      } else if (
+        code === 36 && // $
+        expr.charCodeAt(this.__index + 1) === OCURLY_CODE
+      ) {
+        pushQuasi(false)
         this.__index += 2
-        pushQuasi()
-        raw = ''
-        cooked = ''
         node.expressions.push(...this.__gobbleExpressions(CCURLY_CODE))
         if (!this.__isCode(CCURLY_CODE)) {
           throw this.__getError('unclosed ${')
         }
-      } else if (ch === '\\') {
-        // Check for all of the common escape codes
-        raw += ch
-        ch = this.__expr.charAt(++this.__index)
-        raw += ch
-
-        switch (ch) {
-          case 'n':
-            cooked += '\n'
-            break
-          case 'r':
-            cooked += '\r'
-            break
-          case 't':
-            cooked += '\t'
-            break
-          case 'b':
-            cooked += '\b'
-            break
-          case 'f':
-            cooked += '\f'
-            break
-          case 'v':
-            cooked += '\x0B'
-            break
-          default:
-            cooked += ch
-        }
+        this.__index += 1
+        segmentStart = this.__index
+      } else if (code === BSLASH_CODE) {
+        if (!hasEscape) hasEscape = true
+        rawParts.push(expr.slice(segmentStart, this.__index))
+        cookedParts.push(expr.slice(segmentStart, this.__index))
+        const escCode = expr.charCodeAt(this.__index + 1)
+        rawParts.push(expr.slice(this.__index, this.__index + 2))
+        cookedParts.push(this.__decodeEscapedChar(escCode))
+        this.__index += 2
+        segmentStart = this.__index
       } else {
-        cooked += ch
-        raw += ch
+        this.__index += 1
       }
     }
     throw this.__getError('Unclosed `')
@@ -1224,7 +1312,7 @@ class Jsep {
     while (
       callNode.type === ExpressionType.Member ||
       (callNode.type === ExpressionType.Call &&
-        callNode?.callee?.type === ExpressionType.Member)
+        callNode.callee.type === ExpressionType.Member)
     ) {
       callNode =
         callNode.type === ExpressionType.Member

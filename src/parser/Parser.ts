@@ -74,21 +74,38 @@ export class Parser {
   ): ParseResult {
     const value = sref<any[]>([])
     const stopObserverList = [] as StopObserving[]
-    const unbinder = (): void => {
+    const subscribers = new Set<(values: unknown[]) => void>()
+    const clearObservers = (): void => {
       for (const stopObserver of stopObserverList) {
         stopObserver()
       }
       stopObserverList.length = 0
     }
+    const unbinder = (): void => {
+      clearObservers()
+      subscribers.clear()
+    }
+    const subscribe = (
+      observer: (values: unknown[]) => void,
+      init?: boolean,
+    ): StopObserving => {
+      subscribers.add(observer)
+      if (init) observer(value() as unknown[])
+      return () => {
+        subscribers.delete(observer)
+      }
+    }
     const result: ParseResult = {
       value,
       stop: unbinder,
+      subscribe,
       refs: [],
       context: this.__contexts[0],
     }
     if (isNullOrWhitespace(expression)) return result
     const globalContext = this.__config.globalContext
-    const refs: any[] = []
+    const refs: AnyRef[] = []
+    const uniqueRefs = new Set<AnyRef>()
     const evaluate = (
       expr: Expression,
       contexts: any[],
@@ -117,27 +134,42 @@ export class Parser {
         astCache[expression] ??
         (jsep('[' + expression + ']') as ArrayExpression)
       astCache[expression] = ast
-      const contexts = this.__contexts
+      const contexts = this.__contexts.slice()
+      const elements = ast.elements
+      const len = elements.length
       const refresh = (): void => {
-        refs.splice(0)
-        unbinder()
-        const evaluated = ast.elements.map((x, i) => {
-          if (isLazy?.(i, -1))
-            return {
-              value: (e: Event) =>
-                evaluate(x, contexts, false, { $event: e }).value,
-              refs: [],
-            }
-          return evaluate(x, contexts, true)
-        })
+        refs.length = 0
+        uniqueRefs.clear()
+        clearObservers()
+        const values = new Array<any>(len)
+        const expressionRefs = new Array<any>(len)
+        for (let i = 0; i < len; ++i) {
+          const expr = elements[i]
+          if (isLazy?.(i, -1)) {
+            values[i] = (e: Event) =>
+              evaluate(expr, contexts, false, { $event: e }).value
+            continue
+          }
+          const evaluated = evaluate(expr, contexts, true)
+          values[i] = evaluated.value
+          expressionRefs[i] = evaluated.ref
+        }
         if (!once) {
           for (const r of refs) {
+            if (uniqueRefs.has(r)) continue
+            uniqueRefs.add(r)
             const stopObserving = observe(r, refresh)
             stopObserverList.push(stopObserving)
           }
         }
-        result.refs = evaluated.map((x) => x.ref)
-        value(evaluated.map((x) => x.value))
+        result.refs = expressionRefs
+        value(values)
+        if (subscribers.size !== 0) {
+          for (const subscriber of subscribers) {
+            if (!subscribers.has(subscriber)) continue
+            subscriber(values)
+          }
+        }
       }
       refresh()
     } catch (e) {
@@ -147,7 +179,7 @@ export class Parser {
   }
 
   __capture(): any[] {
-    return this.__contexts
+    return this.__contexts.slice()
   }
 
   __replaced: any[][] = []

@@ -27,3 +27,33 @@ test('collectRefs gathers refs and returns value', () => {
   expect(refs).toContain(b)
   expect(refs.length).toBe(2)
 })
+
+test('silence works when no collection frame exists', () => {
+  const out = silence(() => 42)
+  expect(out).toBe(42)
+})
+
+test('watchEffect supports empty effect, cleanup registration and stop', () => {
+  const stopNoop = watchEffect(undefined as any)
+  expect(() => stopNoop()).not.toThrow()
+
+  const a = ref(1)
+  let runs = 0
+  const cleaned: number[] = []
+  const stop = watchEffect((onCleanup) => {
+    runs++
+    const snapshot = a()
+    onCleanup?.(() => cleaned.push(snapshot))
+  })
+  expect(runs).toBe(1)
+  a(2)
+  expect(runs).toBe(2)
+  expect(cleaned).toContain(1)
+  stop()
+})
+
+test('watchEffect collectRefs handles empty set', () => {
+  const { value, refs } = collectRefs(() => 10)
+  expect(value).toBe(10)
+  expect(refs.length).toBe(0)
+})

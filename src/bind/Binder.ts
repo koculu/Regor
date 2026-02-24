@@ -11,7 +11,6 @@ import {
 import { isNullOrWhitespace } from '../common/is-what'
 import { teleportDirective } from '../directives/teleport'
 // import { warning, WarningType } from '../log/warnings'
-import { observe } from '../observer/observe'
 import { type Parser } from '../parser/Parser'
 import { ComponentBinder } from './ComponentBinder'
 import { DirectiveCollector } from './DirectiveCollector'
@@ -90,9 +89,11 @@ export class Binder {
         console.error('directive not found:', name)
         continue
       }
-      item.__elements.forEach((el) => {
+      const elements = item.__elements
+      for (let i = 0; i < elements.length; ++i) {
+        const el = elements[i]
         this.__bind(directive, el, attribute, false, option, item.__flags)
-      })
+      }
     }
   }
 
@@ -108,10 +109,13 @@ export class Binder {
     const bindExpression = el.getAttribute(attribute)
     el.removeAttribute(attribute)
     const getParentSwitch = (el: HTMLElement): string | null => {
-      const switchId = el.getAttribute(rswitch)
-      if (switchId) return switchId
-      if (!el.parentElement) return null
-      return getParentSwitch(el.parentElement)
+      let cursor: HTMLElement | null = el
+      while (cursor) {
+        const switchId = cursor.getAttribute(rswitch)
+        if (switchId) return switchId
+        cursor = cursor.parentElement
+      }
+      return null
     }
     if (hasSwitch()) {
       const switchId = getParentSwitch(el)
@@ -167,11 +171,12 @@ export class Binder {
       config.once,
     )
     const stopObserverList = [] as StopObserving[]
+    const hasOnChange = !!config.onChange
     const unbinder = (): void => {
       result.stop()
       dynamicOption?.stop()
-      for (const stopObserver of stopObserverList) {
-        stopObserver()
+      for (let i = 0; i < stopObserverList.length; ++i) {
+        stopObserverList[i]()
       }
       stopObserverList.length = 0
     }
@@ -188,38 +193,60 @@ export class Binder {
         config.once,
       )
     }
-    let previousValues: any[]
-    const getValues = (): any[] => {
-      previousValues = result.value()
-      return previousValues
-    }
-    let previousOption: any
-    const getOptionValue = (): any => {
-      if (!dynamicOption) {
-        previousOption = option
-        return option
-      }
-      previousOption = dynamicOption.value()[0]
-      return previousOption
-    }
+    const dynamicOpt = dynamicOption
+    const hasDynamicOption = dynamicOpt != null
+    let previousValues: any[] = result.value()
+    let previousOption: any = hasDynamicOption
+      ? dynamicOption!.value()[0]
+      : option
 
-    const observeTailChanges = (): void => {
-      if (!config.onChange) return
-      const stopObserving = observe(result.value, (_) => {
-        const pre = previousValues
-        const pre2 = previousOption
-        config.onChange?.(el, getValues(), pre, getOptionValue(), pre2, flags)
-      })
+    if (!config.once && hasOnChange) {
+      const stopObserving = (
+        result.subscribe
+          ? result.subscribe(() => {
+              const preValues = previousValues
+              const preOption = previousOption
+              const nextValues = result.value()
+              const nextOption = hasDynamicOption
+                ? dynamicOpt.value()[0]
+                : option
+              previousValues = nextValues
+              previousOption = nextOption
+              config.onChange?.(
+                el,
+                nextValues,
+                preValues,
+                nextOption,
+                preOption,
+                flags,
+              )
+            })
+          : () => {}
+      ) as StopObserving
       stopObserverList.push(stopObserving)
-      if (dynamicOption) {
-        const stopObserving = observe(dynamicOption.value, (_) => {
-          const pre = previousOption
-          config.onChange?.(el, getValues(), pre, getOptionValue(), pre, flags)
-        })
+      if (dynamicOpt) {
+        const stopObserving = (
+          dynamicOpt.subscribe
+            ? dynamicOpt.subscribe(() => {
+                const preOption = previousOption
+                const nextValues = result.value()
+                const nextOption = dynamicOpt.value()[0]
+                previousValues = nextValues
+                previousOption = nextOption
+                config.onChange?.(
+                  el,
+                  nextValues,
+                  preOption,
+                  nextOption,
+                  preOption,
+                  flags,
+                )
+              })
+            : () => {}
+        ) as StopObserving
         stopObserverList.push(stopObserving)
       }
     }
-    if (!config.once) observeTailChanges()
     if (config.onBind)
       stopObserverList.push(
         config.onBind(
@@ -233,9 +260,9 @@ export class Binder {
       )
     config.onChange?.(
       el,
-      getValues(),
+      previousValues,
       undefined,
-      getOptionValue(),
+      previousOption,
       undefined,
       flags,
     )

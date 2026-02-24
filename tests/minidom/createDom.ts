@@ -1,5 +1,5 @@
 import cssEscape from './cssEscape'
-import { parseHtml } from './minidom'
+import { parseHtml, resetMiniDomCaches } from './minidom'
 
 type GlobalKey =
   | 'window'
@@ -19,10 +19,8 @@ type GlobalKey =
   | 'localStorage'
   | 'sessionStorage'
 
-export function registerDomGlobals(
-  window: unknown,
-  document: unknown,
-): () => void {
+export function createDom(html: string): () => void {
+  const { document, window } = parseHtml(html)
   const globals = globalThis as Record<string, unknown>
   const original: Partial<Record<GlobalKey, unknown>> = {}
   const keys: GlobalKey[] = [
@@ -74,6 +72,7 @@ export function registerDomGlobals(
 
   return () => {
     for (const key of keys) globals[key] = original[key]
+    resetMiniDomCaches()
   }
 }
 
@@ -94,8 +93,7 @@ function assignGlobal(
 }
 
 export function ensureDomGlobals(): () => void {
-  const globals = globalThis as Record<string, unknown>
+  const globals = globalThis
   if (globals.document && globals.window) return () => {}
-  const { document, window } = parseHtml('<html><body></body></html>')
-  return registerDomGlobals(window, document)
+  return createDom('<html><body></body></html>')
 }

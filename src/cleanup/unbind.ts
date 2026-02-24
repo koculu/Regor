@@ -1,15 +1,16 @@
 import { bindDataSymbol } from './bindDataSymbol'
 
 export const unbind = (node: Node): void => {
-  const queue: any[] = [node]
-
-  while (queue.length > 0) {
-    const currentElement = queue.shift()
-    unbindSingle(currentElement)
-    const childNodes = currentElement.childNodes
-    if (!childNodes) continue
-    for (const item of childNodes) {
-      queue.push(item)
+  const stack: Node[] = [node]
+  while (stack.length > 0) {
+    const currentNode = stack.pop() as Node
+    unbindSingle(currentNode)
+    for (
+      let child = currentNode.lastChild;
+      child != null;
+      child = child.previousSibling
+    ) {
+      stack.push(child)
     }
   }
 }
@@ -17,10 +18,10 @@ export const unbind = (node: Node): void => {
 const unbindSingle = (node: Node): void => {
   const bindData = (node as any)[bindDataSymbol]
   if (!bindData) return
-  for (const unbinder of bindData.unbinders) {
-    unbinder()
+  const unbinders = bindData.unbinders
+  for (let i = 0; i < unbinders.length; ++i) {
+    unbinders[i]()
   }
-  bindData.unbinders.splice(0)
-
-  delete (node as any)[bindDataSymbol]
+  unbinders.length = 0
+  ;(node as any)[bindDataSymbol] = undefined
 }

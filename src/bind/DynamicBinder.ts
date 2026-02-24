@@ -9,7 +9,6 @@ import {
   unmount,
 } from '../common/common'
 import { isNullOrWhitespace, isObject, isString } from '../common/is-what'
-import { observe } from '../observer/observe'
 import { type Binder } from './Binder'
 import { setSwitchOwner } from './switch'
 
@@ -165,7 +164,9 @@ export class DynamicBinder {
     addUnbinder(commentBegin, unbinder)
 
     refresh()
-    const stopObserving = observe(value, refresh)
+    const stopObserving = (
+      parseResult.subscribe ? parseResult.subscribe(refresh) : () => {}
+    ) as StopObserving
     stopObserverList.push(stopObserving)
   }
 }

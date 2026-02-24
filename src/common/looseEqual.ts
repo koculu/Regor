@@ -37,28 +37,20 @@ export function looseEqual(a: any, b: any): boolean {
   aValidType = isObject(a)
   bValidType = isObject(b)
   if (aValidType || bValidType) {
-    /* istanbul ignore if: this if will probably never be called */
-    if (!aValidType || !bValidType) {
-      return false
-    }
+    if (!aValidType || !bValidType) return false
     const aKeysCount = Object.keys(a).length
     const bKeysCount = Object.keys(b).length
     if (aKeysCount !== bKeysCount) {
       return false
     }
     for (const key in a) {
-      // eslint-disable-next-line no-prototype-builtins
-      const aHasKey = a.hasOwnProperty(key)
-      // eslint-disable-next-line no-prototype-builtins
-      const bHasKey = b.hasOwnProperty(key)
-      if (
-        (aHasKey && !bHasKey) ||
-        (!aHasKey && bHasKey) ||
-        !looseEqual(a[key], b[key])
-      ) {
+      const aHasKey = Object.prototype.hasOwnProperty.call(a, key)
+      const bHasKey = Object.prototype.hasOwnProperty.call(b, key)
+      if ((aHasKey && !bHasKey) || !looseEqual(a[key], b[key])) {
         return false
       }
     }
+    return true
   }
   return String(a) === String(b)
 }

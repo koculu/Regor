@@ -1,6 +1,19 @@
-import { expect, test } from 'vitest'
+import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
 import { createApp, createComponent, html, ref } from '../../src'
+import { modelDirective } from '../../src/directives/model'
+import { warningHandler } from '../../src/log/warnings'
+
+let originalWarning: (...args: unknown[]) => void
+
+beforeEach(() => {
+  originalWarning = warningHandler.warning
+  warningHandler.warning = vi.fn()
+})
+
+afterEach(() => {
+  warningHandler.warning = originalWarning
+})
 
 test('r-model expression flag int converts input to integer', () => {
   const root = document.createElement('div')
@@ -660,4 +673,185 @@ test('regression: selecting host from list should not overwrite previous host it
   expect(input.value).toBe('host-b')
   expect(hostItems()[1]().hostname()).toBe('host-b')
   expect(hostItems()[0]().hostname()).toBe('host-a')
+})
+
+test('model directive updates single select and clears when value is not present', () => {
+  const select = document.createElement('select')
+  const a = document.createElement('option')
+  a.value = 'a'
+  const b = document.createElement('option')
+  b.value = 'b'
+  select.appendChild(a)
+  select.appendChild(b)
+
+  modelDirective.onChange!(select, ['b'])
+  expect(select.selectedIndex).toBe(1)
+
+  modelDirective.onChange!(select, ['missing'])
+  expect(select.selectedIndex).toBe(-1)
+})
+
+test('model directive multiple-select writes selected values to scalar model as array', () => {
+  const select = document.createElement('select')
+  select.multiple = true
+  const a = document.createElement('option')
+  a.value = 'a'
+  const b = document.createElement('option')
+  b.value = 'b'
+  select.appendChild(a)
+  select.appendChild(b)
+
+  const model = ref<any>('initial')
+  const parseResult = {
+    value: () => [model(), ''],
+    stop: () => {},
+    refs: [model],
+    context: {},
+  } as any
+  const unbind = modelDirective.onBind!(select, parseResult, 'expr')
+
+  a.selected = true
+  b.selected = true
+  select.dispatchEvent(new Event('change'))
+  const selected = model() as any[]
+  expect(selected.length).toBe(2)
+  expect(selected[0]).toBe('a')
+  expect(selected[1]).toBe('b')
+
+  unbind()
+  a.selected = false
+  b.selected = false
+  select.dispatchEvent(new Event('change'))
+  const stillSelected = model() as any[]
+  expect(stillSelected.length).toBe(2)
+  expect(stillSelected[0]).toBe('a')
+  expect(stillSelected[1]).toBe('b')
+})
+
+test('model directive multiple-select mutates array model in place', () => {
+  const select = document.createElement('select')
+  select.multiple = true
+  const a = document.createElement('option')
+  a.value = 'a'
+  const b = document.createElement('option')
+  b.value = 'b'
+  select.appendChild(a)
+  select.appendChild(b)
+
+  const list = ['seed'] as string[]
+  const model = ref<any>(list)
+  const parseResult = {
+    value: () => [model(), ''],
+    stop: () => {},
+    refs: [model],
+    context: {},
+  } as any
+  modelDirective.onBind!(select, parseResult, 'expr')
+
+  a.selected = true
+  b.selected = false
+  select.dispatchEvent(new Event('change'))
+
+  expect(model()).toBe(list)
+  const selected = model() as any[]
+  expect(selected.length).toBe(1)
+  expect(selected[0]).toBe('a')
+})
+
+test('model directive warns for unsupported element in onChange', () => {
+  modelDirective.onChange!(document.createElement('div'), ['x'])
+  expect(warningHandler.warning).toHaveBeenCalled()
+})
+
+test('model directive onBind warns and noops when ref is missing', () => {
+  const input = document.createElement('input')
+  const parseResult = {
+    value: () => ['x', ''],
+    stop: () => {},
+    refs: [],
+    context: {},
+  } as any
+  const unbind = modelDirective.onBind!(input, parseResult, 'expr')
+
+  input.value = 'next'
+  input.dispatchEvent(new Event('input'))
+  unbind()
+
+  expect(warningHandler.warning).toHaveBeenCalled()
+})
+
+test('model directive checkbox supports trueValue/falseValue props and attrs', () => {
+  const input = document.createElement('input') as HTMLInputElement & {
+    trueValue?: any
+    falseValue?: any
+  }
+  input.type = 'checkbox'
+
+  input.trueValue = 'yes'
+  modelDirective.onChange!(input, ['yes'])
+  expect(input.checked).toBe(true)
+
+  input.removeAttribute('true-value')
+  delete input.trueValue
+  input.setAttribute('true-value', 'attr-yes')
+  modelDirective.onChange!(input, ['attr-yes'])
+  expect(input.checked).toBe(true)
+
+  input.falseValue = 'no'
+  const model = ref<any>('seed')
+  const parseResult = {
+    value: () => [model(), ''],
+    stop: () => {},
+    refs: [model],
+    context: {},
+  } as any
+  modelDirective.onBind!(input, parseResult, 'expr')
+  input.checked = false
+  input.dispatchEvent(new Event('change'))
+  expect(model()).toBe('no')
+})
+
+test('model directive radio onBind updates model and unbind stops updates', () => {
+  const radio = document.createElement('input')
+  radio.type = 'radio'
+  radio.value = 'r1'
+  const model = ref<any>('init')
+  const parseResult = {
+    value: () => [model(), ''],
+    stop: () => {},
+    refs: [model],
+    context: {},
+  } as any
+
+  const unbind = modelDirective.onBind!(radio, parseResult, 'expr')
+  radio.dispatchEvent(new Event('change'))
+  expect(model()).toBe('r1')
+
+  unbind()
+  radio.value = 'r2'
+  radio.dispatchEvent(new Event('change'))
+  expect(model()).toBe('r1')
+})
+
+test('model directive single select listener writes selected value', () => {
+  const select = document.createElement('select')
+  const a = document.createElement('option')
+  a.value = 'a'
+  const b = document.createElement('option')
+  b.value = 'b'
+  select.appendChild(a)
+  select.appendChild(b)
+
+  const model = ref<any>('init')
+  const parseResult = {
+    value: () => [model(), ''],
+    stop: () => {},
+    refs: [model],
+    context: {},
+  } as any
+  modelDirective.onBind!(select, parseResult, 'expr')
+
+  b.selected = true
+  select.dispatchEvent(new Event('change'))
+  expect(model()).toBe('b')
 })

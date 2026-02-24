@@ -1,0 +1,62 @@
+{
+  "meta": {
+    "version": 1,
+    "createdAt": "2026-02-24T07:24:04.513Z",
+    "platform": "win32",
+    "arch": "x64",
+    "node": "v22.16.0",
+    "rowCount": 1000,
+    "samples": 20,
+    "warmups": 5
+  },
+  "results": {
+    "mount_rfor_rtext": {
+      "median": 73.023,
+      "p90": 80.194,
+      "mean": 74.312,
+      "min": 68.114,
+      "max": 83.47,
+      "samples": 20,
+      "unmount": {
+        "median": 7.723,
+        "p90": 8.965,
+        "mean": 8.021,
+        "min": 7.033,
+        "max": 11.321,
+        "samples": 20
+      }
+    },
+    "mutate_rows_fields": {
+      "median": 87.079,
+      "p90": 92.333,
+      "mean": 87.982,
+      "min": 84.215,
+      "max": 101.536,
+      "samples": 20,
+      "unmount": {
+        "median": 8.655,
+        "p90": 9.838,
+        "mean": 8.678,
+        "min": 7.588,
+        "max": 10.206,
+        "samples": 20
+      }
+    },
+    "toggle_if_loop": {
+      "median": 11.49,
+      "p90": 11.779,
+      "mean": 11.277,
+      "min": 10.591,
+      "max": 12.1,
+      "samples": 20,
+      "unmount": {
+        "median": 0.309,
+        "p90": 0.337,
+        "mean": 0.31,
+        "min": 0.259,
+        "max": 0.411,
+        "samples": 20
+      }
+    }
+  }
+}

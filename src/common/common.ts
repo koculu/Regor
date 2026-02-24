@@ -22,7 +22,9 @@ export const bindChildNodes = (
   binder: Binder,
   childNodes: ChildNode[],
 ): void => {
-  for (const child of childNodes) {
+  for (let i = 0; i < childNodes.length; ++i) {
+    const child = childNodes[i]
+    if (child.nodeType !== Node.ELEMENT_NODE) continue
     // r-if binding can remove sibling else nodes
     if (!isElseNode(child)) binder.__bindDefault(child as Element)
   }
@@ -87,18 +89,41 @@ export const unmount = (start: Node, end: Node): void => {
 /**
  * @internal
  */
+const getRefValue = function (this: AnyRef): unknown {
+  return this()
+}
+
+const setRefValue = function (this: AnyRef, value: unknown): unknown {
+  return this(value)
+}
+
+const setReadonlyRefValue = (): never => {
+  throw new Error('value is readonly.')
+}
+
+const writableRefValueDescriptor: PropertyDescriptor = {
+  get: getRefValue as () => unknown,
+  set: setRefValue as (value: unknown) => unknown,
+  enumerable: true,
+  configurable: false,
+}
+
+const readonlyRefValueDescriptor: PropertyDescriptor = {
+  get: getRefValue as () => unknown,
+  set: setReadonlyRefValue as (value: unknown) => never,
+  enumerable: true,
+  configurable: false,
+}
+
+/**
+ * @internal
+ */
 export const defineRefValue = (result: AnyRef, isReadOnly: boolean): void => {
-  Object.defineProperty(result, 'value', {
-    get() {
-      return result()
-    },
-    set(value: unknown) {
-      if (isReadOnly) throw new Error('value is readonly.')
-      return result(value)
-    },
-    enumerable: true,
-    configurable: false,
-  })
+  Object.defineProperty(
+    result,
+    'value',
+    isReadOnly ? readonlyRefValueDescriptor : writableRefValueDescriptor,
+  )
 }
 
 /**

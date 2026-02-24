@@ -4,26 +4,60 @@ sidebar:
   order: 3
 ---
 
-Regor is a powerful UI framework designed for building HTML5-based applications in both web and desktop environments. With a focus on simplicity, performance, and flexibility, Regor provides developers with the tools to create dynamic and interactive user interfaces.
+Regor is a reactive UI framework built for developers who want direct control over the DOM, expressive runtime behavior, and strong TypeScript ergonomics.
 
-## Key Features
+It is designed to be practical, not restrictive.
 
-- **Simplicity without a Virtual DOM:** Develop UIs without the complexity of a Virtual DOM, simplifying implementation and debugging.
+## What Regor Optimizes For
 
-- **Native TypeScript Support:** Enjoy native TypeScript support for strong typing and code consistency.
+1. **Control over abstraction**
+   Regor does not force one universal rendering model for every case. You can use high-level directives where they help and drop to direct JavaScript/DOM logic where needed.
 
-- **No Build Step Required:** Define components in TypeScript using tagged string templates, eliminating the need for a build step.
+2. **Runtime flexibility**
+   Regor can bind existing HTML markup and progressively enhance server-rendered or mixed-stack pages without requiring a full ownership rewrite.
 
-- **Secure JavaScript VM:** Regor's secure JavaScript Virtual Machine ensures safe runtime compilation under strict content security policies.
+3. **Composable reactivity**
+   Regor provides `ref`, `sref`, computed and observer-based primitives so you can choose the right level of reactivity per feature.
 
-- **Flexible Reactivity:** Empower developers with a highly flexible reactivity system.
+4. **TypeScript-first development**
+   Components, props, and reactive state can be modeled in TypeScript directly, with predictable runtime behavior.
 
-- **Non-JavaScript Server-Side Rendering (SSR):** Support server-side rendering by not removing existing HTML elements.
+5. **Security-aware runtime evaluation**
+   Regor supports CSP-friendly environments and practical secure evaluation scenarios for runtime expressions.
 
-- **Reentrance:** Enable multiple mountings in previously mounted areas for dynamic rendering.
+## Design Philosophy
 
-- **Compatibility:** Seamlessly integrate with other DOM-manipulating libraries.
+Regor intentionally avoids over-constraining architecture choices.
 
-Explore the Regor documentation to learn more about its features and how to leverage them in your projects.
+That means:
+
+1. Component and context patterns are flexible.
+2. Parent/child interaction is not artificially limited to one rigid style.
+3. Framework internals aim to stay understandable and hackable for real-world optimization work.
+
+## Tradeoff Model
+
+Regor prioritizes flexibility and control. In highly generic, binding-dense scenarios, that flexibility can add runtime overhead compared to highly specialized pipelines.
+
+In return, Regor gives you:
+
+1. Better escape hatches for custom optimization.
+2. Better fit for progressive enhancement and mixed DOM ownership.
+3. A development model that does not force one-size-fits-all constraints.
+
+## When Regor Is a Strong Fit
+
+Regor is especially strong when you need:
+
+1. Runtime binding over existing markup.
+2. Fine-grained control over component and context behavior.
+3. Custom domain-specific rendering optimizations.
+4. Direct integration with other DOM-manipulating systems.
+
+## Next Steps
+
+1. Read [Getting Started](/getting-started).
+2. Explore [Directives](/directives).
+3. Use the [Performance Guide](/performance) for profiling and optimization strategy.
 
 [Back to the main](/)
