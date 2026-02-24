@@ -13,3 +13,8 @@ dist/
 .astro
 .yarn
 docs-dist
+
+# Perf profiling artifacts
+*.cpuprofile
+.perf/
+benchmarks/minidom/profiles/
