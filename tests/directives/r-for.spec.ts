@@ -199,6 +199,39 @@ test('should handle lists with falsy key values', () => {
   testContent()
 })
 
+test('should support dotted key expression for item alias (row.id)', () => {
+  const root = document.createElement('div')
+  const app = createApp(
+    {
+      rows: ref([
+        { id: 1, label: 'A' },
+        { id: 2, label: 'B' },
+        { id: 3, label: 'C' },
+      ]),
+    },
+    {
+      element: root,
+      template: html`<div r-for="row in rows" :key="row.id">
+        {{ row.id }}-{{ row.label }}
+      </div>`,
+    },
+  )
+
+  const getText = () =>
+    [...root.querySelectorAll('div')].map((x) => x.textContent?.trim())
+  expect(getText()).toStrictEqual(['1-A', '2-B', '3-C'])
+
+  const rows = app.context.rows()
+  const r1 = rows[0]
+  const r2 = rows[1]
+  const r3 = rows[2]
+  rows.splice(0, rows.length, r3, r1, ref({ id: 4, label: 'D' }))
+
+  expect(getText()).toStrictEqual(['3-C', '1-A', '4-D'])
+  expect(getText()).not.toContain('2-B')
+  expect(r2().id()).toBe(2)
+})
+
 test('should iterate using of syntax', () => {
   const root = document.createElement('div')
   createApp(

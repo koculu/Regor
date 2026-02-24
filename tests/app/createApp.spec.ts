@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 
-import { createApp, html, raw, ref } from '../../src'
+import { createApp, html, raw, ref, RegorConfig, useScope } from '../../src'
 
 test('hello world', () => {
   const root = document.createElement('div')
@@ -69,4 +69,75 @@ test('interpolation supports both syntaxes at once', () => {
   )
 
   expect(root.textContent).toBe('hello world')
+})
+
+test('createApp mounts json template and supports unbind', () => {
+  const root = document.createElement('div')
+  root.appendChild(document.createElement('span'))
+  const app = createApp(
+    { msg: ref('json') },
+    {
+      element: root,
+      json: {
+        t: 'div',
+        c: [{ d: 'ok' }],
+      } as any,
+    },
+  )
+
+  expect(root.textContent).toBe('ok')
+  app.unbind()
+})
+
+test('createApp supports string templates and scope contexts', () => {
+  class ScopeCtx {
+    msg = ref('scope-ok')
+  }
+  const appRoot = document.createElement('div')
+  appRoot.id = 'app'
+  document.body.appendChild(appRoot)
+  createApp(
+    useScope(() => new ScopeCtx()),
+    '<p>{{ msg }}</p>',
+  )
+  expect(appRoot.querySelector('p')?.textContent).toBe('scope-ok')
+  appRoot.remove()
+
+  const root = document.createElement('div')
+  createApp(
+    { msg: ref('inline') },
+    { element: root, template: '<p>{{ msg }}</p>' },
+  )
+  expect(root.querySelector('p')?.textContent).toBe('inline')
+})
+
+test('createApp throws when selector root is missing and can disable interpolation', () => {
+  expect(() =>
+    createApp({}, { selector: '#__missing__regor_root__' }),
+  ).toThrow()
+
+  const root = document.createElement('div')
+  const cfg = new RegorConfig()
+  cfg.useInterpolation = false
+  createApp(
+    { msg: ref('x') },
+    { element: root, template: '<p>{{ msg }}</p>' },
+    cfg,
+  )
+  expect(root.querySelector('p')?.textContent).toBe('{{ msg }}')
+})
+
+test('createApp supports default #app selector and throws when no root source provided', () => {
+  const appRoot = document.createElement('div')
+  appRoot.id = 'app'
+  document.body.appendChild(appRoot)
+  try {
+    const app = createApp({ msg: ref('auto-root') })
+    expect(app.context.msg()).toBe('auto-root')
+    app.unbind()
+  } finally {
+    appRoot.remove()
+  }
+
+  expect(() => createApp({}, { template: '<div>x</div>' } as any)).toThrow()
 })

@@ -70,3 +70,19 @@ test('should normalize self-closing kebab-case components in aliased tr', () => 
     '<trx is="r-tr"><table-cell ></table-cell></trx>',
   )
 })
+
+test('keeps malformed tags and unmatched closing tags unchanged', () => {
+  expect(preprocess('<div><  ></div>')).toBe('<div><  ></div>')
+  expect(preprocess('</ghost><div>x</div>')).toBe('</ghost><div>x</div>')
+})
+
+test('keeps special tags and unfinished tags unchanged', () => {
+  const special = '<!doctype html><?xml version="1.0"?><div>x</div>'
+  expect(preprocess(special)).toBe(special)
+  expect(preprocess('<div')).toBe('<div')
+})
+
+test('preprocess supports plain text and unterminated comment tails', () => {
+  expect(preprocess('plain text only')).toBe('plain text only')
+  expect(preprocess('a<!--open comment')).toBe('a<!--open comment')
+})

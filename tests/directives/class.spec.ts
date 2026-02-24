@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest'
 
 import { createApp, html, ref } from '../../src'
+import { classDirective } from '../../src/directives/class'
 
 test('class directive toggles classes', () => {
   const root = document.createElement('div')
@@ -42,4 +43,39 @@ test('class directive handles space-separated class lists', () => {
   expect(div.classList.contains('b')).toBe(true)
   expect(div.classList.contains('c')).toBe(true)
   expect(div.classList.length).toBe(2)
+})
+
+test('class directive supports array entries and previous-array cleanup', () => {
+  const el = document.createElement('div')
+  el.className = 'old stale'
+
+  classDirective.onChange!(
+    el,
+    [['new', { keep: true, stale: false }]],
+    [['old', { stale: true }]],
+  )
+
+  expect(el.classList.contains('old')).toBe(false)
+  expect(el.classList.contains('new')).toBe(true)
+  expect(el.classList.contains('keep')).toBe(true)
+  expect(el.classList.contains('stale')).toBe(false)
+})
+
+test('class directive removes previous string classes when next is null', () => {
+  const el = document.createElement('div')
+  el.className = 'a b'
+
+  classDirective.onChange!(el, [null], ['a b'])
+
+  expect(el.classList.contains('a')).toBe(false)
+  expect(el.classList.contains('b')).toBe(false)
+})
+
+test('class directive keeps class list stable when next string equals previous', () => {
+  const el = document.createElement('div')
+  el.className = 'x y'
+
+  classDirective.onChange!(el, ['x y'], ['x y'])
+
+  expect(el.className).toBe('x y')
 })

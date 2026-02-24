@@ -613,7 +613,7 @@ test('class r-model binding survives multiple prop target replacements in nested
   expect(app.context.selectedHost().hostname()).toBe('gamma-child')
 })
 
-test('known issue: named slot content should render with class component context', () => {
+test('named slot content should render with class component context', () => {
   class ShellContext {
     constructor(head: ComponentHead<ShellContext>) {
       head.enableSwitch = true
