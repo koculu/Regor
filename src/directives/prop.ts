@@ -60,7 +60,7 @@ function includeBooleanAttr(value: unknown): boolean {
  */
 export const patchProp = (el: any, key: string, value: any): void => {
   if (isNullOrUndefined(key)) {
-    warning(WarningType.KeyIsEmpty, name, el)
+    warning(WarningType.KeyIsEmpty, ':prop', el)
     return
   }
 

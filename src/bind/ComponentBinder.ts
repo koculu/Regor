@@ -31,6 +31,8 @@ export class ComponentBinder {
   __binder: Binder
 
   __inherit: string
+  __registeredComponentSelector = ''
+  __registeredComponentSize = -1
 
   constructor(binder: Binder) {
     this.__binder = binder
@@ -41,17 +43,49 @@ export class ComponentBinder {
     this.__unwrapComponents(element)
   }
 
+  __getRegisteredComponentSelector(
+    registeredComponents: Map<string, Component>,
+  ): string {
+    if (this.__registeredComponentSize !== registeredComponents.size) {
+      const names = [...registeredComponents.keys()]
+      this.__registeredComponentSelector = names
+        .concat(names.map(hyphenate))
+        .join(',')
+      this.__registeredComponentSize = registeredComponents.size
+    }
+    return this.__registeredComponentSelector
+  }
+
+  __hasContextComponents(contexts: any[]): boolean {
+    for (let i = 0; i < contexts.length; ++i) {
+      const components = contexts[i]?.components
+      if (!components) continue
+      for (const _ in components) {
+        return true
+      }
+    }
+    return false
+  }
+
   __unwrapComponents(element: Element): void {
     const binder = this.__binder
     const parser = binder.__parser
     const registeredComponents = binder.__config.__components
     const registeredComponentsUpperCase = binder.__config.__componentsUpperCase
+    if (
+      registeredComponents.size === 0 &&
+      !this.__hasContextComponents(parser.__contexts)
+    ) {
+      return
+    }
+
     const contextComponents = parser.__getComponents()
     const contextComponentSelectors = parser.__getComponentSelectors()
+    const registeredSelector =
+      this.__getRegisteredComponentSelector(registeredComponents)
     const selector = [
-      ...registeredComponents.keys(),
+      ...(registeredSelector ? [registeredSelector] : []),
       ...contextComponentSelectors,
-      ...[...registeredComponents.keys()].map(hyphenate),
       ...contextComponentSelectors.map(hyphenate),
     ].join(',')
     if (isNullOrWhitespace(selector)) return

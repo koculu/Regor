@@ -14,6 +14,7 @@ export const observe = <TValueType extends AnyRef>(
   source: TValueType,
   observer: ObserveCallback<UnwrapRef<TValueType>>,
   init?: boolean,
+  trackUnmount = true,
 ): StopObserving => {
   if (!isRef(source))
     throw getError(ErrorType.RequiresRefSourceArgument, 'observe')
@@ -25,6 +26,6 @@ export const observe = <TValueType extends AnyRef>(
     RefOperation.observe,
     observer,
   ) as StopObserving
-  onUnmounted(stop, true)
+  if (trackUnmount) onUnmounted(stop, true)
   return stop
 }

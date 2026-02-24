@@ -101,7 +101,7 @@ const patchAttribute = (
   }
 
   if (isNullOrUndefined(key)) {
-    warning(WarningType.KeyIsEmpty, name, el)
+    warning(WarningType.KeyIsEmpty, 'r-bind', el)
     return
   }
 
