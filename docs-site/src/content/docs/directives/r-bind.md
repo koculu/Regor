@@ -2,109 +2,79 @@
 title: r-bind Directive
 ---
 
-The `r-bind` directive in Regor is used to bind an element's attribute to a component's data, allowing dynamic updates. It is similar to Vue's `v-bind` directive and is a fundamental part of creating dynamic and interactive user interfaces.
+`r-bind` is Regor’s generic binding directive.
 
-## Usage
+It maps to attribute binding by default, with property binding available via shorthand/flag.
 
-The `r-bind` directive is typically used in the following format:
-
-```html
-<element r-bind:attribute="expression"></element>
-```
-
-- `element`: The HTML element to which the attribute is bound.
-- `attribute`: The name of the attribute you want to bind.
-- `expression`: An expression or component data property that will be evaluated and used to update the attribute's value.
-
-### Shorthand
-
-You can use the shorthand notation `:` to achieve the same effect as `r-bind`. For example, the following two lines of code are equivalent:
+## Syntax
 
 ```html
-<element r-bind:attribute="expression"></element>
-<element :attribute="expression"></element>
+<button r-bind:title="tooltip"></button>
+<button :title="tooltip"></button>
+<input .value="text" />
+<input :value.prop="text" />
 ```
 
-### Supported Flags
+1. `:` is shorthand for `r-bind:` and uses attribute binding.
+2. `.` shorthand uses property binding.
+3. `.prop` flag switches `:` binding to property binding.
+4. `.camel` camelizes option key before binding.
 
-The `r-bind` directive supports flags that allow you to control attribute binding behavior:
+## Exact runtime mapping
 
-- `.prop`: Use the `.prop` flag to bind to an element's property instead of its attribute. This is useful when dealing with properties that have complex behavior, such as input values.
+From `RegorConfig`:
 
-  ```html
-  <input :value.prop="inputValue" />
-  ```
+1. `r-bind:*` and `:*` use `attrDirective`.
+2. `.*` and `:*.prop` use `propDirective`.
+3. `:class` / `r-bind:class` are routed to `classDirective`.
+4. `:style` / `r-bind:style` are routed to `styleDirective`.
 
-- `.camel`: The .camel flag allows you to use kebap-case attribute names in your expressions when actual binding occurs in a camel case property, making it stick to the HTML standards.
+## Supported value shapes
 
-### Object Syntax
+When an option is present (`:title="x"`), the first resolved value is used.
 
-You can use object syntax with the `r-bind` directive to bind multiple attributes at once. This is particularly useful when binding multiple attributes to the same expression or when using dynamic attribute names.
+When binding without an option (`r-bind="expr"`), these forms are supported:
+
+1. Object: `{ key: value, ... }`
+2. Pair array: `['key', value]` (and arrays of pairs)
+3. Flat key/value sequence: `key, value, key2, value2`
+
+Example:
 
 ```html
-<element
-  r-bind="{
-  attribute1: expression1,
-  attribute2: expression2,
-  ...
-}"
-></element>
+<div r-bind="{ id: boxId, title: hint }"></div>
+<div r-bind="[dynKey, dynValue]"></div>
 ```
 
-For example:
+## Dynamic key binding
+
+For template-authored dynamic option keys, Regor uses normalized dynamic markers:
 
 ```html
-<img
-  r-bind="{
-  src: imageUrl,
-  alt: imageAlt,
-  title: imageTitle
-}"
-/>
+<button r-bind:_d_dynamic-key_d_="value"></button>
 ```
 
-In the above example, multiple attributes of the `img` element are bound to corresponding component data properties using object syntax.
-
-## Examples
-
-### Binding an Element's `src` Attribute
-
-In this example, we use the `r-bind` directive to bind the `src` attribute of an `img` element to a component data property `imageUrl`. When the `imageUrl` data property changes, the `src` attribute of the `img` element is updated dynamically.
-
-```html
-<img r-bind:src="imageUrl" alt="Image" />
-```
-
-### Dynamic Styling
-
-You can use the `r-bind` directive to dynamically set the `style` attribute of an element based on component data. For example:
-
-```html
-<div r-bind:style="dynamicStyles"></div>
-```
-
-In the above example, `dynamicStyles` can be a computed property or method that returns an object with CSS style properties.
+When dynamic **attribute** key changes, previous attribute is removed and new attribute is set.
 
 ## Notes
 
-- The `r-bind` directive is a powerful tool for creating dynamic and reactive user interfaces in Regor.
+1. Attribute path handles boolean attributes and `xlink:*` attributes.
+2. For DOM properties (`value`, `checked`, `innerHTML`, etc.), use `.` shorthand or `.prop`.
+3. For component prop-object assignment, use [`:context`](./context), not `r-bind="{...}"`.
 
-- You can use it to bind various attributes of HTML elements, including `src`, `href`, `style`, and more.
+## Example
 
-- Expressions in the `r-bind` directive are evaluated in the context of the component, allowing you to access and update component data properties.
-
-- Changes to the bound data properties will automatically trigger updates to the associated element attributes.
-
-- You can use `r-bind` in combination with other directives like `r-model`, `:class`, and `:style` to create complex and interactive UIs.
-
-- Keep in mind that the `r-bind` directive is not limited to standard HTML attributes; you can also use it to bind to custom attributes in your components.
+```html
+<a :href="profileUrl" :title="'Open ' + user.name">Profile</a>
+<input .value="query" @input="query = $event.target.value" />
+<div :class="{ active: isActive }" :style="{ color: tone }"></div>
+```
 
 ## See Also
 
-- [r-model Directive](/directives/r-model)
-- [r-text Directive](/directives/r-text)
-- [r-html Directive](/directives/r-html)
-- [r-on Directive](/directives/r-on)
-- [r-show Directive](/directives/r-show)
+1. [r-text](./r-text)
+2. [r-model](./r-model)
+3. [r-on](./r-on)
+4. [r-for](./r-for)
 
-[Back to the directives](/directives/)
+

@@ -2,163 +2,75 @@
 title: r-for Directive
 ---
 
-The `r-for` directive is a powerful tool in Regor that allows you to iterate over an array or iterable and generate repetitive elements based on a template. It enables you to efficiently render lists of items and is especially useful for creating dynamic content in your templates.
+`r-for` renders repeated template instances from arrays, iterables, and object-like values.
 
 ## Usage
 
-To use the `r-for` directive, apply it to an element in your template, followed by an expression that represents the data you want to iterate over. The directive creates a template that is duplicated for each item in the iterable, providing a way to render dynamic content.
-
 ```html
-<element r-for="item in items">
-  <!-- 'item' represents the current item -->
-  <!-- Content to be repeated for each item -->
-  {{ item }}
-</element>
+<li r-for="item in items">{{ item }}</li>
 ```
 
-- `item`: Represents the current item in the iteration.
-- `items`: An array or iterable from which items are taken for rendering.
-
-### Example
+You can use `in` or `of`:
 
 ```html
-<ul>
-  <li r-for="fruit in fruits">{{ fruit }}</li>
-</ul>
+<li r-for="item of items">{{ item }}</li>
 ```
-
-In this example, the `r-for` directive iterates over the `fruits` array and generates an `<li>` element for each fruit, displaying the fruit's name.
 
 ## Index Variable
 
-You can also access the index of the current iteration using the `#` character in front of any variable, which is commonly used when you need to track the position of each item in the iterable.
-
-`#` prefix enables accessing to individual indexes in nested `r-for` loops.
+Use `#`-prefixed variable for index:
 
 ```html
-<element r-for="(item, #index) in items">
-  <!-- 'item' and 'index' variables -->
-  <!-- Content to be repeated for each item -->
-  {{ index + 1 }}. {{ item }}
-</element>
+<li r-for="(item, #i) in items">{{ i }} - {{ item }}</li>
 ```
-
-- `item`: Represents the current item in the iteration.
-- `#index`: Represents the index of the current item (zero-based).
-- `items`: An array or iterable from which items are taken for rendering.
-
-### Example
-
-```html
-<ul>
-  <li r-for="(fruit, #index) in fruits">{{ index + 1 }}. {{ fruit }}</li>
-</ul>
-```
-
-In this example, the `r-for` directive generates a numbered list of fruits, displaying both the index and the fruit name.
 
 ## Iterating Over Objects
 
-You can use the `r-for` directive to iterate over the properties of an object.
+Object iteration is supported:
 
 ```html
-<element r-for="(key, value) in object">
-  <!-- 'key' and 'value' variables -->
-  <!-- Content to be repeated for each property -->
-  {{ key }}: {{ value }}
-</element>
+<li r-for="(key, value) in person">{{ key }}: {{ value }}</li>
 ```
-
-- `key`: Represents the current property's key (name).
-- `value`: Represents the current property's value.
-- `object`: An object whose properties are iterated over.
-
-### Example
-
-```html
-<ul>
-  <li r-for="(key, value) in person">{{ key }}: {{ value }}</li>
-</ul>
-```
-
-In this example, the `r-for` directive iterates over the properties of the `person` object and displays each property's key-value pair.
 
 ## Object Destructuring
 
-You can use object destructuring to extract specific properties from the items in the iterable when using the r-for directive. This allows you to access and display only the properties you need within the repeated content.
+Destructuring is supported:
 
 ```html
-<element r-for="{ property1, property2 }, #index in items">
-  <!-- 'property1', 'property2', and 'index' variables -->
-  <!-- Content to be repeated for each item -->
-  {{ property1 }} - {{ property2 }} (Index: {{ index }})
-</element>
-```
-
-- `{ property1, property2 }`: Specifies the properties to be extracted from each item in the iterable.
-- `#index`: Represents the index of the current item (zero-based).
-- `items`: An array or iterable from which items are taken for rendering.
-
-### Example
-
-```html
-<ul>
-  <li r-for="{ name, age }, #index in users">
-    {{ name }} (Age: {{ age }}, Index: {{ #index }})
-  </li>
-</ul>
-```
-
-In this example, the `r-for` directive iterates over the `users` array and extracts the `name` and `age` properties from each user object. It then displays both the `name`, `age`, and the `index` of each user.
-
-Object destructuring provides fine-grained control over which properties are utilized within the repeated content, enhancing flexibility and readability in your templates.
-
-## Iterating with `of` and `in`
-
-You can use either `of` or `in` to specify the iteration variable and the iterable, depending on your preference. Both are equivalent in functionality.
-
-```html
-<element r-for="fruit of fruits">
-  <!-- Using 'of' -->
-  <!-- Content to be repeated for each item -->
-  {{ fruit }}
-</element>
+<li r-for="{ name, age }, #i in users">
+  {{ i }} - {{ name }} ({{ age }})
+</li>
 ```
 
 ## Complex Expressions
 
-You can pass any JavaScript expression after `in` or `of`. This allows using
-helpers like `filter` directly within the directive.
+Any valid expression can provide iterable data:
 
 ```html
 <ul>
-  <li r-for="n in numbers.filter(n => n > 5)">{{ n }}</li>
+  <li r-for="n in numbers.filter((n) => n > 5)">{{ n }}</li>
 </ul>
 ```
 
-## Key Attribute
+## Keying (`key` and `:key`)
 
-When iterating over lists of items, it's important to provide a unique `key` attribute to help Regor efficiently track and update elements. The `key` attribute should be applied to the repeated element, and its value should be unique for each item in the iterable.
+For stable identity and predictable updates, set a key on repeated nodes.
 
 ```html
-<ul>
-  <li r-for="(user, #index) in fruits" :key="id">{{ user }}</li>
-</ul>
+<li r-for="row in rows" :key="row.id" r-text="row.name"></li>
 ```
 
-In this example, the `:key` attribute is set to `id`, ensuring that each `<li>` element has a unique identifier based on user's id.
+Important behavior in Regor templates:
+
+1. `key="row.id"` and `:key="row.id"` are both expression-based for list keying.
+2. Nested key paths are supported, including `a.b.c.d`.
+3. Use stable, unique keys from your domain model.
+
+If keys are unstable, DOM reuse quality degrades and updates become less predictable.
 
 ## Table Templates
 
-`r-for` is supported in table templates, including component-based rows and
-cells.
-
-- Supported containers: `table`, `thead`, `tbody`, `tfoot`.
-- Component rows can be rendered from these containers.
-- Component-like direct children of `<tr>` are normalized to cell hosts to keep
-  valid table structure.
-
-Example:
+`r-for` supports native table structures and component-based rows/cells.
 
 ```html
 <table>
@@ -182,14 +94,15 @@ const tableRow = createComponent(
 )
 ```
 
-Regor keeps table templates valid across `table`, `thead`, `tbody`, and `tfoot`
-while supporting component-based rows and cells.
+## Best Practices
 
-## Notes
+1. Keep row templates minimal.
+2. Use stable keying.
+3. Avoid expensive per-row expressions in large lists.
+4. Prefer pagination/windowing for very large data sets.
 
-- The `r-for` directive is a powerful tool for rendering dynamic lists and iterables.
-- You can use `#` prefix to access the current iteration's index.
+## See Also
 
-The `r-for` directive in Regor simplifies the process of rendering dynamic lists of items, making your templates more flexible and data-driven.
-
-[Back to the directives](/directives/)
+1. [r-if](./r-if)
+2. [r-bind](./r-bind)
+3. [r-text](./r-text)

@@ -22,7 +22,7 @@ To create a Regor component, call the `createComponent` function with the follow
 
 - `options` (optional): An array of strings that defines component properties or an object that allows you to configure various options for the component, such as whether to use interpolation, props, the component's default name, or the component context.
   - `context` (optional): A function that defines the Regor context for the component. This function receives a `ComponentHead` object, which you can use to specify the component's behavior and props. It should return the Regor context.
-    - `head.autoProps`: Automatically assigns properties defined in the `:props` binding to the component context. Defaults to `true`.
+    - `head.autoProps`: Automatically assigns properties defined in the `:context` binding to the component context. Defaults to `true`.
     - `head.entangle`: Keeps refs defined in the component context entangled with `head.props` refs. Defaults to `true`.
     - `head.enableSwitch`: Enables slot context switching to the parent. Defaults to `false`.
     - `head.onAutoPropsAssigned`: Callback invoked after auto props get assigned to the component context.
@@ -94,3 +94,4 @@ The `createComponent` function returns a component object with the following pro
 - [`toJsonTemplate`](/api/toJsonTemplate)
 
 [Back to the API list](/api/)
+

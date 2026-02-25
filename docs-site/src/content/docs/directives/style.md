@@ -4,6 +4,8 @@ title: :style Directive
 
 The `:style` directive in Regor allows you to dynamically apply inline styles to HTML elements. It provides a way to bind and update the `style` attribute of an element based on data or expressions. With `:style`, you can create dynamic and responsive styling for your components.
 
+`r-style` is an alias of `:style` and behaves the same way.
+
 ## Syntax
 
 ```html

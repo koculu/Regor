@@ -1,75 +1,83 @@
 ---
 title: Regor API
 sidebar:
-  order: 5
+  order: 6
 ---
 
-In this section, you will find a list of Regor's API methods organized by categories. Click on each method to view its detailed documentation.
+This section contains the function-level reference for Regor.
 
-**App / Component Template Functions:**
+Use this page as an index, then open each API page for signature details and examples.
 
-- [`createApp`](/api/createApp)
-- [`createComponent`](/api/createComponent)
-- [`toFragment`](/api/toFragment)
-- [`toJsonTemplate`](/api/toJsonTemplate)
-- [`RegorConfig`](/api/regorConfig)
+## App and Components
 
-**Cleanup Functions:**
+1. [`createApp`](./createApp)
+2. [`createComponent`](./createComponent)
+3. [`toFragment`](./toFragment)
+4. [`toJsonTemplate`](./toJsonTemplate)
+5. [`RegorConfig`](./regorConfig)
 
-- [`addUnbinder`](/api/addUnbinder)
-- [`getBindData`](/api/getBindData)
-- [`removeNode`](/api/removeNode)
-- [`unbind`](/api/unbind)
+## Reactivity
 
-**Compute Functions:**
+1. [`ref`](./ref)
+2. [`sref`](./sref)
+3. [`isRef`](./isRef)
+4. [`isDeepRef`](./isDeepRef)
+5. [`unref`](./unref)
+6. [`pause`](./pause)
+7. [`resume`](./resume)
+8. [`trigger`](./trigger)
+9. [`entangle`](./entangle)
 
-- [`computed`](/api/computed)
-- [`computeRef`](/api/computeRef)
-- [`computeMany`](/api/computeMany)
-- [`watchEffect`](/api/watchEffect)
-- [`collectRefs`](/api/collectRefs)
-- [`silence`](/api/silence)
+## Computed and Effects
 
-**Misc Functions:**
+1. [`computed`](./computed)
+2. [`computeRef`](./computeRef)
+3. [`computeMany`](./computeMany)
+4. [`watchEffect`](./watchEffect)
+5. [`collectRefs`](./collectRefs)
+6. [`silence`](./silence)
 
-- [`flatten`](/api/flatten)
-- [`isRaw`](/api/isRaw)
-- [`markRaw`](/api/markRaw)
-- [`persist`](/api/persist)
-- [`html`](/api/html)
-- [`raw`](/api/raw)
+## Observation and Batch
 
-**Observe Functions:**
+1. [`observe`](./observe)
+2. [`observeMany`](./observeMany)
+3. [`observerCount`](./observerCount)
+4. [`batch`](./batch)
+5. [`startBatch`](./startBatch)
+6. [`endBatch`](./endBatch)
 
-- [`observe`](/api/observe)
-- [`observeMany`](/api/observeMany)
-- [`observerCount`](/api/observerCount)
-- [`batch`](/api/batch)
-- [`startBatch`](/api/startBatch)
-- [`endBatch`](/api/endBatch)
+## Lifecycle and Scope
 
-**Reactivity Functions:**
+1. [`useScope`](./useScope)
+2. [`onMounted`](./onMounted)
+3. [`onUnmounted`](./onUnmounted)
 
-- [`ref`](/api/ref)
-- [`sref`](/api/sref)
-- [`isDeepRef`](/api/isDeepRef)
-- [`isRef`](/api/isRef)
-- [`pause`](/api/pause)
-- [`resume`](/api/resume)
-- [`trigger`](/api/trigger)
-- [`unref`](/api/unref)
-- [`entangle`](/api/entangle)
+## Cleanup and Unbind
 
-**Composition Functions:**
+1. [`addUnbinder`](./addUnbinder)
+2. [`getBindData`](./getBindData)
+3. [`removeNode`](./removeNode)
+4. [`unbind`](./unbind)
 
-- [`useScope`](/api/useScope)
-- [`onMounted`](/api/onMounted)
-- [`onUnmounted`](/api/onUnmounted)
+## Utilities
 
-**Log Configuration:**
+1. [`flatten`](./flatten)
+2. [`markRaw`](./markRaw)
+3. [`isRaw`](./isRaw)
+4. [`persist`](./persist)
+5. [`html`](./html)
+6. [`raw`](./raw)
 
-- [`warningHandler`](/api/warningHandler)
+## Logging
 
-Each link will take you to a dedicated documentation page for the respective method, where you can find detailed information, examples, and usage guidelines.
+1. [`warningHandler`](./warningHandler)
 
-[Back to the main](/)
+## Recommendation
+
+Start with:
+
+1. [`createApp`](./createApp)
+2. [`ref`](./ref)
+3. [`sref`](./sref)
+4. [`computed`](./computed)
+5. [`watchEffect`](./watchEffect)

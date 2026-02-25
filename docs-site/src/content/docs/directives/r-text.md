@@ -2,51 +2,57 @@
 title: r-text Directive
 ---
 
-The `r-text` directive is used to set the text content of an HTML element to the result of an expression. It allows you to dynamically update the text displayed within an element based on the evaluated value of the provided expression.
+`r-text` binds an expression to an element’s `textContent`.
+
+It is the safest and most direct way to render text output.
 
 ## Syntax
 
 ```html
-<element r-text="expression"></element>
+<p r-text="expression"></p>
 ```
 
-- `<element>`: The HTML element to which you want to bind the text content.
-- `expression`: An expression that determines the text content to be displayed within the element.
-
-## Usage
-
-The `r-text` directive is particularly useful when you want to insert dynamic data or computed values into your HTML content.
-
-### Example
+## Basic Example
 
 ```html
-<div>
-  <p r-text="message"></p>
-</div>
+<p r-text="message"></p>
 ```
 
-In this example, the text content of the `<p>` element will be dynamically updated based on the value of the `message` property in your component's data. Any changes to the `message` property will automatically reflect in the displayed text.
+When `message` changes, the element text updates reactively.
 
-## Notes
-
-- The `r-text` directive updates the text content of an element and does not interpret HTML tags. Use `r-html` if you need to render HTML content.
-
-- You can use expressions and variables in the `expression` attribute to display dynamic content. For example, you can concatenate strings, perform calculations, or reference component properties.
-
-- The `r-text` directive is reactive, meaning that if the value of the `expression` changes, the displayed text will update accordingly in real-time.
-
-- You can combine the `r-text` directive with other directives and HTML attributes to create complex dynamic templates.
-
-## Example
+## Expression Example
 
 ```html
-<div>
-  <p r-text="greeting"></p>
-</div>
+<p r-text="user.firstName + ' ' + user.lastName"></p>
 ```
 
-In this example, if the `greeting` property in your component's data is initially set to "Hello, Regor!", the text displayed within the `<p>` element will be "Hello, Regor!". If you later update the `greeting` property to "Welcome to Regor!", the displayed text will automatically change to "Welcome to Regor!".
+## `r-text` vs `{{ ... }}`
 
-The `r-text` directive simplifies the process of updating text content within your templates, allowing you to create dynamic and responsive user interfaces with ease.
+Both are valid. Prefer `r-text` when:
 
-[Back to the directives](/directives/)
+1. You want explicit binding at element level.
+2. You are optimizing repeated row templates and want predictable binding points.
+3. You want to avoid accidental surrounding whitespace behavior from text nodes.
+
+## Security and Behavior
+
+1. `r-text` writes plain text, not HTML.
+2. HTML tags in values are escaped as text.
+3. Use [`r-html`](./r-html) only when you intentionally need HTML rendering.
+
+## Common Patterns
+
+```html
+<li r-for="row in rows" :key="row.id">
+  <span r-text="row.id"></span>
+  <span r-text="row.label"></span>
+</li>
+```
+
+This is a clear and performant default for list text output.
+
+## See Also
+
+1. [r-bind](./r-bind)
+2. [r-html](./r-html)
+3. [r-for](./r-for)
