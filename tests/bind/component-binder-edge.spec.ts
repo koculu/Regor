@@ -113,7 +113,7 @@ test('component binder skips unsupported directive names even if option matches 
   bindSpy.mockRestore()
 })
 
-test('component binder ignores :props/:props-once during attribute fallthrough transfer', () => {
+test('component binder ignores :context/r-context during attribute fallthrough transfer', () => {
   const root = document.createElement('div')
   const comp = createComponent('<div class="inner"></div>', {
     defaultName: 'PropsSkip',
@@ -125,16 +125,16 @@ test('component binder ignores :props/:props-once during attribute fallthrough t
 
   ;(binder as any).__bind = (...args: any[]) => {
     const attr = args[2] as string
-    if (attr === ':props' || attr === ':props-once') return
+    if (attr === ':context' || attr === 'r-context') return
     return originalBind(...args)
   }
 
   root.innerHTML =
-    '<props-skip :props="{a:1}" :props-once="{b:2}" class="host"></props-skip>'
+    '<props-skip :context="{a:1}" r-context="{b:2}" class="host"></props-skip>'
   ;(binder as any).__componentBinder.__unwrapComponents(root)
 
   const inner = root.querySelector('.inner') as HTMLElement
   expect(inner).toBeTruthy()
-  expect(inner.hasAttribute(':props')).toBe(false)
-  expect(inner.hasAttribute(':props-once')).toBe(false)
+  expect(inner.hasAttribute(':context')).toBe(false)
+  expect(inner.hasAttribute('r-context')).toBe(false)
 })

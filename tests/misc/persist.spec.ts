@@ -42,3 +42,17 @@ test('should throw when key is empty', () => {
     getError(ErrorType.PersistRequiresKey),
   )
 })
+
+test('should return the same ref instance for inline context usage', () => {
+  localStorage.clear()
+  const source = ref(10)
+  const persisted = persist(source, KEY)
+  expect(persisted).toBe(source)
+
+  // Can be used inline while preserving the same ref identity.
+  const context = {
+    count: persist(ref(1), 'persist-inline-count'),
+  }
+  context.count(2)
+  expect(localStorage.getItem('persist-inline-count')).toBe('2')
+})

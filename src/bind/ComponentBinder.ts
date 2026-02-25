@@ -16,8 +16,7 @@ import { isNullOrWhitespace } from '../common/is-what'
 import { callMounted } from '../composition/callMounted'
 import { callUnmounted } from '../composition/callUnmounted'
 import { useScope } from '../composition/useScope'
-import { propsDirective } from '../directives/props'
-import { propsOnceDirective } from '../directives/props-once'
+import { contextDirective } from '../directives/context'
 import { singlePropDirective } from '../directives/single-prop'
 import { entangle } from '../reactivity/entangle'
 import { isRef } from '../reactivity/isRef'
@@ -114,8 +113,8 @@ export class ComponentBinder {
       const endOfComponent = new Comment(' end component: ' + component.tagName)
       componentParent.insertBefore(startOfComponent, component)
       component.remove()
-      const propsName = binder.__config.__builtInNames.props
-      const propsOnceName = binder.__config.__builtInNames.propsOnce
+      const contextName = binder.__config.__builtInNames.context
+      const contextAliasName = binder.__config.__builtInNames.contextAlias
       const bindName = binder.__config.__builtInNames.bind
 
       const getProps = (
@@ -123,13 +122,14 @@ export class ComponentBinder {
         capturedContext: any[],
       ): Record<string, unknown> => {
         const props: Record<string, unknown> = {}
-        const hasProps = component.hasAttribute(propsName)
-        const hasPropsOnce = component.hasAttribute(propsOnceName)
+        const hasContext = component.hasAttribute(contextName)
         parser.__scoped(capturedContext, () => {
           parser.__push(props)
-          if (hasProps) binder.__bind(propsDirective, component, propsName)
-          if (hasPropsOnce)
-            binder.__bind(propsOnceDirective, component, propsOnceName)
+          if (hasContext) {
+            binder.__bind(contextDirective, component, contextName)
+          } else if (component.hasAttribute(contextAliasName)) {
+            binder.__bind(contextDirective, component, contextAliasName)
+          }
 
           let definedProps = registeredComponent.props
           if (!definedProps || definedProps.length === 0) return
@@ -192,12 +192,33 @@ export class ComponentBinder {
             if (key in componentCtx) {
               const compValue = componentCtx[key]
               if (compValue === propsValue) continue
-              // the component author didn't provide property using head.props
-              // if entangle enabled, entangle the props[ref] to the componentCtx[ref] to provide parent-child data sync.
-              if (head.entangle && isRef(compValue) && isRef(propsValue)) {
-                addUnbinder(startOfComponent, entangle(propsValue, compValue))
+              if (isRef(compValue)) {
+                // Existing component field is a ref:
+                // route incoming value into that ref instead of replacing the field.
+                if (isRef(propsValue)) {
+                  // Ref -> ref input:
+                  // - entangle=true: keep both refs synchronized
+                  // - entangle=false: take one-time snapshot from parent ref
+                  // the component author didn't provide property using head.props
+                  // if entangle enabled, entangle the props[ref] to the componentCtx[ref] to provide parent-child data sync.
+                  if (head.entangle) {
+                    addUnbinder(
+                      startOfComponent,
+                      entangle(propsValue, compValue),
+                    )
+                  } else {
+                    compValue(propsValue())
+                  }
+                } else {
+                  // Primitive/object input into existing component ref:
+                  // apply value to ref target.
+                  compValue(propsValue)
+                }
+                continue
               }
+              // Existing non-ref field is intentionally preserved as component-owned state.
             } else componentCtx[key] = propsValue
+            // Key does not exist on component context yet; auto-add from inputs.
           }
           head.onAutoPropsAssigned?.()
         }
@@ -320,7 +341,8 @@ export class ComponentBinder {
         if (!inheritor) return
 
         for (const attrName of component.getAttributeNames()) {
-          if (attrName === propsName || attrName === propsOnceName) continue
+          if (attrName === contextName || attrName === contextAliasName)
+            continue
           const value = component.getAttribute(attrName) as string
           if (attrName === 'class') {
             inheritor.classList.add(...value.split(' '))

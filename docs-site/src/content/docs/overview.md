@@ -1,63 +1,79 @@
 ---
 title: Overview
 sidebar:
-  order: 3
+  order: 2
 ---
 
-Regor is a reactive UI framework built for developers who want direct control over the DOM, expressive runtime behavior, and strong TypeScript ergonomics.
+Regor is a reactive UI library designed for engineers who want:
 
-It is designed to be practical, not restrictive.
+1. Direct control over runtime behavior.
+2. A powerful template/directive model.
+3. TypeScript-friendly reactivity primitives.
+4. Freedom to optimize with plain JavaScript and DOM when needed.
 
-## What Regor Optimizes For
+Regor is intentionally practical. It does not force one rigid rendering architecture for every use case.
 
-1. **Control over abstraction**
-   Regor does not force one universal rendering model for every case. You can use high-level directives where they help and drop to direct JavaScript/DOM logic where needed.
+## Why Teams Choose Regor
 
-2. **Runtime flexibility**
-   Regor can bind existing HTML markup and progressively enhance server-rendered or mixed-stack pages without requiring a full ownership rewrite.
+### 1. Runtime flexibility without lock-in
 
-3. **Composable reactivity**
-   Regor provides `ref`, `sref`, computed and observer-based primitives so you can choose the right level of reactivity per feature.
+Regor can bind existing markup and progressively enhance real pages. You can adopt it incrementally instead of rewriting everything.
 
-4. **TypeScript-first development**
-   Components, props, and reactive state can be modeled in TypeScript directly, with predictable runtime behavior.
+### 2. Reactivity that stays explicit
 
-5. **Security-aware runtime evaluation**
-   Regor supports CSP-friendly environments and practical secure evaluation scenarios for runtime expressions.
+You get `ref`, `sref`, `computed`, `watchEffect`, `observe`, and batching primitives. State flows are explicit and composable.
 
-## Design Philosophy
+### 3. Directive model with real depth
 
-Regor intentionally avoids over-constraining architecture choices.
+Regor supports rich directive workflows:
 
-That means:
+1. Conditional rendering (`r-if`, `r-else-if`, `r-else`, `r-show`).
+2. List rendering (`r-for` with keys, table use cases, nested structures).
+3. Attribute/property/class/style/event binding (`r-bind`, `.prop`, `.camel`, `:class`, `:style`, `@event`).
+4. Form binding (`r-model`) and dynamic components (`:is`, `:context`).
 
-1. Component and context patterns are flexible.
-2. Parent/child interaction is not artificially limited to one rigid style.
-3. Framework internals aim to stay understandable and hackable for real-world optimization work.
+### 4. Excellent fit for mixed environments
 
-## Tradeoff Model
+Regor works well when part of your DOM is owned by other systems, or when performance-critical sections need custom handling.
 
-Regor prioritizes flexibility and control. In highly generic, binding-dense scenarios, that flexibility can add runtime overhead compared to highly specialized pipelines.
+## Core Philosophy
 
-In return, Regor gives you:
+Regor’s philosophy is:
 
-1. Better escape hatches for custom optimization.
-2. Better fit for progressive enhancement and mixed DOM ownership.
-3. A development model that does not force one-size-fits-all constraints.
+1. Keep defaults productive.
+2. Keep escape hatches available.
+3. Keep internals understandable.
+4. Keep control in developers’ hands.
 
-## When Regor Is a Strong Fit
+## What Regor Is Not Trying To Be
 
-Regor is especially strong when you need:
+Regor is not built around artificial constraints to optimize only one benchmark shape. It is built for real product constraints where integration flexibility matters.
 
-1. Runtime binding over existing markup.
-2. Fine-grained control over component and context behavior.
-3. Custom domain-specific rendering optimizations.
-4. Direct integration with other DOM-manipulating systems.
+If your app needs:
 
-## Next Steps
+1. Existing-markup binding.
+2. Runtime composition.
+3. Context flexibility.
+4. Controlled optimization paths.
 
-1. Read [Getting Started](/getting-started).
-2. Explore [Directives](/directives).
-3. Use the [Performance Guide](/performance) for profiling and optimization strategy.
+Regor is a strong fit.
 
-[Back to the main](/)
+## Practical Tradeoffs
+
+Regor favors flexibility and control. In very binding-dense paths, runtime cost can grow with total DOM + binding volume. This is normal for highly dynamic runtime systems.
+
+The upside is that Regor keeps optimization options open:
+
+1. Reduce binding density where it matters.
+2. Use stable keying and list strategies.
+3. Drop to targeted custom logic in hot sections.
+4. Keep the rest of the app high-level and maintainable.
+
+## Recommended Reading Order
+
+1. [Getting Started](./getting-started)
+2. [Guide](./guide)
+3. [Directives](./directives)
+4. [API Reference](./api)
+5. [Performance Guide](./guide/performance)
+

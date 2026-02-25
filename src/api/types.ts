@@ -326,29 +326,82 @@ export type OnUnmounted = () => void
 export interface CreateComponentOptions<
   TContext extends IRegorContext | object = IRegorContext,
 > {
+  /**
+   * Enables interpolation transform inside the component template.
+   *
+   * When `true` (default), text like `{{ expr }}` / `[[ expr ]]` is converted
+   * to directive bindings during component template preparation.
+   *
+   * Set to `false` when the template should keep interpolation markers as plain text.
+   */
   useInterpolation?: boolean
 
+  /**
+   * Regor configuration used while creating this component.
+   *
+   * Useful when the component must use a specific config instance
+   * (custom directives, global context, registered components).
+   */
   config?: RegorConfig
 
   /**
-   * A function that defines the Regor context for the component.
+   * Factory that creates the component context.
+   *
+   * `head` contains incoming parent-bound values (`head.props`) and mount controls.
+   *
+   * Example:
+   * ```ts
+   * context(head) {
+   *   return {
+   *     title: head.props.title ?? 'Untitled',
+   *     close: () => head.emit('close', { reason: 'user' }),
+   *   }
+   * }
+   * ```
    */
   context?(head: ComponentHead<TContext>): TContext
 
+  /**
+   * Controls attribute fallthrough from component host to component root.
+   *
+   * - `true` (default): non-prop attributes like `class`, `style`, `id` are inherited.
+   * - `false`: host attributes are not forwarded automatically.
+   */
   inheritAttrs?: boolean
 
   /**
-   * Notes on component props:
-   * The props defined in the props list can be used with :foo or r-bind:foo syntax.
-   * `<MyComponent :prop-kebab-1="1" r-bind:prop-kebab-2="x ? 1 : 0" :props="{ propFoo3: true, propFoo4: x ? 'a' : 'b' }></MyComponent>`
-   * It is required to define prop-kebab-1 and prop-kebab-2 in the props list camelized.
-   * It is not required to define propFoo3 and propFoo4 in the props list because it uses :props binding. :props binding enables binding to arbitrary component properties regardless they are explicitly defined in props list.
+   * Declares prop names accepted via single-prop binding (`:foo`, `r-bind:foo`, `.foo`).
+   *
+   * Use camelCase names in this list.
+   * Kebab-case template attributes are matched to camelCase automatically.
+   *
+   * Example:
+   * ```ts
+   * props: ['userName', 'isActive']
+   * ```
+   * ```html
+   * <UserCard :user-name="name" r-bind:is-active="enabled"></UserCard>
+   * ```
+   *
+   * Note:
+   * `:context="{ ... }"` can assign arbitrary component fields even when
+   * they are not declared in `props`.
    */
   props?: string[]
 
-  /** The default name of the component.
-   * It is required if the component is registered using the Regor config.addComponent method.
-   * It is not required if the component being registered in app or component scope. */
+  /**
+   * Default component name used by global registration (`config.addComponent(...)`).
+   *
+   * Required for global registration.
+   * Optional when component is provided via app/component local `components` context.
+   *
+   * Example:
+   * ```ts
+   * const Card = createComponent('<div>...</div>', { defaultName: 'CardView' })
+   * cfg.addComponent(Card)
+   * // usable as <CardView></CardView>
+   * ```
+   */
   defaultName?: string
 }
 

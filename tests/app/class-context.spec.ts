@@ -356,6 +356,14 @@ test('class component autoProps entangle can sync or isolate refs', () => {
   ) as HTMLInputElement | null
   if (!entangled || !isolated) throw new Error('missing test inputs')
 
+  // Entangled input starts from parent and keeps two-way sync.
+  expect(app.context.sharedA()).toBe('root-a')
+  expect(entangled.value).toBe('root-a')
+
+  // Isolated input takes an initial snapshot from parent, but does not entangle.
+  expect(app.context.sharedB()).toBe('root-b')
+  expect(isolated.value).toBe('root-b')
+
   app.context.sharedA('from-parent')
   expect(entangled.value).toBe('from-parent')
 
@@ -364,11 +372,16 @@ test('class component autoProps entangle can sync or isolate refs', () => {
   expect(app.context.sharedA()).toBe('from-child')
 
   app.context.sharedB('from-parent')
-  expect(isolated.value).toBe('local-isolated')
+  expect(isolated.value).toBe('root-b')
 
   isolated.value = 'child-local'
   isolated.dispatchEvent(new Event('input'))
   expect(app.context.sharedB()).toBe('from-parent')
+
+  // Parent can still change independently after child edit without forcing child value.
+  app.context.sharedB('parent-after-child')
+  expect(isolated.value).toBe('child-local')
+  expect(app.context.sharedB()).toBe('parent-after-child')
 })
 
 test('nested class components run lifecycle hooks and unmount cleanly', async () => {
@@ -456,7 +469,7 @@ test('class scope cleans up watchEffect/observe/observeMany on unmount', async (
   expect(observerCount(app.context.b)).toBe(0)
 })
 
-test('class component supports :props and :props-once with class ref fields', () => {
+test('class component supports :context with class ref fields', () => {
   class LabelContext {
     liveLabel = ref('live-local')
     onceLabel = ref('once-local')
@@ -483,8 +496,7 @@ test('class component supports :props and :props-once with class ref fields', ()
     {
       element: root,
       template: html`<LabelsComponent
-        :props="{ liveLabel: selectedHost.hostname }"
-        :props-once="{ onceLabel: selectedHost.hostname }"
+        :context="{ liveLabel: selectedHost.hostname, onceLabel: selectedHost.hostname }"
       ></LabelsComponent>`,
     },
   )

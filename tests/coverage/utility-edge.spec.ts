@@ -15,7 +15,7 @@ import {
 } from '../../src/common/common'
 import { looseEqual } from '../../src/common/looseEqual'
 import { popScope, pushScope, setScope } from '../../src/composition/stack'
-import { propsDirective } from '../../src/directives/props'
+import { contextDirective } from '../../src/directives/context'
 import { ErrorType, getError } from '../../src/log/errors'
 import { warning, warningHandler, WarningType } from '../../src/log/warnings'
 import { persist } from '../../src/misc/persist'
@@ -139,7 +139,7 @@ test('props directive ignores non-object payloads', () => {
     refs: [],
     context: {},
   } as any
-  const stop = propsDirective.onBind!(
+  const stop = contextDirective.onBind!(
     document.createElement('div'),
     parseResult,
     '',
@@ -204,3 +204,4 @@ test('batch catches trigger errors from observers', () => {
     spy.mockRestore()
   }
 })
+
