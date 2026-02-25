@@ -13,6 +13,43 @@ import { RegorConfig } from './RegorConfig'
 import { toFragment } from './toFragment'
 import { toJsonTemplate } from './toJsonTemplate'
 
+/**
+ * Creates a reusable Regor component definition.
+ *
+ * `createComponent` prepares a template once, then Regor clones/binds it for each
+ * component instance in the app.
+ *
+ * @typeParam TContext - Component context type.
+ * @param template Component template source:
+ * - inline HTML string
+ * - `Template` object (`template`, `element`, `selector`, or `json`)
+ * @param options Component options (`context`, `props`, `inheritAttrs`, etc.).
+ * You can also pass `string[]` as shorthand for `props`.
+ *
+ * @returns Component definition usable in app/component `components`.
+ *
+ * @example
+ * ```ts
+ * const UserCard = createComponent(
+ *   `<article><h3 r-text="name"></h3></article>`,
+ *   {
+ *     props: ['name'],
+ *     context: (head) => ({
+ *       name: head.props.name ?? 'Anonymous',
+ *     }),
+ *   },
+ * )
+ * ```
+ *
+ * @example
+ * ```ts
+ * // Props shorthand:
+ * const CounterLabel = createComponent(
+ *   `<span r-text="value"></span>`,
+ *   ['value'],
+ * )
+ * ```
+ */
 export const createComponent = <
   TContext extends IRegorContext | object = IRegorContext,
 >(

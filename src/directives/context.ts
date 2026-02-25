@@ -6,7 +6,7 @@ import { isRef } from '../reactivity/isRef'
 /**
  * @internal
  */
-export const propsDirective: Directive = {
+export const contextDirective: Directive = {
   collectRefObj: true,
   onBind: (_: HTMLElement, parseResult: ParseResult): Unbinder => {
     const stopObserving = observe(
