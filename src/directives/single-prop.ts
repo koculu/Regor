@@ -1,11 +1,5 @@
-import {
-  type AnyRef,
-  type Directive,
-  type ParseResult,
-  type Unbinder,
-} from '../api/types'
+import { type AnyRef, type Directive, type Unbinder } from '../api/types'
 import { camelize } from '../common/common'
-import { observe } from '../observer/observe'
 import { entangle } from '../reactivity/entangle'
 import { isRef } from '../reactivity/isRef'
 import { ref } from '../reactivity/ref'
@@ -53,15 +47,8 @@ const createModelBridge = (source: AnyRef): AnyRef => {
  */
 export const singlePropDirective: Directive = {
   collectRefObj: true,
-  onBind: (
-    _: HTMLElement,
-    parseResult: ParseResult,
-    _expr: string,
-    option?: string,
-    _dynamicOption?: ParseResult,
-    _flags?: string[],
-  ): Unbinder => {
-    if (!option) return noop
+  mount: ({ parseResult, option }) => {
+    if (typeof option !== 'string' || !option) return noop
     const key = camelize(option)
     let currentSource: AnyRef | undefined
     let bridge: AnyRef | undefined
@@ -84,47 +71,47 @@ export const singlePropDirective: Directive = {
       currentSource = source
     }
 
-    const stopObserving = observe(
-      parseResult.value,
-      () => {
-        const value = parseResult.refs[0] ?? parseResult.value()[0]
-        const ctx = parseResult.context
-        const ctxKey = ctx[key]
+    const apply = (): void => {
+      const value = parseResult.refs[0] ?? parseResult.value()[0]
+      const ctx = parseResult.context
+      const ctxKey = ctx[key]
 
-        if (!isRef(value)) {
-          if (bridge && ctxKey === bridge) {
-            bridge(value)
-            return
-          }
-          resetSync()
-          if (isRef(ctxKey)) {
-            ctxKey(value)
-            return
-          }
+      if (!isRef(value)) {
+        if (bridge && ctxKey === bridge) {
+          bridge(value)
+          return
+        }
+        resetSync()
+        if (isRef(ctxKey)) {
+          ctxKey(value)
+          return
+        }
+        ctx[key] = value
+        return
+      }
+
+      if (isModelBridge(value)) {
+        if (ctxKey === value) return
+        if (isRef(ctxKey)) {
+          syncRefs(value, ctxKey)
+        } else {
           ctx[key] = value
-          return
         }
+        return
+      }
 
-        if (isModelBridge(value)) {
-          if (ctxKey === value) return
-          if (isRef(ctxKey)) {
-            syncRefs(value, ctxKey)
-          } else {
-            ctx[key] = value
-          }
-          return
-        }
+      if (!bridge) bridge = createModelBridge(value)
+      ctx[key] = bridge
 
-        if (!bridge) bridge = createModelBridge(value)
-        ctx[key] = bridge
-
-        syncRefs(value, bridge)
+      syncRefs(value, bridge)
+    }
+    return {
+      update: () => {
+        apply()
       },
-      true,
-    )
-    return () => {
-      stopEntangle()
-      stopObserving()
+      unmount: () => {
+        stopEntangle()
+      },
     }
   },
 }

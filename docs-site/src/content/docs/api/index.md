@@ -58,6 +58,7 @@ Use this page as an index, then open each API page for signature details and exa
 2. [`getBindData`](./getBindData)
 3. [`removeNode`](./removeNode)
 4. [`unbind`](./unbind)
+5. [`drainUnbind`](./drainUnbind)
 
 ## Utilities
 

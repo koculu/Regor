@@ -83,11 +83,9 @@ test('binder bindDefault short-circuits on dynamic binder', () => {
 test('binder bindToExpression handles null expressions and once directives', () => {
   const binder = createBinder({ v: sref([1]) })
   const el = document.createElement('div')
-  const onBind = vi.fn(() => () => {})
-  const onChange = vi.fn()
-  binder.__bindToExpression({ once: true, onBind, onChange } as any, el, null)
-  expect(onBind).not.toHaveBeenCalled()
-  expect(onChange).not.toHaveBeenCalled()
+  const mount = vi.fn(() => ({ update: vi.fn() }))
+  binder.__bindToExpression({ once: true, mount } as any, el, null)
+  expect(mount).not.toHaveBeenCalled()
 })
 
 test('binder bind returns early when element has r-pre', () => {
@@ -95,11 +93,11 @@ test('binder bind returns early when element has r-pre', () => {
   const el = document.createElement('div')
   el.setAttribute((binder as any).__pre, '')
   el.setAttribute('d', 'v')
-  const onChange = vi.fn()
+  const mount = vi.fn()
 
-  binder.__bind({ onChange } as any, el as any, 'd')
+  binder.__bind({ mount } as any, el as any, 'd')
 
-  expect(onChange).not.toHaveBeenCalled()
+  expect(mount).not.toHaveBeenCalled()
   expect(el.getAttribute('d')).toBe('v')
 })
 
@@ -113,7 +111,7 @@ test('binder binds inside switch scope path', () => {
   expect(hasSwitch()).toBe(true)
   binder.__bind(
     {
-      onChange: vi.fn(),
+      mount: vi.fn(),
     } as any,
     el as any,
     'd',

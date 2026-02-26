@@ -42,6 +42,7 @@ removeNode(someElement)
 
 - [addUnbinder](/api/addUnbinder)
 - [unbind](/api/unbind)
+- [drainUnbind](/api/drainUnbind)
 - [getBindData](/api/getBindData)
 
 [Back to the API list](/api/)

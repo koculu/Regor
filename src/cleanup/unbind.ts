@@ -2,8 +2,8 @@ import { bindDataSymbol } from './bindDataSymbol'
 
 export const unbind = (node: Node): void => {
   const stack: Node[] = [node]
-  while (stack.length > 0) {
-    const currentNode = stack.pop() as Node
+  for (let i = 0; i < stack.length; ++i) {
+    const currentNode = stack[i]
     unbindSingle(currentNode)
     for (
       let child = currentNode.lastChild;

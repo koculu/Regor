@@ -1,4 +1,4 @@
-import { type Directive, type ParseResult, type Unbinder } from '../api/types'
+import { type Directive, type Unbinder } from '../api/types'
 import { isArray } from '../common/is-what'
 
 /**
@@ -6,7 +6,8 @@ import { isArray } from '../common/is-what'
  */
 export const refDirective: Directive = {
   once: true,
-  onBind: (el: HTMLElement, result: ParseResult, expr: string): Unbinder => {
+  mount: ({ el, parseResult, expr }): Unbinder => {
+    const result = parseResult
     const value = result.value()[0]
     const isAnArray = isArray(value)
     const sref = result.refs[0]

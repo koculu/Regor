@@ -7,44 +7,48 @@ import { warning, WarningType } from '../log/warnings'
 /**
  * @internal
  */
-export const propDirective: Directive = {
-  onChange: (
-    el: HTMLElement,
-    values: any[],
-    _previousValues?: any[],
-    option?: any,
-    _previousOption?: any,
-    flags?: string[],
-  ) => {
-    if (option) {
-      if (flags && flags.includes('camel')) option = camelize(option)
-      patchProp(el, option, values[0])
-      return
-    }
-    // supports
-    // k,v,k,v
-    // [k,v],[k,v]...
-    // {k,v},{k,v}...
-    const len = values.length
-    for (let i = 0; i < len; ++i) {
-      const next = values[i]
-      if (isArray(next)) {
-        const key = next[0]
-        const value = next[1]
-        patchProp(el, key, value)
-      } else if (isObject(next)) {
-        for (const item of Object.entries(next)) {
-          const key = item[0]
-          const value = item[1]
-          patchProp(el, key, value)
-        }
-      } else {
-        const key = values[i++]
-        const value = values[i]
+const updatePropBinding = (
+  el: HTMLElement,
+  values: any[],
+  option?: any,
+  flags?: string[],
+): void => {
+  if (option) {
+    if (flags && flags.includes('camel')) option = camelize(option as string)
+    patchProp(el, option as string, values[0])
+    return
+  }
+  // supports
+  // k,v,k,v
+  // [k,v],[k,v]...
+  // {k,v},{k,v}...
+  const len = values.length
+  for (let i = 0; i < len; ++i) {
+    const next = values[i]
+    if (isArray(next)) {
+      const key = next[0]
+      const value = next[1]
+      patchProp(el, key, value)
+    } else if (isObject(next)) {
+      for (const item of Object.entries(next)) {
+        const key = item[0]
+        const value = item[1]
         patchProp(el, key, value)
       }
+    } else {
+      const key = values[i++]
+      const value = values[i]
+      patchProp(el, key, value)
     }
-  },
+  }
+}
+
+export const propDirective: Directive = {
+  mount: () => ({
+    update: ({ el, values, option, flags }) => {
+      updatePropBinding(el, values as any[], option, flags)
+    },
+  }),
 }
 // The following property patch logic is copied from vuejs/core.
 // using the license: The MIT License (MIT)

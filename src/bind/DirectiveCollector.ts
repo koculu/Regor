@@ -101,15 +101,14 @@ export class DirectiveCollector {
     const processNode = (node: HTMLElement): void => {
       const attrs = node.attributes
       if (!attrs || attrs.length === 0) return
-      const attrsAny = attrs as any
       for (let i = 0; i < attrs.length; ++i) {
-        const name = (attrsAny[i] ?? attrs.item(i))?.name
+        const name = attrs.item(i)?.name
         if (!name) continue
         appendDirective(node, name)
       }
     }
     processNode(element)
-    if (!isRecursive) return map
+    if (!isRecursive || !element.firstElementChild) return map
     // IMPORTANT:
     // Keep this on native `querySelectorAll('*')`.
     // Browser engines optimize this traversal heavily and it is faster than

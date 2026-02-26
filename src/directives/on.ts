@@ -37,67 +37,76 @@ const getFlags = (flags: string): EventFlags | undefined => {
 /**
  * @internal
  */
+const bindOn = (
+  el: HTMLElement,
+  parseResult: ParseResult,
+  option?: string,
+  dynamicOption?: ParseResult,
+  flags?: string[],
+): Unbinder => {
+  if (dynamicOption) {
+    const values = parseResult.value()
+    const option = unref(dynamicOption.value()[0])
+    if (!isString(option)) return () => {}
+    return attachEventListener(
+      el,
+      camelize(option),
+      () => parseResult.value()[0],
+      flags?.join(',') ?? values[1],
+    )
+  } else if (option) {
+    const values = parseResult.value()
+    return attachEventListener(
+      el,
+      camelize(option),
+      () => parseResult.value()[0],
+      flags?.join(',') ?? values[1],
+    )
+  }
+  // object syntax
+  // {k,v,f,...},{k,v,f,...},...
+  const unbinders: Unbinder[] = []
+  const unbinder = (): void => {
+    unbinders.forEach((x) => x())
+  }
+  const values = parseResult.value()
+  const len = values.length
+  for (let i = 0; i < len; ++i) {
+    let next = values[i]
+    if (isFunction(next)) next = next()
+    if (isObject(next)) {
+      for (const item of Object.entries(next)) {
+        const eventType = item[0]
+        const method = (): any => {
+          let obj = parseResult.value()[i] as any
+          if (isFunction(obj)) obj = obj()
+          obj = obj[eventType]
+          if (isFunction(obj)) obj = obj()
+          return obj
+        }
+        const flags = (next as any)[eventType + '_flags']
+        unbinders.push(attachEventListener(el, eventType, method, flags))
+      }
+    } else {
+      warning(WarningType.BindingRequiresObjectExpressions, 'r-on', el)
+    }
+  }
+  return unbinder
+}
+
 export const onDirective: Directive = {
   isLazy: (i: number, d: number) => d === -1 && i % 2 === 0,
   isLazyKey: (key: string, d: number) => d === 0 && !key.endsWith('_flags'),
   once: false,
   collectRefObj: true,
-  onBind: (
-    el: HTMLElement,
-    parseResult: ParseResult,
-    _expr: string,
-    option?: string,
-    dynamicOption?: ParseResult,
-    flags?: string[],
-  ): Unbinder => {
-    if (dynamicOption) {
-      const values = parseResult.value()
-      const option = unref(dynamicOption.value()[0])
-      if (!isString(option)) return () => {}
-      return attachEventListener(
-        el,
-        camelize(option),
-        () => parseResult.value()[0],
-        flags?.join(',') ?? values[1],
-      )
-    } else if (option) {
-      const values = parseResult.value()
-      return attachEventListener(
-        el,
-        camelize(option),
-        () => parseResult.value()[0],
-        flags?.join(',') ?? values[1],
-      )
-    }
-    // object syntax
-    // {k,v,f,...},{k,v,f,...},...
-    const unbinders: Unbinder[] = []
-    const unbinder = (): void => {
-      unbinders.forEach((x) => x())
-    }
-    const values = parseResult.value()
-    const len = values.length
-    for (let i = 0; i < len; ++i) {
-      let next = values[i]
-      if (isFunction(next)) next = next()
-      if (isObject(next)) {
-        for (const item of Object.entries(next)) {
-          const eventType = item[0]
-          const method = (): any => {
-            let obj = parseResult.value()[i] as any
-            if (isFunction(obj)) obj = obj()
-            obj = obj[eventType]
-            if (isFunction(obj)) obj = obj()
-            return obj
-          }
-          const flags = (next as any)[eventType + '_flags']
-          unbinders.push(attachEventListener(el, eventType, method, flags))
-        }
-      } else {
-        warning(WarningType.BindingRequiresObjectExpressions, 'r-on', el)
-      }
-    }
-    return unbinder
+  mount: ({ el, parseResult, option, dynamicOption, flags }) => {
+    return bindOn(
+      el,
+      parseResult,
+      option as string | undefined,
+      dynamicOption,
+      flags,
+    )
   },
 }
 
@@ -111,7 +120,7 @@ const getShouldExecuteEvent = (
     eventType.startsWith('keypress')
   ) {
     flags ??= ''
-    const parts = eventType.split('.').concat(flags.split(','))
+    const parts = [...eventType.split('.'), ...flags.split(',')]
     eventType = parts[0]
     const keyType = parts[1]
     const isCtrl = parts.includes('ctrl')

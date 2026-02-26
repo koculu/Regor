@@ -10,36 +10,37 @@ import { type RegorConfig } from '../app/RegorConfig'
 import { isNullOrWhitespace } from '../common/is-what'
 import { warning, WarningType } from '../log/warnings'
 import { observe } from '../observer/observe'
-import { sref } from '../reactivity/sref'
 import { jsep } from './jsep/jsep'
 import { type ArrayExpression, type Expression } from './jsep/jsep-types'
 import { regorEval } from './regorEval'
 
 const astCache: Record<string, ArrayExpression> = {}
+const isComponentMap = (value: unknown): value is Record<string, Component> =>
+  !!value
 
 /**
  * @internal
  */
 export class Parser {
-  __contexts: any[]
+  __contexts: Record<string, unknown>[]
 
   __config: RegorConfig
 
-  constructor(contexts: any[], config: RegorConfig) {
+  constructor(contexts: Record<string, unknown>[], config: RegorConfig) {
     this.__contexts = contexts
     this.__config = config
   }
 
-  __push(context: any): void {
+  __push(context: Record<string, unknown>): void {
     this.__contexts = [context, ...this.__contexts]
   }
 
   __getComponents(): Record<string, Component> {
     const obj = this.__contexts
       .map((x) => x.components)
-      .filter((x) => !!x)
+      .filter(isComponentMap)
       .reverse()
-      .reduce((p, c) => {
+      .reduce<Record<string, Component>>((p, c) => {
         for (const [key, value] of Object.entries(c)) {
           p[key.toUpperCase()] = value
         }
@@ -53,7 +54,7 @@ export class Parser {
     const seen = new Set<string>()
     const componentsList = this.__contexts
       .map((x) => x.components)
-      .filter((x) => !!x)
+      .filter(isComponentMap)
       .reverse()
     for (const components of componentsList) {
       for (const key of Object.keys(components)) {
@@ -72,12 +73,12 @@ export class Parser {
     collectRefObj?: boolean,
     once?: boolean,
   ): ParseResult {
-    const value = sref<any[]>([])
-    const stopObserverList = [] as StopObserving[]
+    let currentValues: unknown[] = []
+    const stopObserverList: StopObserving[] = []
     const subscribers = new Set<(values: unknown[]) => void>()
     const clearObservers = (): void => {
-      for (const stopObserver of stopObserverList) {
-        stopObserver()
+      for (let i = 0; i < stopObserverList.length; ++i) {
+        stopObserverList[i]()
       }
       stopObserverList.length = 0
     }
@@ -90,13 +91,13 @@ export class Parser {
       init?: boolean,
     ): StopObserving => {
       subscribers.add(observer)
-      if (init) observer(value() as unknown[])
+      if (init) observer(currentValues)
       return () => {
         subscribers.delete(observer)
       }
     }
     const result: ParseResult = {
-      value,
+      value: () => currentValues,
       stop: unbinder,
       subscribe,
       refs: [],
@@ -108,10 +109,10 @@ export class Parser {
     const uniqueRefs = new Set<AnyRef>()
     const evaluate = (
       expr: Expression,
-      contexts: any[],
+      contexts: Record<string, unknown>[],
       collectRefs: boolean,
-      context?: any,
-    ): { value: any; refs: AnyRef[]; ref?: AnyRef } => {
+      context?: unknown,
+    ): { value: unknown; refs: AnyRef[]; ref?: AnyRef } => {
       try {
         const r = regorEval(
           expr,
@@ -122,7 +123,7 @@ export class Parser {
           context,
           collectRefObj,
         )
-        if (collectRefs) refs.push(...r.refs)
+        if (collectRefs && r.refs.length > 0) refs.push(...r.refs)
         return { value: r.value, refs: r.refs, ref: r.ref }
       } catch (e) {
         warning(WarningType.ErrorLog, `evaluation error: ${expression}`, e)
@@ -137,37 +138,38 @@ export class Parser {
       const contexts = this.__contexts.slice()
       const elements = ast.elements
       const len = elements.length
+      const expressionRefs = new Array<AnyRef | undefined>(len)
+      result.refs = expressionRefs
       const refresh = (): void => {
         refs.length = 0
-        uniqueRefs.clear()
-        clearObservers()
-        const values = new Array<any>(len)
-        const expressionRefs = new Array<any>(len)
+        if (!once) {
+          uniqueRefs.clear()
+          clearObservers()
+        }
+        const nextValues = new Array<unknown>(len)
         for (let i = 0; i < len; ++i) {
           const expr = elements[i]
           if (isLazy?.(i, -1)) {
-            values[i] = (e: Event) =>
+            nextValues[i] = (e: Event) =>
               evaluate(expr, contexts, false, { $event: e }).value
             continue
           }
           const evaluated = evaluate(expr, contexts, true)
-          values[i] = evaluated.value
+          nextValues[i] = evaluated.value
           expressionRefs[i] = evaluated.ref
         }
         if (!once) {
           for (const r of refs) {
             if (uniqueRefs.has(r)) continue
             uniqueRefs.add(r)
-            const stopObserving = observe(r, refresh)
-            stopObserverList.push(stopObserving)
+            stopObserverList.push(observe(r, refresh))
           }
         }
-        result.refs = expressionRefs
-        value(values)
+        currentValues = nextValues as unknown[]
         if (subscribers.size !== 0) {
           for (const subscriber of subscribers) {
             if (!subscribers.has(subscriber)) continue
-            subscriber(values)
+            subscriber(currentValues)
           }
         }
       }
@@ -178,18 +180,18 @@ export class Parser {
     return result
   }
 
-  __capture(): any[] {
+  __capture(): Record<string, unknown>[] {
     return this.__contexts.slice()
   }
 
-  __replaced: any[][] = []
+  __replaced: Record<string, unknown>[][] = []
 
-  __replace(contexts: any[]): void {
+  __replace(contexts: Record<string, unknown>[]): void {
     this.__replaced.push(this.__contexts)
     this.__contexts = contexts
   }
 
-  __scoped(contexts: any[], action: () => any): void {
+  __scoped(contexts: Record<string, unknown>[], action: () => unknown): void {
     try {
       this.__replace(contexts)
       action()

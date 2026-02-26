@@ -200,8 +200,8 @@ Unmount cleans child component bindings and observers.
 
 ## See Also
 
-1. [createComponent API](../api/createComponent)
-2. [Directive: :is](../directives/is)
-3. [Directive: :context](../directives/context)
-4. [TypeScript Guide](./typescript)
-5. [Directive: r-for](../directives/r-for)
+1. [createComponent API](/api/createComponent)
+2. [Directive: :is](/directives/is)
+3. [Directive: :context](/directives/context)
+4. [TypeScript Guide](/guide/typescript)
+5. [Directive: r-for](/directives/r-for)

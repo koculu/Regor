@@ -2,7 +2,9 @@
 
 # Regor
 
-Regor is a powerful UI framework designed to streamline the development of HTML5-based applications for both web and desktop environments. With a template syntax that closely follows Vue.js, transitioning from VueJS to Regor is seamless for developers familiar with Vue.
+Regor is a runtime-first UI framework for teams that want direct DOM control, strong TypeScript ergonomics, and precise reactivity behavior without being forced into a Virtual DOM architecture.
+
+Its template syntax is familiar to Vue users (`r-if`, `r-model`, `r-for`, `r-bind`), but its runtime model is intentionally different: Regor is built for progressive enhancement, mixed-rendering environments, and incremental adoption.
 
 ### [![Published on npm](https://img.shields.io/npm/v/regor.svg)](https://www.npmjs.com/package/regor)
 
@@ -10,9 +12,9 @@ Regor is a powerful UI framework designed to streamline the development of HTML5
 
 ## Key Features
 
-- **Simplicity:** Develop UIs without a Virtual DOM for a more straightforward implementation and easier debugging.
-- **TypeScript:** Enjoy native TypeScript support without workarounds.
-- **No Build Step Required:** Define components in TypeScript using tagged string templates, no build step needed.
+- **No VDOM Layer:** Bind directly to real DOM for transparent runtime behavior and straightforward debugging.
+- **TypeScript-Native:** Use standard TypeScript interfaces, classes, and generics without framework-specific file formats.
+- **No Build Step Required:** Define components in TypeScript using tagged string templates with npm, CDN ESM, or global build workflows.
 - **Secure Evaluation:** Regor's secure JavaScript VM ensures safe runtime compilation. You can enable security policy in your page without removing runtime compilation support.
 
 ```html
@@ -22,9 +24,9 @@ Regor is a powerful UI framework designed to streamline the development of HTML5
 />
 ```
 
-- **Flexible Reactivity:** Empowering developers with a highly flexible reactivity system.
-- **Non-JS SSR:** Bind to the existing DOM without removing already mounted HTML elements, suitable for non-JavaScript server-side rendering.
-- **Reentrance:** Regor supports multiple mountings in the previously mounted area using the same or different app contexts. This enables creating and mounting new directives dynamically.
+- **Flexible Reactivity:** Combine `ref`, `sref`, `batch`, `pause`, `resume`, and `entangle` for explicit state orchestration.
+- **Static-First + Islands:** Bind to existing DOM without removing server-rendered HTML, ideal for progressive enhancement.
+- **Reentrance:** Mount multiple times in already-mounted regions with same or different app contexts.
 - **Compatibility:** Rendered pages are designed for seamless integration with other libraries manipulating the DOM.
 
 ## Documentation
@@ -72,16 +74,13 @@ const template = html`<button @click="count++">
 
 const props = ['message']
 
-const myComponent = createComponent<MyComponent>(
-  template,
-  {
-    context: (head) => ({
-      message: head.props.message,
-      count: ref(0),
-    }),
-    props,
-  },
-)
+const myComponent = createComponent<MyComponent>(template, {
+  context: (head) => ({
+    message: head.props.message,
+    count: ref(0),
+  }),
+  props,
+})
 
 createApp({
   components: { myComponent },
@@ -161,7 +160,31 @@ or
 
 ## Comparison with VueJs
 
-Regor shares core functionality with VueJs but differs in implementation, TypeScript support, template evaluation, reactivity, server-side rendering support, compatibility.
+Regor is openly inspired by Vue’s concepts (even adopting a similar directive syntax like r-if / r-model instead of v-if / v-model), but it fundamentally diverges in its implementation. It prioritizes runtime flexibility, build-less environments, and strict TypeScript integration over the Virtual DOM (VDOM) paradigm.
+
+### Architecture and rendering model
+
+- **Vue:** Uses a Virtual DOM. This provides excellent performance for highly dynamic Single Page Applications (SPAs) because Vue calculates diffs in memory before updating the browser. However, it usually requires a compilation step to optimize templates, and hydrating existing server-rendered HTML can be notoriously strict (hydration mismatches).
+- **Regor:** Ditches the VDOM entirely. It binds directly to the actual DOM. Regor explicitly supports Static-first + dynamic islands and "Reentrance." You can mount an application multiple times over already-mounted regions or existing server-rendered HTML without destroying the elements.
+- **Verdict:** Regor is significantly more flexible for integrating into existing applications, multi-page applications (MPAs), or legacy backends.
+
+### Runtime and deployment model
+
+- **Vue:** Commonly paired with a build pipeline for SFCs and tooling depth.
+- **Regor:** Designed to require no build step. You can write standard TypeScript using tagged string templates (e.g., `html` tags for templates) and it will evaluate at runtime. Crucially, Regor features a Secure JavaScript VM for runtime compilation that adheres to strict Content Security Policies (CSP)—a common pain point when using Vue's runtime compiler in enterprise environments.
+- **Verdict:** Regor wins in deployment flexibility and zero-config setups. It respects modern security policies out of the box without demanding a bundler.
+
+### Reactivity control model
+
+- **Vue:** Uses ES6 Proxies for a highly automated, "magical" reactivity system. You update an object, and Vue figures out what to re-render. However, this magic can sometimes abstract away performance bottlenecks, leading to over-rendering if you aren't careful with deep reactivity.
+- **Regor:** Provides fine-tuned, manual control. It offers `ref` (deep reactivity) and `sref` (simple/shallow reactivity without nested observation). Furthermore, Regor provides advanced control APIs like `pause()` and `resume()` to stop a ref's auto-triggers, `entangle()` to sync two refs effortlessly, and `batch()` for precise state grouping.
+- **Verdict:** Vue's reactivity is easier for beginners.. Regor’s reactivity is more flexible and transparent, giving engineers exact tools to orchestrate update semantics and prevent unwanted DOM paints.
+
+### TypeScript ergonomics
+
+- **Vue:** TypeScript support in Vue has improved massively, but it still relies on heavy IDE plugins (Volar) and specialized compilers (vue-tsc) to understand .vue files. The separation between the `<template>` and `<script>` requires tooling to bridge the gap.
+- **Regor:** Offers native TypeScript support without workarounds. Because components and templates are defined using standard TypeScript functions, class-based contexts, and `ComponentHead<T>`, standard TypeScript compilers and IDEs understand 100% of the code immediately.
+- **Verdict:** Regor offers a purer, higher-quality TypeScript experience. It leverages the language itself rather than relying on framework-specific compiler magic to provide type safety.
 
 ## Supported Directives
 

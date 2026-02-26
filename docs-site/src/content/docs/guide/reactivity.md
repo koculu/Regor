@@ -136,8 +136,28 @@ Manual `trigger(ref)` still works while paused.
 1. `unref(x)` unwraps one ref level.
 2. `isRef(x)` checks any ref (`ref` or `sref`).
 3. `isDeepRef(x)` checks whether value was created as deep `ref`.
-4. `entangle(a, b)` creates two-way sync and initializes `b` with `a`.
-5. `persist(ref, key)` syncs ref data with `localStorage`.
+4. `flatten(x)` recursively unwraps refs in objects/arrays/Map/Set into plain data.
+5. `entangle(a, b)` creates two-way sync and initializes `b` with `a`.
+6. `persist(ref, key)` syncs ref data with `localStorage`.
+
+### `flatten` sample
+
+Use `flatten` when you need a plain snapshot for logging, serialization, or transport.
+
+```ts
+const state = ref({
+  user: ref({ name: 'Ada' }),
+  tags: new Set([ref('core')]),
+  meta: new Map([['count', ref(2)]]),
+})
+
+const plain = flatten(state)
+// {
+//   user: { name: 'Ada' },
+//   tags: Set { 'core' },
+//   meta: Map { 'count' => 2 }
+// }
+```
 
 ## Collections and caveats
 
@@ -147,6 +167,6 @@ Manual `trigger(ref)` still works while paused.
 
 ## See Also
 
-1. [API Reference](../api)
-2. [Lifecycle and Cleanup](./lifecycle-and-cleanup)
-3. [Templates and Expressions](./templates)
+1. [API Reference](/api)
+2. [Lifecycle and Cleanup](/guide/lifecycle-and-cleanup)
+3. [Templates and Expressions](/guide/templates)

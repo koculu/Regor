@@ -3,6 +3,7 @@ import { expect, test } from 'vitest'
 import { singlePropDirective } from '../../src/directives/single-prop'
 import { ref } from '../../src/reactivity/ref'
 import { sref } from '../../src/reactivity/sref'
+import { bindDirective } from '../directive-test-utils'
 
 const makeParseResult = (
   valuesRef: any,
@@ -18,10 +19,15 @@ const makeParseResult = (
 
 test('single-prop returns no-op unbinder when option is missing', () => {
   const parseResult = makeParseResult(sref([1]), [], {})
-  const unbind = singlePropDirective.onBind!(
+  const unbind = bindDirective(
+    singlePropDirective,
     document.createElement('div'),
     parseResult,
     'expr',
+    undefined,
+    undefined,
+    undefined,
+    { runInitialUpdate: true, observeValueRef: true },
   )
   expect(typeof unbind).toBe('function')
   expect(() => unbind()).not.toThrow()
@@ -32,11 +38,15 @@ test('single-prop assigns non-ref values into ref target', () => {
   const valuesRef = sref(['y'])
   const parseResult = makeParseResult(valuesRef, [], { model: target })
 
-  singlePropDirective.onBind!(
+  bindDirective(
+    singlePropDirective,
     document.createElement('div'),
     parseResult,
     'expr',
     'model',
+    undefined,
+    undefined,
+    { runInitialUpdate: true, observeValueRef: true },
   )
 
   expect(target()).toBe('y')
@@ -47,11 +57,15 @@ test('single-prop assigns non-ref values into plain target', () => {
   const ctx: Record<string, unknown> = { model: 1 }
   const parseResult = makeParseResult(valuesRef, [], ctx)
 
-  const unbind = singlePropDirective.onBind!(
+  const unbind = bindDirective(
+    singlePropDirective,
     document.createElement('div'),
     parseResult,
     'expr',
     'model',
+    undefined,
+    undefined,
+    { runInitialUpdate: true, observeValueRef: true },
   )
 
   expect(ctx.model).toBe(7)
@@ -65,11 +79,15 @@ test('single-prop creates bridge for ref source and keeps sync', () => {
   const ctx: Record<string, unknown> = {}
   const parseResult = makeParseResult(valuesRef, refs, ctx)
 
-  const unbind = singlePropDirective.onBind!(
+  const unbind = bindDirective(
+    singlePropDirective,
     document.createElement('div'),
     parseResult,
     'expr',
     'model',
+    undefined,
+    undefined,
+    { runInitialUpdate: true, observeValueRef: true },
   )
 
   const bridge = ctx.model as any
@@ -93,20 +111,28 @@ test('single-prop no-ops when forwarded bridge is already assigned', () => {
   const ctx: Record<string, unknown> = {}
   const parseResult = makeParseResult(valuesRef, refs, ctx)
 
-  const unbind1 = singlePropDirective.onBind!(
+  const unbind1 = bindDirective(
+    singlePropDirective,
     document.createElement('div'),
     parseResult,
     'expr',
     'model',
+    undefined,
+    undefined,
+    { runInitialUpdate: true, observeValueRef: true },
   )
   const bridge = ctx.model
 
   refs[0] = bridge
-  const unbind2 = singlePropDirective.onBind!(
+  const unbind2 = bindDirective(
+    singlePropDirective,
     document.createElement('div'),
     parseResult,
     'expr',
     'model',
+    undefined,
+    undefined,
+    { runInitialUpdate: true, observeValueRef: true },
   )
 
   expect(ctx.model).toBe(bridge)
@@ -120,21 +146,29 @@ test('single-prop assigns forwarded bridge to plain ctx keys', () => {
   const refs: any[] = [source]
   const ctx: Record<string, unknown> = {}
   const parseResult = makeParseResult(valuesRef, refs, ctx)
-  const unbind1 = singlePropDirective.onBind!(
+  const unbind1 = bindDirective(
+    singlePropDirective,
     document.createElement('div'),
     parseResult,
     'expr',
     'model',
+    undefined,
+    undefined,
+    { runInitialUpdate: true, observeValueRef: true },
   )
   const bridge = ctx.model
 
   refs[0] = bridge
   ctx.model = 1
-  const unbind2 = singlePropDirective.onBind!(
+  const unbind2 = bindDirective(
+    singlePropDirective,
     document.createElement('div'),
     parseResult,
     'expr',
     'model',
+    undefined,
+    undefined,
+    { runInitialUpdate: true, observeValueRef: true },
   )
   expect(ctx.model).toBe(bridge)
 
@@ -148,22 +182,30 @@ test('single-prop entangles forwarded bridge with existing ref target', () => {
   const refs: any[] = [source]
   const firstCtx: Record<string, unknown> = {}
   const firstParseResult = makeParseResult(valuesRef, refs, firstCtx)
-  const unbind1 = singlePropDirective.onBind!(
+  const unbind1 = bindDirective(
+    singlePropDirective,
     document.createElement('div'),
     firstParseResult,
     'expr',
     'model',
+    undefined,
+    undefined,
+    { runInitialUpdate: true, observeValueRef: true },
   )
   const bridge = firstCtx.model as any
 
   const target = ref('t0')
   const secondCtx: Record<string, unknown> = { model: target }
   const secondParseResult = makeParseResult(valuesRef, [bridge], secondCtx)
-  const unbind2 = singlePropDirective.onBind!(
+  const unbind2 = bindDirective(
+    singlePropDirective,
     document.createElement('div'),
     secondParseResult,
     'expr',
     'model',
+    undefined,
+    undefined,
+    { runInitialUpdate: true, observeValueRef: true },
   )
 
   bridge('t1')
@@ -182,11 +224,15 @@ test('single-prop reuses bridge and skips re-entangle for same source', () => {
   const refs: any[] = [source1]
   const ctx: Record<string, unknown> = {}
   const parseResult = makeParseResult(valuesRef, refs, ctx)
-  const unbind = singlePropDirective.onBind!(
+  const unbind = bindDirective(
+    singlePropDirective,
     document.createElement('div'),
     parseResult,
     'expr',
     'model',
+    undefined,
+    undefined,
+    { runInitialUpdate: true, observeValueRef: true },
   )
 
   const bridge = ctx.model as any

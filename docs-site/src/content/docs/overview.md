@@ -13,6 +13,15 @@ Regor is a reactive UI library designed for engineers who want:
 
 Regor is intentionally practical. It does not force one rigid rendering architecture for every use case.
 
+## Architecture Positioning
+
+Regor is Vue-inspired in directive syntax, but different by architecture.
+
+1. Regor does not rely on a Virtual DOM layer.
+2. Regor can bind existing server-rendered/static markup in place.
+3. Regor supports runtime composition and reentrance across already-mounted regions.
+4. Regor keeps optimization escape hatches close to plain DOM and JavaScript.
+
 ## Why Teams Choose Regor
 
 ### 1. Runtime flexibility without lock-in
@@ -22,6 +31,8 @@ Regor can bind existing markup and progressively enhance real pages. You can ado
 ### 2. Reactivity that stays explicit
 
 You get `ref`, `sref`, `computed`, `watchEffect`, `observe`, and batching primitives. State flows are explicit and composable.
+
+Control APIs like `pause`, `resume`, and `entangle` help you shape update behavior intentionally in complex flows.
 
 ### 3. Directive model with real depth
 
@@ -35,6 +46,10 @@ Regor supports rich directive workflows:
 ### 4. Excellent fit for mixed environments
 
 Regor works well when part of your DOM is owned by other systems, or when performance-critical sections need custom handling.
+
+### 5. TypeScript without framework-only indirection
+
+Regor uses plain TypeScript code paths for app and component contexts (`createApp<T>`, `ComponentHead<TProps>`, interfaces/classes). You keep normal TS ergonomics without relying on custom file format compilers.
 
 ## Core Philosophy
 
@@ -57,6 +72,14 @@ If your app needs:
 4. Controlled optimization paths.
 
 Regor is a strong fit.
+
+## Regor vs Vue (Practical Lens)
+
+1. Vue is a strong default for framework-owned SPA architecture.
+2. Regor is a strong default for progressive enhancement and static-first plus dynamic-island architectures.
+3. Vue commonly centers build tooling for peak DX/perf in SPA workflows.
+4. Regor keeps build-less and CSP-constrained runtime options first-class.
+5. Both are capable; pick based on rendering ownership and deployment constraints.
 
 ## Practical Tradeoffs
 

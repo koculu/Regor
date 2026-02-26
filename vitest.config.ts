@@ -9,7 +9,10 @@ export default defineConfig({
     coverage: {
       provider: 'istanbul',
       reporter: ['text', 'html'],
-      exclude: [...configDefaults.coverage.exclude!],
+      exclude: [
+        ...configDefaults.coverage.exclude!,
+        'src/directives/teleport.ts',
+      ],
     },
   },
 }) as UserConfig

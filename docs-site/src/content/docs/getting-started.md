@@ -7,6 +7,9 @@ sidebar:
 Regor binds runtime behavior directly to DOM you already have, or to template
 content you provide at mount time.
 
+This means you can start from static HTML, mount only where needed, and scale
+to multiple independent runtime islands on the same page.
+
 ## Install
 
 ```sh

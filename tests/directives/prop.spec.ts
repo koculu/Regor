@@ -3,6 +3,7 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import * as unbindModule from '../../src/cleanup/unbind'
 import { patchProp, propDirective } from '../../src/directives/prop'
 import { warningHandler } from '../../src/log/warnings'
+import { updateDirective } from '../directive-test-utils'
 
 let originalWarning: (...args: unknown[]) => void
 
@@ -19,7 +20,9 @@ afterEach(() => {
 test('prop directive option path supports camel flag', () => {
   const el = document.createElement('div') as any
 
-  propDirective.onChange!(el, [1], undefined, 'foo-bar', undefined, ['camel'])
+  updateDirective(propDirective, el, [1], undefined, 'foo-bar', undefined, [
+    'camel',
+  ])
 
   expect(el.fooBar).toBe(1)
 })
@@ -27,7 +30,7 @@ test('prop directive option path supports camel flag', () => {
 test('prop directive supports kv, tuple and object syntaxes', () => {
   const el = document.createElement('div') as any
 
-  propDirective.onChange!(el, ['a', 1, ['b', 2], { c: 3 }])
+  updateDirective(propDirective, el, ['a', 1, ['b', 2], { c: 3 }])
 
   expect(el.a).toBe(1)
   expect(el.b).toBe(2)

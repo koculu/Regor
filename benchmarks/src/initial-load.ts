@@ -1,4 +1,18 @@
 import { createApp as createRegorApp, html, RegorConfig, sref } from '../../src'
+import {
+  clearRoot,
+  formatMs,
+  getRowCount,
+  getSampleRuns,
+  getWarmupRuns,
+  loadVueModule,
+  nextFrame,
+  percentile,
+  runAlternating,
+  runSamples,
+  setButtonsDisabled,
+  setLog,
+} from './shared'
 
 type Row = {
   id: number
@@ -21,23 +35,23 @@ type BenchSummary = {
   samples: number
 }
 
-const ROW_COUNT = 500
-const SAMPLE_RUNS = 20
-const WARMUP_RUNS = 6
-const VUE_ESM_URL =
-  'https://cdn.jsdelivr.net/npm/vue@latest/dist/vue.esm-browser.prod.js'
+type VueRuntime = {
+  createApp: (options: { data: () => { rows: Row[] }; template: string }) => {
+    mount: (root: HTMLElement) => void
+    unmount: () => void
+  }
+  reactive: <T extends object>(state: T) => T
+}
 
-let vueModulePromise: Promise<any> | null = null
 let lastRegorApp: { unbind: () => void } | null = null
 let lastVueApp: { unmount: () => void } | null = null
-const regorBenchConfig = (() => {
+
+const getRegorLabel = (): string => 'Regor'
+
+const createRegorBenchConfig = (): RegorConfig => {
   const config = new RegorConfig()
   config.useInterpolation = true
   return config
-})()
-
-const nextFrame = async (): Promise<void> => {
-  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
 }
 
 const makeRows = (count: number, startId = 0): Row[] => {
@@ -54,30 +68,19 @@ const makeRows = (count: number, startId = 0): Row[] => {
   return out
 }
 
-const clearRoot = (root: HTMLElement): void => {
-  root.innerHTML = ''
-}
-
-const loadVueModule = async (): Promise<any> => {
-  if (!vueModulePromise) {
-    vueModulePromise = import(/* @vite-ignore */ VUE_ESM_URL)
-  }
-  return vueModulePromise
-}
-
 const runRegor = async (root: HTMLElement): Promise<BenchResult> => {
   if (lastRegorApp) {
     lastRegorApp.unbind()
     lastRegorApp = null
   }
   clearRoot(root)
-  const rows = makeRows(ROW_COUNT)
+
+  const rows = makeRows(getRowCount())
   await nextFrame()
+
   const t0 = performance.now()
   const app = createRegorApp(
-    {
-      rows: sref(rows),
-    },
+    { rows: sref(rows) },
     {
       element: root,
       template: html`<div>
@@ -87,14 +90,14 @@ const runRegor = async (root: HTMLElement): Promise<BenchResult> => {
         </div>
       </div>`,
     },
-    regorBenchConfig,
+    createRegorBenchConfig(),
   )
   lastRegorApp = app
+
   await nextFrame()
-  const mountMs = performance.now() - t0
   return {
-    framework: 'Regor',
-    mountMs,
+    framework: getRegorLabel(),
+    mountMs: performance.now() - t0,
     rowsFinal: app.context.rows().length,
   }
 }
@@ -105,12 +108,10 @@ const runVue = async (root: HTMLElement): Promise<BenchResult> => {
     lastVueApp = null
   }
   clearRoot(root)
-  const vue = await loadVueModule()
-  const { createApp, reactive } = vue
 
-  const state = reactive({
-    rows: makeRows(ROW_COUNT),
-  })
+  const vue = (await loadVueModule()) as VueRuntime
+  const { createApp, reactive } = vue
+  const state = reactive({ rows: makeRows(getRowCount()) })
 
   await nextFrame()
   const t0 = performance.now()
@@ -128,25 +129,13 @@ const runVue = async (root: HTMLElement): Promise<BenchResult> => {
   })
   app.mount(root)
   lastVueApp = app
-  await nextFrame()
-  const mountMs = performance.now() - t0
 
+  await nextFrame()
   return {
     framework: 'Vue@latest',
-    mountMs,
+    mountMs: performance.now() - t0,
     rowsFinal: state.rows.length,
   }
-}
-
-const formatMs = (n: number): string => n.toFixed(2)
-
-const percentile = (sorted: number[], p: number): number => {
-  if (!sorted.length) return 0
-  const idx = Math.min(
-    sorted.length - 1,
-    Math.max(0, Math.ceil((p / 100) * sorted.length) - 1),
-  )
-  return sorted[idx]
 }
 
 const summarize = (framework: string, samples: BenchResult[]): BenchSummary => {
@@ -160,17 +149,57 @@ const summarize = (framework: string, samples: BenchResult[]): BenchSummary => {
   }
 }
 
+const winnerByDisplayedValue = (
+  left: number,
+  leftFramework: string,
+  right: number,
+  rightFramework: string,
+): string => {
+  const leftShown = Number(left.toFixed(2))
+  const rightShown = Number(right.toFixed(2))
+  if (leftShown === rightShown) return ''
+  return leftShown < rightShown ? leftFramework : rightFramework
+}
+
 const renderResults = (rows: BenchSummary[]): void => {
   const tbody =
     document.querySelector<HTMLTableSectionElement>('#results tbody')
   if (!tbody) return
+
+  const mountMedianWinner =
+    rows.length === 2
+      ? winnerByDisplayedValue(
+          rows[0].mountMedian,
+          rows[0].framework,
+          rows[1].mountMedian,
+          rows[1].framework,
+        )
+      : ''
+  const mountP90Winner =
+    rows.length === 2
+      ? winnerByDisplayedValue(
+          rows[0].mountP90,
+          rows[0].framework,
+          rows[1].mountP90,
+          rows[1].framework,
+        )
+      : ''
+  const labelWinner =
+    mountMedianWinner !== '' && mountMedianWinner === mountP90Winner
+      ? mountMedianWinner
+      : ''
+
   tbody.innerHTML = ''
   for (const r of rows) {
+    const frameworkClass = labelWinner === r.framework ? 'winner-metric' : ''
+    const mountMedianClass =
+      mountMedianWinner === r.framework ? 'winner-metric' : ''
+    const mountP90Class = mountP90Winner === r.framework ? 'winner-metric' : ''
     const tr = document.createElement('tr')
     tr.innerHTML = `
-      <td>${r.framework}</td>
-      <td>${formatMs(r.mountMedian)}</td>
-      <td>${formatMs(r.mountP90)}</td>
+      <td class="${frameworkClass}">${r.framework}</td>
+      <td class="${mountMedianClass}">${formatMs(r.mountMedian)}</td>
+      <td class="${mountP90Class}">${formatMs(r.mountP90)}</td>
       <td>${r.rowsFinal}</td>
       <td>${r.samples}</td>
     `
@@ -178,145 +207,106 @@ const renderResults = (rows: BenchSummary[]): void => {
   }
 }
 
-const setLog = (msg: string): void => {
-  const log = document.getElementById('log')
-  if (log) log.textContent = msg
-}
-
-const setButtonsDisabled = (disabled: boolean): void => {
-  const ids = ['run', 'run-regor', 'run-vue']
-  for (const id of ids) {
-    const button = document.getElementById(id) as HTMLButtonElement | null
-    if (button) button.disabled = disabled
+const withButtonsDisabled = async (
+  onFailure: string,
+  action: () => Promise<void>,
+): Promise<void> => {
+  setButtonsDisabled(true)
+  try {
+    await action()
+  } catch (e) {
+    console.error(e)
+    setLog(`${onFailure}: ${(e as Error).message}`)
+  } finally {
+    setButtonsDisabled(false)
   }
-}
-
-const runRegorSamples = async (
-  root: HTMLElement,
-  count: number,
-): Promise<BenchResult[]> => {
-  const out: BenchResult[] = []
-  for (let i = 0; i < count; i++) out.push(await runRegor(root))
-  return out
-}
-
-const runVueSamples = async (
-  root: HTMLElement,
-  count: number,
-): Promise<BenchResult[]> => {
-  const out: BenchResult[] = []
-  for (let i = 0; i < count; i++) out.push(await runVue(root))
-  return out
-}
-
-const runComparativeSamples = async (
-  regorRoot: HTMLElement,
-  vueRoot: HTMLElement,
-  samples: number,
-): Promise<{ regor: BenchResult[]; vue: BenchResult[] }> => {
-  const regor: BenchResult[] = []
-  const vue: BenchResult[] = []
-  for (let i = 0; i < samples; i++) {
-    const regorFirst = (i & 1) === 0
-    if (regorFirst) {
-      regor.push(await runRegor(regorRoot))
-      vue.push(await runVue(vueRoot))
-    } else {
-      vue.push(await runVue(vueRoot))
-      regor.push(await runRegor(regorRoot))
-    }
-    setLog(`Measured sample ${i + 1}/${samples}...`)
-  }
-  return { regor, vue }
 }
 
 const run = async (): Promise<void> => {
-  setButtonsDisabled(true)
-  try {
+  await withButtonsDisabled('Benchmark failed', async () => {
+    const rowCount = getRowCount()
+    const warmupRuns = getWarmupRuns()
+    const sampleRuns = getSampleRuns()
     setLog(
-      `Warmup ${WARMUP_RUNS} rounds (unmeasured), then ${SAMPLE_RUNS} measured samples (A/B alternating)...`,
+      `rows=${rowCount}, warmup ${warmupRuns} rounds (unmeasured), then ${sampleRuns} measured samples (A/B alternating)...`,
     )
+
     const regorRoot = document.getElementById('regor-root')
     const vueRoot = document.getElementById('vue-root')
     if (!regorRoot || !vueRoot) {
       setLog('Missing benchmark roots in DOM.')
       return
     }
-    for (let i = 0; i < WARMUP_RUNS; i++) {
-      if ((i & 1) === 0) {
-        await runRegor(regorRoot)
-        await runVue(vueRoot)
-      } else {
-        await runVue(vueRoot)
-        await runRegor(regorRoot)
-      }
-    }
-    const measured = await runComparativeSamples(
-      regorRoot,
-      vueRoot,
-      SAMPLE_RUNS,
+
+    await runAlternating(
+      warmupRuns,
+      () => runRegor(regorRoot),
+      () => runVue(vueRoot),
     )
-    const regorSummary = summarize('Regor', measured.regor)
-    const vueSummary = summarize('Vue@latest', measured.vue)
+    const measured = await runAlternating(
+      sampleRuns,
+      () => runRegor(regorRoot),
+      () => runVue(vueRoot),
+      (i) => setLog(`Measured sample ${i + 1}/${sampleRuns}...`),
+    )
+
+    const regorSummary = summarize(getRegorLabel(), measured.a)
+    const vueSummary = summarize('Vue@latest', measured.b)
     renderResults([regorSummary, vueSummary])
+
     setLog('Done. Showing mount median + p90 only.')
     console.table([regorSummary, vueSummary])
-  } catch (e) {
-    console.error(e)
-    setLog(`Benchmark failed: ${(e as Error).message}`)
-  } finally {
-    setButtonsDisabled(false)
-  }
+  })
 }
 
 const runOnlyRegor = async (): Promise<void> => {
-  setButtonsDisabled(true)
-  try {
+  await withButtonsDisabled('Regor benchmark failed', async () => {
+    const rowCount = getRowCount()
+    const warmupRuns = getWarmupRuns()
+    const sampleRuns = getSampleRuns()
     setLog(
-      `Regor: warmup ${WARMUP_RUNS} rounds (unmeasured), ${SAMPLE_RUNS} measured samples...`,
+      `${getRegorLabel()}: rows=${rowCount}, warmup ${warmupRuns} rounds (unmeasured), ${sampleRuns} measured samples...`,
     )
+
     const regorRoot = document.getElementById('regor-root')
     if (!regorRoot) {
       setLog('Missing Regor root in DOM.')
       return
     }
-    await runRegorSamples(regorRoot, WARMUP_RUNS)
-    const samples = await runRegorSamples(regorRoot, SAMPLE_RUNS)
-    const summary = summarize('Regor', samples)
+
+    await runSamples(warmupRuns, () => runRegor(regorRoot))
+    const samples = await runSamples(sampleRuns, () => runRegor(regorRoot))
+    const summary = summarize(getRegorLabel(), samples)
+
     renderResults([summary])
-    setLog('Regor done. Showing mount median + p90.')
+    setLog(`${getRegorLabel()} done. Showing mount median + p90.`)
     console.table([summary])
-  } catch (e) {
-    console.error(e)
-    setLog(`Regor benchmark failed: ${(e as Error).message}`)
-  } finally {
-    setButtonsDisabled(false)
-  }
+  })
 }
 
 const runOnlyVue = async (): Promise<void> => {
-  setButtonsDisabled(true)
-  try {
+  await withButtonsDisabled('Vue benchmark failed', async () => {
+    const rowCount = getRowCount()
+    const warmupRuns = getWarmupRuns()
+    const sampleRuns = getSampleRuns()
     setLog(
-      `Vue: warmup ${WARMUP_RUNS} rounds (unmeasured), ${SAMPLE_RUNS} measured samples...`,
+      `Vue: rows=${rowCount}, warmup ${warmupRuns} rounds (unmeasured), ${sampleRuns} measured samples...`,
     )
+
     const vueRoot = document.getElementById('vue-root')
     if (!vueRoot) {
       setLog('Missing Vue root in DOM.')
       return
     }
-    await runVueSamples(vueRoot, WARMUP_RUNS)
-    const samples = await runVueSamples(vueRoot, SAMPLE_RUNS)
+
+    await runSamples(warmupRuns, () => runVue(vueRoot))
+    const samples = await runSamples(sampleRuns, () => runVue(vueRoot))
     const summary = summarize('Vue@latest', samples)
+
     renderResults([summary])
     setLog('Vue done. Showing mount median + p90.')
     console.table([summary])
-  } catch (e) {
-    console.error(e)
-    setLog(`Vue benchmark failed: ${(e as Error).message}`)
-  } finally {
-    setButtonsDisabled(false)
-  }
+  })
 }
 
 const wire = (): void => {
@@ -334,7 +324,7 @@ const wire = (): void => {
     .then(() => {
       setButtonsDisabled(false)
       setLog(
-        `Ready. Initial-load benchmark with ${ROW_COUNT} rows, ${WARMUP_RUNS} warmups, ${SAMPLE_RUNS} samples.`,
+        `Ready. Initial-load benchmark with rows=${getRowCount()}, warmups=${getWarmupRuns()}, samples=${getSampleRuns()}.`,
       )
     })
     .catch((e) => {

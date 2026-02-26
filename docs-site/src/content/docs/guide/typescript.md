@@ -105,6 +105,6 @@ You can type `head` in class constructors and use runtime behavior flags intenti
 
 ## See Also
 
-1. [Components](./components)
-2. [createComponent API](../api/createComponent)
-3. [createApp API](../api/createApp)
+1. [Components](/guide/components)
+2. [createComponent API](/api/createComponent)
+3. [createApp API](/api/createApp)

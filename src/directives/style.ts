@@ -6,26 +6,36 @@ import { isArray, isString } from '../common/is-what'
 /**
  * @internal
  */
-export const styleDirective: Directive = {
-  onChange: (el: HTMLElement, values: any[], previousValues?: any[]) => {
-    // supports
-    // s1,s2,s3,s4
-    // [s1,s2],[s3,s4]...
-    // {k:v,...},{k:v,...}...
-    const len = values.length
-    for (let i = 0; i < len; ++i) {
-      const next = values[i]
-      const previous = previousValues?.[i]
-      if (isArray(next)) {
-        const len2 = next.length
-        for (let j = 0; j < len2; ++j) {
-          patchStyle(el, next[j], previous?.[j])
-        }
-      } else {
-        patchStyle(el, next, previous)
+const updateStyle = (
+  el: HTMLElement,
+  values: any[],
+  previousValues?: any[],
+): void => {
+  // supports
+  // s1,s2,s3,s4
+  // [s1,s2],[s3,s4]...
+  // {k:v,...},{k:v,...}...
+  const len = values.length
+  for (let i = 0; i < len; ++i) {
+    const next = values[i]
+    const previous = previousValues?.[i]
+    if (isArray(next)) {
+      const len2 = next.length
+      for (let j = 0; j < len2; ++j) {
+        patchStyle(el, next[j], previous?.[j])
       }
+    } else {
+      patchStyle(el, next, previous)
     }
-  },
+  }
+}
+
+export const styleDirective: Directive = {
+  mount: () => ({
+    update: ({ el, values, previousValues }) => {
+      updateStyle(el, values as any[], previousValues as any[] | undefined)
+    },
+  }),
 }
 
 // The following style patch logic is copied from vuejs/core.

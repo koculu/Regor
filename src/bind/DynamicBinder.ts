@@ -12,6 +12,8 @@ import { isNullOrWhitespace, isObject, isString } from '../common/is-what'
 import { type Binder } from './Binder'
 import { setSwitchOwner } from './switch'
 
+const noopStopObserving: StopObserving = () => {}
+
 const mount = (nodes: ChildNode[], parent: HTMLElement): void => {
   for (const x of nodes) {
     const node = x.cloneNode(true)
@@ -153,20 +155,15 @@ export class DynamicBinder {
       })
     }
 
-    const stopObserverList = [] as StopObserving[]
+    let stopObserver = noopStopObserving
     const unbinder = (): void => {
       parseResult.stop()
-      for (const stopObserver of stopObserverList) {
-        stopObserver()
-      }
-      stopObserverList.length = 0
+      stopObserver()
+      stopObserver = noopStopObserving
     }
     addUnbinder(commentBegin, unbinder)
 
     refresh()
-    const stopObserving = (
-      parseResult.subscribe ? parseResult.subscribe(refresh) : () => {}
-    ) as StopObserving
-    stopObserverList.push(stopObserving)
+    stopObserver = parseResult.subscribe(refresh)
   }
 }

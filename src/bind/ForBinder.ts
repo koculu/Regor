@@ -13,11 +13,14 @@ import { warning, WarningType } from '../log/warnings'
 import { sref } from '../reactivity/sref'
 import { unref } from '../reactivity/unref'
 import { type Binder } from './Binder'
+import { ForBinderFastPath } from './ForBinderFastPath'
+import { ForBinderKeyedDiff } from './ForBinderKeyedDiff'
 import { MountList } from './MountList'
 import { setSwitchOwner } from './switch'
 
 const forMarker = Symbol('r-for')
 const noIndexRef = ((_: number) => -1) as SRef<number>
+const noopStopObserving: StopObserving = () => {}
 
 /**
  * @internal
@@ -117,6 +120,7 @@ export class ForBinder {
     el.removeAttribute(nameKeyBind)
 
     const nodes = getNodes(el)
+    const fastPath = ForBinderFastPath.__create(this.__binder, nodes)
     const parent = el.parentNode as HTMLElement
     if (!parent) return
     const title = `${this.__for} => ${forPath}`
@@ -139,6 +143,7 @@ export class ForBinder {
       : undefined
     const getKey = this.__createKeyGetter(keyExpression)
     const areEqual = (a: any, b: any): boolean => getKey(a) === getKey(b)
+    const isSameValue = (a: unknown, b: unknown): boolean => a === b
     const mountNewValue = (
       i: number,
       newValue: any,
@@ -158,7 +163,8 @@ export class ForBinder {
           insertParent.insertBefore(node, nextSibling)
           childNodes.push(node)
         }
-        bindChildNodes(binder, childNodes)
+        if (fastPath) fastPath.__bind(binder, childNodes)
+        else bindChildNodes(binder, childNodes)
         start = start.nextSibling as ChildNode
         while (start !== nextSibling) {
           mountItem.items.push(start)
@@ -216,6 +222,40 @@ export class ForBinder {
         mountList.__removeAllAfter(0)
         return
       }
+      const iterableValues: unknown[] = []
+      for (const value of this.__getIterable(newValues[0])) {
+        iterableValues.push(value)
+      }
+
+      const patched = ForBinderKeyedDiff.__patch({
+        oldItems: mountList.__list,
+        newValues: iterableValues,
+        getKey,
+        isSameValue,
+        mountNewValue: (index, value, nextSibling) =>
+          mountNewValue(index, value, nextSibling),
+        removeMountItem: (item) => {
+          for (let k = 0; k < item.items.length; ++k) {
+            removeNode(item.items[k])
+          }
+        },
+        endAnchor: commentEnd,
+      })
+      if (patched) {
+        mountList.__list = patched
+        mountList.__valueMap.clear()
+        for (let k = 0; k < patched.length; ++k) {
+          const item = patched[k]
+          item.order = k
+          item.index(k)
+          const key = getKey(item.value)
+          if (key !== undefined) {
+            mountList.__valueMap.set(key, item)
+          }
+        }
+        return
+      }
+
       let i = 0
       let firstRemovalOrInsertionIndex = Number.MAX_SAFE_INTEGER
       // shouldGrowList defines maximum number of inserts
@@ -224,11 +264,15 @@ export class ForBinder {
       const forGrowThreshold = this.__binder.__config.forGrowThreshold
       const shouldGrowList = (): boolean =>
         mountList.__length < initialLength + forGrowThreshold
-      for (const newValue of this.__getIterable(newValues[0])) {
+      for (const newValue of iterableValues) {
         const modify = (): void => {
           if (i < len) {
             const mountItem = mountList.__get(i++)
-            if (areEqual(mountItem.value, newValue)) return
+            if (areEqual(mountItem.value, newValue)) {
+              if (isSameValue(mountItem.value, newValue)) return
+              replace(i - 1, newValue)
+              return
+            }
             const newValueMountPosition = mountList.__lookupValueOrderIfMounted(
               getKey(newValue),
             )
@@ -291,21 +335,16 @@ export class ForBinder {
       updateIndexes(firstRemovalOrInsertionIndex)
     }
 
-    const observeTailChanges = (): void => {
-      stopObserving = (
-        parseResult.subscribe ? parseResult.subscribe(updateDom) : () => {}
-      ) as StopObserving
-    }
-
     const unbinder = (): void => {
       parseResult.stop()
       stopObserving()
+      stopObserving = noopStopObserving
     }
 
     const parseResult = parser.__parse(config.list)
     const value = parseResult.value
 
-    let stopObserving: StopObserving
+    let stopObserving: StopObserving = noopStopObserving
 
     let i = 0
     const mountList = new MountList(getKey)
@@ -313,7 +352,7 @@ export class ForBinder {
       mountList.__push(mountNewValue(i++, item, commentEnd))
     }
     addUnbinder(commentBegin, unbinder)
-    observeTailChanges()
+    stopObserving = parseResult.subscribe(updateDom)
   }
 
   static __forPathRegex =

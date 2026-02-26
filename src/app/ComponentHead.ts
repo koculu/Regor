@@ -13,8 +13,9 @@ import { callUnmounted } from '../composition/callUnmounted'
  *
  * Typical usage:
  * ```ts
- * const Card = createComponent({
- *   template: `<article><h3 r-text="title"></h3></article>`,
+ * const Card = createComponent(
+ *  `<article><h3 r-text="title"></h3></article>`,
+ *  {
  *   props: ['title'],
  *   context(head) {
  *     // read parent values

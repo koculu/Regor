@@ -92,6 +92,6 @@ Use in-place mode whenever markup is already present and you only need reactive 
 
 ## See Also
 
-1. [Guide: Components](./components)
-2. [Guide: Lifecycle and Cleanup](./lifecycle-and-cleanup)
-3. [Performance Guide](./performance)
+1. [Guide: Components](/guide/components)
+2. [Guide: Lifecycle and Cleanup](/guide/lifecycle-and-cleanup)
+3. [Performance Guide](/guide/performance)

@@ -46,48 +46,61 @@ function includeBooleanAttr(value: unknown): boolean {
 /**
  * @internal
  */
-export const attrDirective: Directive = {
-  onChange: (
-    el: HTMLElement,
-    values: any[],
-    previousValues?: any[],
-    option?: any,
-    previousOption?: any,
-    flags?: string[],
-  ) => {
-    if (option) {
-      if (flags && flags.includes('camel')) option = camelize(option)
-      patchAttribute(el, option, values[0], previousOption)
-      return
-    }
-    // supports
-    // k,v,k,v
-    // [k,v],[k,v]...
-    // {k,v},{k,v}...
-    const len = values.length
-    for (let i = 0; i < len; ++i) {
-      const next = values[i]
-      if (isArray(next)) {
-        const previousKey = previousValues?.[i]?.[0]
-        const key = next[0]
-        const value = next[1]
-        patchAttribute(el, key, value, previousKey)
-      } else if (isObject(next)) {
-        for (const item of Object.entries(next)) {
-          const key = item[0]
-          const value = item[1]
-          const p = previousValues?.[i]
-          const previousKey = p && key in p ? key : undefined
-          patchAttribute(el, key, value, previousKey)
-        }
-      } else {
-        const previousKey = previousValues?.[i]
-        const key = values[i++]
-        const value = values[i]
+const updateAttr = (
+  el: HTMLElement,
+  values: any[],
+  previousValues?: any[],
+  option?: any,
+  previousOption?: any,
+  flags?: string[],
+): void => {
+  if (option) {
+    if (flags && flags.includes('camel')) option = camelize(option as string)
+    patchAttribute(el, option as string, values[0], previousOption as string)
+    return
+  }
+  // supports
+  // k,v,k,v
+  // [k,v],[k,v]...
+  // {k,v},{k,v}...
+  const len = values.length
+  for (let i = 0; i < len; ++i) {
+    const next = values[i]
+    if (isArray(next)) {
+      const previousKey = previousValues?.[i]?.[0]
+      const key = next[0]
+      const value = next[1]
+      patchAttribute(el, key, value, previousKey)
+    } else if (isObject(next)) {
+      for (const item of Object.entries(next)) {
+        const key = item[0]
+        const value = item[1]
+        const p = previousValues?.[i]
+        const previousKey = p && key in p ? key : undefined
         patchAttribute(el, key, value, previousKey)
       }
+    } else {
+      const previousKey = previousValues?.[i]
+      const key = values[i++]
+      const value = values[i]
+      patchAttribute(el, key, value, previousKey)
     }
-  },
+  }
+}
+
+export const attrDirective: Directive = {
+  mount: () => ({
+    update: ({ el, values, previousValues, option, previousOption, flags }) => {
+      updateAttr(
+        el,
+        values as any[],
+        previousValues as any[] | undefined,
+        option,
+        previousOption,
+        flags,
+      )
+    },
+  }),
 }
 
 const patchAttribute = (

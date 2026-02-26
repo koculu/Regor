@@ -169,34 +169,38 @@ export type IsLazy = (i: number, d: number) => boolean
 
 export type IsLazyKey = (key: string, d: number) => boolean
 
+export interface DirectiveUpdatePayload {
+  el: HTMLElement
+  expr: string
+  values: unknown[]
+  previousValues?: unknown[]
+  option?: unknown
+  previousOption?: unknown
+  flags?: string[]
+  parseResult: ParseResult
+  dynamicOption?: ParseResult
+}
+
+export interface MountedDirective {
+  update?: (payload: DirectiveUpdatePayload) => void
+  unmount?: Unbinder
+}
+
 export interface Directive {
   isLazy?: IsLazy
   isLazyKey?: IsLazyKey
   collectRefObj?: boolean
 
-  /** if once is enabled, the onChange is never triggered.
-   * The refs in parseResult are still reactive. */
+  /** If once is enabled, updates are not re-triggered after initial mount. */
   once?: boolean
 
-  /** Called on every value change. */
-  onChange?: (
-    el: HTMLElement,
-    values: unknown[],
-    previousValues?: unknown[],
-    option?: unknown,
-    previousOption?: unknown,
-    flags?: string[],
-  ) => void
-
-  /** Called on binding. Returns unbinder.  */
-  onBind?: (
-    el: HTMLElement,
-    parseResult: ParseResult,
-    expr: string,
-    option?: string,
-    dynamicOption?: ParseResult,
-    flags?: string[],
-  ) => Unbinder
+  /**
+   * Called once at bind time.
+   * Returns either:
+   * - unmount function
+   * - mounted object with `update` and/or `unmount`
+   */
+  mount: (payload: DirectiveUpdatePayload) => Unbinder | MountedDirective | void
 }
 
 export interface BindData {
@@ -207,9 +211,9 @@ export interface BindData {
 export type Unbinder = () => void
 
 export interface ParseResult {
-  value: SRef<unknown[]>
+  value: () => unknown[]
   stop: StopObserving
-  subscribe?: (
+  subscribe: (
     observer: ObserveCallback<unknown[]>,
     init?: boolean,
   ) => StopObserving

@@ -6,8 +6,8 @@ sidebar:
 hero:
   title: "Reactive UI without framework lock-in"
   tagline: |
-    Regor gives you direct DOM control, strong reactivity primitives,
-    and runtime-first flexibility for real applications.
+    Regor gives you direct DOM binding, precise reactivity primitives,
+    and TypeScript-native workflows for real applications.
   image:
     file: ../../assets/regor-logo.svg
   actions:
@@ -31,10 +31,10 @@ Regor is a modern reactive UI library for teams that want **power and control** 
 
 It supports:
 
-1. Runtime binding over existing markup.
-2. Fine-grained reactive primitives (`ref`, `sref`, computed, observers).
-3. Component and context models that stay flexible.
-4. Direct JavaScript/DOM escape hatches where performance or integration requires it.
+1. Direct DOM binding over existing markup (no Virtual DOM dependency).
+2. Fine-grained reactive primitives (`ref`, `sref`, `computed`, `observe`, `batch`, `pause`, `resume`, `entangle`).
+3. Component and context models that stay flexible in mixed rendering stacks.
+4. Build-less and CSP-friendly runtime workflows when deployment constraints require them.
 
 <CardGrid stagger>
   <Card title="Runtime-First" icon="rocket">
@@ -42,7 +42,7 @@ It supports:
   </Card>
 
   <Card title="Strong Reactivity Core" icon="random">
-    Use `ref`, `sref`, `computed`, `watchEffect`, observers, and batch updates to model state precisely.
+    Use `ref`, `sref`, `computed`, `watchEffect`, observers, batch updates, and pause/resume controls to model state precisely.
   </Card>
 
   <Card title="Directive Power" icon="list-format">
@@ -62,7 +62,7 @@ It supports:
   </Card>
 
   <Card title="Progressive Enhancement" icon="star">
-    Adopt Regor incrementally in legacy or mixed-stack applications.
+    Adopt Regor incrementally in legacy or mixed-stack applications, including static-first pages with dynamic islands.
   </Card>
 
   <Card title="Library-Friendly" icon="puzzle">

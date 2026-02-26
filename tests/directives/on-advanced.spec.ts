@@ -2,6 +2,7 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
 import { attachEventListener, onDirective } from '../../src/directives/on'
 import { warningHandler } from '../../src/log/warnings'
+import { bindDirective } from '../directive-test-utils'
 
 const makeParseResult = (values: unknown[]) =>
   ({
@@ -132,7 +133,8 @@ test('onDirective supports dynamic event option', () => {
   const parseResult = makeParseResult([click, 'prevent'])
   const dynamicOption = makeParseResult(['click'])
 
-  const unbind = onDirective.onBind!(
+  const unbind = bindDirective(
+    onDirective,
     el,
     parseResult,
     'expr',
@@ -151,7 +153,7 @@ test('onDirective warns when object syntax receives non-object value', () => {
   const el = document.createElement('button')
   const parseResult = makeParseResult([123])
 
-  const unbind = onDirective.onBind!(el, parseResult, 'expr')
+  const unbind = bindDirective(onDirective, el, parseResult, 'expr')
   unbind()
 
   expect(warningHandler.warning).toHaveBeenCalled()
@@ -167,7 +169,7 @@ test('onDirective object syntax binds handlers and per-event flags', () => {
     }),
   ])
 
-  const unbind = onDirective.onBind!(el, parseResult, 'expr')
+  const unbind = bindDirective(onDirective, el, parseResult, 'expr')
   el.dispatchEvent(new MouseEvent('click'))
   el.dispatchEvent(new MouseEvent('click'))
   unbind()
@@ -204,7 +206,8 @@ test('onDirective dynamic option ignores non-string event type', () => {
   const parseResult = makeParseResult([click, 'prevent'])
   const dynamicOption = makeParseResult([123])
 
-  const unbind = onDirective.onBind!(
+  const unbind = bindDirective(
+    onDirective,
     el,
     parseResult,
     'expr',
@@ -251,7 +254,7 @@ test('onDirective static option reads flags from parse result when none provided
   const el = document.createElement('button')
   const click = vi.fn()
   const parseResult = makeParseResult([click, 'prevent'])
-  const unbind = onDirective.onBind!(el, parseResult, 'expr', 'click')
+  const unbind = bindDirective(onDirective, el, parseResult, 'expr', 'click')
 
   const ev = new MouseEvent('click', { cancelable: true })
   el.dispatchEvent(ev)
@@ -270,7 +273,7 @@ test('onDirective object syntax supports direct object values', () => {
     },
   ])
 
-  onDirective.onBind!(el, parseResult, 'expr')
+  bindDirective(onDirective, el, parseResult, 'expr')
   el.dispatchEvent(new MouseEvent('click'))
 
   expect(click).toHaveBeenCalledTimes(1)

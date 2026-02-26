@@ -20,10 +20,10 @@ import { toJsonTemplate } from './toJsonTemplate'
  * component instance in the app.
  *
  * @typeParam TContext - Component context type.
- * @param template Component template source:
+ * @param template - Component template source:
  * - inline HTML string
  * - `Template` object (`template`, `element`, `selector`, or `json`)
- * @param options Component options (`context`, `props`, `inheritAttrs`, etc.).
+ * @param options - Component options (`context`, `props`, `inheritAttrs`, etc.).
  * You can also pass `string[]` as shorthand for `props`.
  *
  * @returns Component definition usable in app/component `components`.

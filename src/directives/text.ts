@@ -5,17 +5,23 @@ import { flatten } from '../misc/flatten'
 /**
  * @internal
  */
-export const textDirective: Directive = {
-  onChange: (el: HTMLElement, values: any[]) => {
-    const value = values[0]
-    // https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent#differences_from_innertext
-    // Note: order is important: [isSet,isMap] should come before [isObject].
-    el.textContent = isSet(value)
+const updateText = (el: HTMLElement, values: unknown[]): void => {
+  const value = values[0]
+  // https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent#differences_from_innertext
+  // Note: order is important: [isSet,isMap] should come before [isObject].
+  el.textContent = isSet(value)
+    ? JSON.stringify(flatten([...value]))
+    : isMap(value)
       ? JSON.stringify(flatten([...value]))
-      : isMap(value)
-        ? JSON.stringify(flatten([...value]))
-        : isObject(value)
-          ? JSON.stringify(flatten(value))
-          : (value?.toString() ?? '')
-  },
+      : isObject(value)
+        ? JSON.stringify(flatten(value))
+        : (value?.toString() ?? '')
+}
+
+export const textDirective: Directive = {
+  mount: () => ({
+    update: ({ el, values }) => {
+      updateText(el, values)
+    },
+  }),
 }
