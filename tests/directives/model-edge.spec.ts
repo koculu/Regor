@@ -4,6 +4,7 @@ import { type ParseResult, type SRef } from '../../src/api/types'
 import { modelDirective } from '../../src/directives/model'
 import { warningHandler } from '../../src/log/warnings'
 import { ref } from '../../src/reactivity/ref'
+import { bindDirective, updateDirective } from '../directive-test-utils'
 
 const makeParseResult = (
   refs: any[],
@@ -16,10 +17,35 @@ const makeParseResult = (
   ;(value as any).value = getValue()
   return {
     value,
+    subscribe: () => () => {},
     stop: () => {},
     refs,
     context: {},
   }
+}
+
+const updateModel = (
+  el: HTMLElement,
+  value: unknown,
+  flags: unknown = '',
+): void => {
+  let modelValue = value
+  const modelRef = function (nextValue?: unknown) {
+    if (arguments.length === 0) return modelValue
+    modelValue = nextValue
+    return modelValue
+  } as any
+  const parseResult = makeParseResult([modelRef], () => [modelRef(), flags])
+  updateDirective(
+    modelDirective,
+    el,
+    [value],
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    parseResult,
+  )
 }
 
 test('model number parser returns early for trailing decimal when value is unchanged', () => {
@@ -33,7 +59,7 @@ test('model number parser returns early for trailing decimal when value is uncha
   } as any
   const input = document.createElement('input')
   const parseResult = makeParseResult([modelRef], () => [modelRef(), 'number'])
-  modelDirective.onBind!(input, parseResult, 'expr')
+  bindDirective(modelDirective, input, parseResult, 'expr')
 
   input.value = '1.'
   input.dispatchEvent(new Event('input'))
@@ -51,7 +77,7 @@ test('model number parser handles invalid trailing decimal values', () => {
   } as any
   const input = document.createElement('input')
   const parseResult = makeParseResult([modelRef], () => [modelRef(), 'number'])
-  modelDirective.onBind!(input, parseResult, 'expr')
+  bindDirective(modelDirective, input, parseResult, 'expr')
 
   input.value = 'x.'
   input.dispatchEvent(new Event('input'))
@@ -69,7 +95,7 @@ test('model number parser trailing decimal executes non-NaN branch', () => {
   } as any
   const input = document.createElement('input')
   const parseResult = makeParseResult([modelRef], () => [modelRef(), 'number'])
-  modelDirective.onBind!(input, parseResult, 'expr')
+  bindDirective(modelDirective, input, parseResult, 'expr')
 
   input.value = '1.'
   input.dispatchEvent(new Event('input'))
@@ -87,7 +113,7 @@ test('model checkbox set binding adds and deletes values', () => {
     return v
   } as any
   const parseResult = makeParseResult([modelRef], () => [modelRef(), ''])
-  modelDirective.onBind!(input, parseResult, 'expr')
+  bindDirective(modelDirective, input, parseResult, 'expr')
 
   input.checked = true
   input.dispatchEvent(new Event('change'))
@@ -108,7 +134,7 @@ test('model checkbox array binding noops when checked value is already present',
     return v
   } as any
   const parseResult = makeParseResult([modelRef], () => [modelRef(), ''])
-  modelDirective.onBind!(input, parseResult, 'expr')
+  bindDirective(modelDirective, input, parseResult, 'expr')
 
   input.checked = true
   input.dispatchEvent(new Event('change'))
@@ -134,8 +160,8 @@ test('model radio/select listeners noop after model ref is removed', () => {
   const radioResult = makeParseResult([modelRef], () => [modelRef(), ''])
   const selectResult = makeParseResult([modelRef], () => [modelRef(), ''])
 
-  modelDirective.onBind!(radio, radioResult, 'expr')
-  modelDirective.onBind!(select, selectResult, 'expr')
+  bindDirective(modelDirective, radio, radioResult, 'expr')
+  bindDirective(modelDirective, select, selectResult, 'expr')
 
   radioResult.refs[0] = undefined
   selectResult.refs[0] = undefined
@@ -154,7 +180,7 @@ test('model input unbinder removes composition and input listeners', () => {
   } as any
   const input = document.createElement('input')
   const parseResult = makeParseResult([modelRef], () => [modelRef(), 'trim'])
-  const unbind = modelDirective.onBind!(input, parseResult, 'expr')
+  const unbind = bindDirective(modelDirective, input, parseResult, 'expr')
 
   unbind()
   input.value = ' next '
@@ -171,7 +197,7 @@ test('model checkbox fallback value and attr-based true/false values are support
   input.type = 'checkbox'
   const model = ref<any>('seed')
   const parseResult = makeParseResult([model], () => [model(), ''])
-  modelDirective.onBind!(input, parseResult, 'expr')
+  bindDirective(modelDirective, input, parseResult, 'expr')
 
   input.checked = true
   input.dispatchEvent(new Event('change'))
@@ -193,7 +219,7 @@ test('model checkbox fallback value and attr-based true/false values are support
 
   input.removeAttribute('true-value')
   input.removeAttribute('false-value')
-  modelDirective.onChange!(input, [true])
+  updateModel(input, true)
   expect(input.checked).toBe(true)
 })
 
@@ -206,7 +232,7 @@ test('model input composition handlers and trimmer execute expected branches', (
   } as any
   const input = document.createElement('input')
   const parseResult = makeParseResult([modelRef], () => [modelRef(), 'trim'])
-  modelDirective.onBind!(input, parseResult, 'expr')
+  bindDirective(modelDirective, input, parseResult, 'expr')
 
   input.value = '  keep  '
   input.dispatchEvent(new Event('change'))
@@ -226,7 +252,7 @@ test('model checkbox unbind removes listener', () => {
   input.type = 'checkbox'
   const model = ref<any>(false)
   const parseResult = makeParseResult([model], () => [model(), ''])
-  const unbind = modelDirective.onBind!(input, parseResult, 'expr')
+  const unbind = bindDirective(modelDirective, input, parseResult, 'expr')
   unbind()
 
   input.checked = true
@@ -238,13 +264,13 @@ test('model onChange covers radio, checkbox-set and select-multiple array branch
   const radio = document.createElement('input')
   radio.type = 'radio'
   radio.value = 'r'
-  modelDirective.onChange!(radio, ['r'])
+  updateModel(radio, 'r')
   expect(radio.checked).toBe(true)
 
   const checkbox = document.createElement('input')
   checkbox.type = 'checkbox'
   checkbox.value = 'x'
-  modelDirective.onChange!(checkbox, [new Set(['x'])])
+  updateModel(checkbox, new Set(['x']))
   expect(checkbox.checked).toBe(true)
 
   const select = document.createElement('select')
@@ -255,7 +281,7 @@ test('model onChange covers radio, checkbox-set and select-multiple array branch
   b.value = 'b'
   select.appendChild(a)
   select.appendChild(b)
-  modelDirective.onChange!(select, [['b']])
+  updateModel(select, ['b'])
   expect(a.selected).toBe(false)
   expect(b.selected).toBe(true)
 })
@@ -272,7 +298,7 @@ test('model onBind handles object flags and unsupported element branch', () => {
     modelRef(),
     { trim: true },
   ])
-  modelDirective.onBind!(input, parseResult, 'expr')
+  bindDirective(modelDirective, input, parseResult, 'expr')
 
   input.value = '  x  '
   input.dispatchEvent(new Event('input'))
@@ -284,7 +310,7 @@ test('model onBind handles object flags and unsupported element branch', () => {
     .spyOn(warningHandler, 'warning')
     .mockImplementation(() => undefined)
   try {
-    const unbind = modelDirective.onBind!(div, parse2, 'expr')
+    const unbind = bindDirective(modelDirective, div, parse2, 'expr')
     expect(typeof unbind).toBe('function')
     expect(() => unbind()).not.toThrow()
   } finally {
@@ -304,7 +330,7 @@ test('model getFlags resolves ref and function flags', () => {
     modelRef(),
     ref(() => ({ trim: true })),
   ])
-  modelDirective.onBind!(input, parseResult, 'expr')
+  bindDirective(modelDirective, input, parseResult, 'expr')
 
   input.value = '  x  '
   input.dispatchEvent(new Event('input'))
@@ -321,7 +347,7 @@ test('model input and checkbox listeners return early when model ref is removed'
 
   const input = document.createElement('input')
   const inputResult = makeParseResult([modelRef], () => [modelRef(), ''])
-  modelDirective.onBind!(input, inputResult, 'expr')
+  bindDirective(modelDirective, input, inputResult, 'expr')
   inputResult.refs[0] = undefined
   input.value = 'next'
   input.dispatchEvent(new Event('input'))
@@ -331,7 +357,7 @@ test('model input and checkbox listeners return early when model ref is removed'
   checkbox.type = 'checkbox'
   checkbox.value = 'x'
   const boxResult = makeParseResult([modelRef], () => [modelRef(), ''])
-  modelDirective.onBind!(checkbox, boxResult, 'expr')
+  bindDirective(modelDirective, checkbox, boxResult, 'expr')
   boxResult.refs[0] = undefined
   checkbox.checked = true
   checkbox.dispatchEvent(new Event('change'))
@@ -345,7 +371,7 @@ test('model reads _value payloads and select number flag converts selected value
   radio.type = 'radio'
   radio.value = 'fallback'
   radio._value = { id: 1 }
-  modelDirective.onChange!(radio, [{ id: 1 }])
+  updateModel(radio, { id: 1 })
   expect(radio.checked).toBe(true)
 
   const select = document.createElement('select')
@@ -365,7 +391,7 @@ test('model reads _value payloads and select number flag converts selected value
 
   const model = ref<any>('init')
   const parseResult = makeParseResult([model], () => [model(), 'number'])
-  modelDirective.onBind!(select, parseResult, 'expr')
+  bindDirective(modelDirective, select, parseResult, 'expr')
   select.dispatchEvent(new Event('change'))
 
   const selected = model() as any[]
@@ -385,6 +411,6 @@ test('model onChange keeps selectedIndex when single-select already points to ma
   select.appendChild(b)
 
   expect(select.selectedIndex).toBe(1)
-  modelDirective.onChange!(select, ['b'])
+  updateModel(select, 'b')
   expect(select.selectedIndex).toBe(1)
 })

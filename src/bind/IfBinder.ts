@@ -18,6 +18,7 @@ interface CollectedElses {
   isTrue: () => boolean
   isMounted: boolean
 }
+const noopStopObserving: StopObserving = () => {}
 const mount = (
   nodes: ChildNode[],
   binder: Binder,
@@ -182,20 +183,15 @@ export class IfBinder {
       const value = parseResult.value
       const remainingElses = this.__collectElses(nextElement, refresh)
 
-      const stopObserverList = [] as StopObserving[]
+      let stopObserver = noopStopObserving
       const unbinder = (): void => {
         parseResult.stop()
-        for (const stopObserver of stopObserverList) {
-          stopObserver()
-        }
-        stopObserverList.length = 0
+        stopObserver()
+        stopObserver = noopStopObserving
       }
       addUnbinder(commentBegin, unbinder)
 
-      const stopObserving = (
-        parseResult.subscribe ? parseResult.subscribe(refresh) : () => {}
-      ) as StopObserving
-      stopObserverList.push(stopObserving)
+      stopObserver = parseResult.subscribe(refresh)
 
       return [
         {
@@ -208,7 +204,8 @@ export class IfBinder {
           isTrue: () => !!value()[0],
           isMounted: false,
         },
-      ].concat(remainingElses)
+        ...remainingElses,
+      ]
     }
   }
 
@@ -258,20 +255,15 @@ export class IfBinder {
 
     const collectedElses = this.__collectElses(nextElement, refresh)
 
-    const stopObserverList = [] as StopObserving[]
+    let stopObserver = noopStopObserving
     const unbinder = (): void => {
       parseResult.stop()
-      for (const stopObserver of stopObserverList) {
-        stopObserver()
-      }
-      stopObserverList.length = 0
+      stopObserver()
+      stopObserver = noopStopObserving
     }
     addUnbinder(commentBegin, unbinder)
 
     refresh()
-    const stopObserving = (
-      parseResult.subscribe ? parseResult.subscribe(refresh) : () => {}
-    ) as StopObserving
-    stopObserverList.push(stopObserving)
+    stopObserver = parseResult.subscribe(refresh)
   }
 }

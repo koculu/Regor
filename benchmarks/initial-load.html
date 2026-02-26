@@ -11,6 +11,7 @@
         --fg: #e5e7eb;
         --muted: #9ca3af;
         --accent: #22c55e;
+        --winner: #4ade80;
       }
       body {
         margin: 0;
@@ -60,6 +61,10 @@
         padding: 8px;
         text-align: left;
       }
+      #results .winner-metric {
+        color: var(--winner);
+        font-weight: 700;
+      }
       .roots {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -89,6 +94,35 @@
         <button id="run-regor">Run Regor</button>
         <button id="run-vue">Run Vue</button>
         <button id="run">Run Both</button>
+        <label style="margin-left: 12px; color: var(--muted)">
+          Row count
+          <select id="row-count">
+            <option value="500" selected>500</option>
+            <option value="1000">1000</option>
+            <option value="2000">2000</option>
+            <option value="5000">5000</option>
+          </select>
+        </label>
+        <label style="margin-left: 12px; color: var(--muted)">
+          Warmups
+          <select id="warmup-runs">
+            <option value="0">0</option>
+            <option value="2">2</option>
+            <option value="4">4</option>
+            <option value="6" selected>6</option>
+            <option value="10">10</option>
+          </select>
+        </label>
+        <label style="margin-left: 12px; color: var(--muted)">
+          Samples
+          <select id="sample-runs">
+            <option value="1">1</option>
+            <option value="10">10</option>
+            <option value="20" selected>20</option>
+            <option value="30">30</option>
+            <option value="50">50</option>
+          </select>
+        </label>
         <table id="results">
           <thead>
             <tr>

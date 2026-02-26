@@ -75,7 +75,10 @@ test('style mapping: r-style is an alias of :style', () => {
     },
     {
       element: root,
-      template: html`<div id="x" r-style="{ color: colorRef, padding: padRef }"></div>`,
+      template: html`<div
+        id="x"
+        r-style="{ color: colorRef, padding: padRef }"
+      ></div>`,
     },
   )
 

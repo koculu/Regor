@@ -4,26 +4,36 @@ import { isArray, isString } from '../common/is-what'
 /**
  * @internal
  */
-export const classDirective: Directive = {
-  onChange: (el: HTMLElement, values: any[], previousValues?: any[]) => {
-    // supports
-    // s1,s2,s3,s4
-    // [s1,s2],[s3,s4]...
-    // {k:v,...},{k:v,...}...
-    const len = values.length
-    for (let i = 0; i < len; ++i) {
-      const next = values[i]
-      const previous = previousValues?.[i]
-      if (isArray(next)) {
-        const len2 = next.length
-        for (let j = 0; j < len2; ++j) {
-          patchClass(el, next[j], previous?.[j])
-        }
-      } else {
-        patchClass(el, next, previous)
+const updateClass = (
+  el: HTMLElement,
+  values: any[],
+  previousValues?: any[],
+): void => {
+  // supports
+  // s1,s2,s3,s4
+  // [s1,s2],[s3,s4]...
+  // {k:v,...},{k:v,...}...
+  const len = values.length
+  for (let i = 0; i < len; ++i) {
+    const next = values[i]
+    const previous = previousValues?.[i]
+    if (isArray(next)) {
+      const len2 = next.length
+      for (let j = 0; j < len2; ++j) {
+        patchClass(el, next[j], previous?.[j])
       }
+    } else {
+      patchClass(el, next, previous)
     }
-  },
+  }
+}
+
+export const classDirective: Directive = {
+  mount: () => ({
+    update: ({ el, values, previousValues }) => {
+      updateClass(el, values as any[], previousValues as any[] | undefined)
+    },
+  }),
 }
 
 type Class = string | Record<string, string | string[]> | null

@@ -473,6 +473,7 @@ class MiniNamedNodeMapImpl implements MiniNamedNodeMap {
 
 class MiniElement extends MiniNode {
   tagName: string
+  private __cachedTagNameLower?: string
   namespaceURI: string | null = null
   private attributeMap = new Map<string, string>()
   private _attributes?: MiniNamedNodeMap
@@ -487,6 +488,19 @@ class MiniElement extends MiniNode {
   constructor(tagName: string) {
     super(NodeType.ELEMENT_NODE)
     this.tagName = tagName.toUpperCase()
+  }
+
+  get __tagNameLower(): string {
+    let lower = this.__cachedTagNameLower
+    if (lower === undefined) {
+      lower = this.tagName.toLowerCase()
+      this.__cachedTagNameLower = lower
+    }
+    return lower
+  }
+
+  isTagNameLower(lowerTagName: string): boolean {
+    return this.__tagNameLower === lowerTagName
   }
 
   get attributes(): MiniNamedNodeMap {
@@ -825,10 +839,9 @@ class MiniElement extends MiniNode {
       }
       return clone
     }
-    const clone =
-      this.tagName.toLowerCase() === 'slot'
-        ? new MiniHTMLSlotElement()
-        : new MiniHTMLElement(this.tagName)
+    const clone = this.isTagNameLower('slot')
+      ? new MiniHTMLSlotElement()
+      : new MiniHTMLElement(this.tagName)
     clone.namespaceURI = this.namespaceURI
     clone._ownerDocument = this.ownerDocument
     copyElementAttributes(this, clone)
@@ -1408,9 +1421,8 @@ function parseClosingTag(
   for (let i = stack.length - 1; i > 0; i -= 1) {
     const node = stack[i].node
     if (!(node instanceof MiniElement)) continue
-    const name = node.tagName.toLowerCase()
     stack.pop()
-    if (name === tagName) break
+    if (node.isTagNameLower(tagName)) break
   }
   return closeEnd === -1 ? html.length : closeEnd + 1
 }
@@ -1584,7 +1596,7 @@ function serializeNode(node: MiniNode, rawText = false): string {
     return `<template${attrs}>${content}</template>`
   }
   if (node instanceof MiniElement) {
-    const tag = node.tagName.toLowerCase()
+    const tag = node.__tagNameLower
     const attrs = serializeAttributes(node)
     const isRaw = RAW_TEXT_ELEMENTS.has(tag)
     const children = node.childNodes
@@ -1695,13 +1707,13 @@ function toFastSelector(chain: SelectorStep[]): FastSelector | null {
 
 function matchesFastSelector(el: MiniElement, fast: FastSelector) {
   if (fast.kind === 'any') return true
-  if (fast.kind === 'tag') return el.tagName.toLowerCase() === fast.tag
+  if (fast.kind === 'tag') return el.isTagNameLower(fast.tag)
   if (fast.kind === 'attr') {
     if (!el.hasAttribute(fast.name)) return false
     if (fast.value === undefined) return true
     return el.getAttribute(fast.name) === fast.value
   }
-  if (el.tagName.toLowerCase() !== fast.tag) return false
+  if (!el.isTagNameLower(fast.tag)) return false
   if (!el.hasAttribute(fast.name)) return false
   if (fast.value === undefined) return true
   return el.getAttribute(fast.name) === fast.value
@@ -1765,37 +1777,42 @@ function querySelectorAllFrom(
   }
   const compiledSelectors = getCompiledSelectors(rawSelector)
   if (compiledSelectors.length === 0) return []
+  const shouldFilterTemplate = filterTemplates && rawSelector === 'template'
+  const isTemplateVisible = (el: MiniElement): boolean => {
+    if (!el.isTagNameLower('template')) return true
+    if (el.hasAttribute('name')) return false
+    const attrs = el.attributes
+    for (let i = 0; i < attrs.length; ++i) {
+      const name = attrs.item(i)?.name
+      if (name?.startsWith('#')) return false
+    }
+    return true
+  }
   const results: MiniElement[] = []
   if (compiledSelectors.length === 1) {
     const compiled = compiledSelectors[0]
     forEachElement(root, (el) => {
-      if (matchesCompiledSelector(el, compiled)) results.push(el)
-      return false
-    })
-  } else {
-    forEachElement(root, (el) => {
       if (
-        compiledSelectors.some((compiled) =>
-          matchesCompiledSelector(el, compiled),
-        )
+        matchesCompiledSelector(el, compiled) &&
+        (!shouldFilterTemplate || isTemplateVisible(el))
       ) {
         results.push(el)
       }
       return false
     })
-  }
-  let output = results
-  if (filterTemplates && rawSelector === 'template') {
-    output = results.filter((el) => {
-      if (el.tagName.toLowerCase() !== 'template') return true
-      if (el.hasAttribute('name')) return false
-      const hasNamedSlot = el
-        .getAttributeNames()
-        .some((name) => name.startsWith('#'))
-      return !hasNamedSlot
+  } else {
+    forEachElement(root, (el) => {
+      for (let i = 0; i < compiledSelectors.length; ++i) {
+        if (!matchesCompiledSelector(el, compiledSelectors[i])) continue
+        if (!shouldFilterTemplate || isTemplateVisible(el)) {
+          results.push(el)
+        }
+        break
+      }
+      return false
     })
   }
-  return output
+  return results
 }
 
 function forEachElement(
@@ -1803,9 +1820,11 @@ function forEachElement(
   iteratee: (el: MiniElement) => boolean,
 ) {
   const stack: MiniNode[] = []
+  let size = 0
   const pushChildren = (node: MiniNode) => {
-    for (let i = node.childNodes.length - 1; i >= 0; i -= 1) {
-      stack.push(node.childNodes[i])
+    const children = node.childNodes
+    for (let i = children.length - 1; i >= 0; i -= 1) {
+      stack[size++] = children[i]
     }
   }
   if (root instanceof MiniDocument || root instanceof MiniDocumentFragment) {
@@ -1814,13 +1833,12 @@ function forEachElement(
     pushChildren(root)
   }
 
-  while (stack.length > 0) {
-    const node = stack.pop()
+  while (size > 0) {
+    const node = stack[--size]
     if (!(node instanceof MiniElement)) continue
     if (iteratee(node)) return
-    if (!(node instanceof MiniHTMLTemplateElement)) {
-      pushChildren(node)
-    }
+    if (node instanceof MiniHTMLTemplateElement) continue
+    pushChildren(node)
   }
 }
 
@@ -2045,7 +2063,7 @@ function matchesSelectorPart(el: MiniElement, part: SelectorPart) {
 
 function matchesSelectorPartBasic(el: MiniElement, part: SelectorPart) {
   const tag = part.tag
-  if (tag && tag !== '*' && el.tagName.toLowerCase() !== tag) return false
+  if (tag && tag !== '*' && !el.isTagNameLower(tag)) return false
   if (part.id) {
     const id = el.getAttribute('id')
     if (id !== part.id) return false

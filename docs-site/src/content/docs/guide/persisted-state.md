@@ -108,6 +108,6 @@ Avoid collisions across islands/features.
 
 ## See Also
 
-1. [API: persist](../api/persist)
-2. [Guide: Mounting](./mounting)
-3. [Guide: Reactivity](./reactivity)
+1. [API: persist](/api/persist)
+2. [Guide: Mounting](/guide/mounting)
+3. [Guide: Reactivity](/guide/reactivity)

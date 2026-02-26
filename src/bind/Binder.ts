@@ -1,4 +1,9 @@
-import type { Directive, ParseResult, StopObserving } from '../api/types'
+import type {
+  Directive,
+  DirectiveUpdatePayload,
+  ParseResult,
+  StopObserving,
+} from '../api/types'
 import { type RegorConfig } from '../app/RegorConfig'
 import { addUnbinder } from '../cleanup/addUnbinder'
 import { removeNode } from '../cleanup/removeNode'
@@ -163,108 +168,151 @@ export class Binder {
   ): void {
     if (el.nodeType !== Node.ELEMENT_NODE || valueExpression == null) return
     if (this.__handleTeleport(config, el, valueExpression)) return
-    const result = this.__parser.__parse(
+
+    const dynamicOption = this.__parseDynamicOption(option, config.once)
+    const result = this.__parseExpression(config, valueExpression)
+
+    const stops = this.__createBindStops(result, dynamicOption)
+    addUnbinder(el, stops.stop)
+
+    const payload = this.__createDirectivePayload(
+      el,
+      valueExpression,
+      result,
+      dynamicOption,
+      option,
+      flags,
+    )
+
+    const mountedUpdate = this.__mountDirective(config, payload, stops)
+    if (!mountedUpdate) return
+
+    const emitChange = this.__createEmitter(
+      payload,
+      result,
+      dynamicOption,
+      option,
+      mountedUpdate,
+    )
+    emitChange()
+    if (!config.once) {
+      stops.result = result.subscribe(emitChange)
+      if (dynamicOption) {
+        stops.dynamic = dynamicOption.subscribe(emitChange)
+      }
+    }
+  }
+
+  __parseDynamicOption(
+    option: string | undefined,
+    once?: boolean,
+  ): ParseResult | undefined {
+    const dynamicOptionExpression = isOptionDynamic(option, this.__dynamic)
+    if (!dynamicOptionExpression) return undefined
+    return this.__parser.__parse(
+      camelize(dynamicOptionExpression),
+      undefined,
+      undefined,
+      undefined,
+      once,
+    )
+  }
+
+  __parseExpression(config: Directive, valueExpression: string): ParseResult {
+    return this.__parser.__parse(
       valueExpression,
       config.isLazy,
       config.isLazyKey,
       config.collectRefObj,
       config.once,
     )
-    const stopObserverList = [] as StopObserving[]
-    const hasOnChange = !!config.onChange
-    const unbinder = (): void => {
-      result.stop()
-      dynamicOption?.stop()
-      for (let i = 0; i < stopObserverList.length; ++i) {
-        stopObserverList[i]()
-      }
-      stopObserverList.length = 0
-    }
-    addUnbinder(el, unbinder)
+  }
 
-    const dynamicOptionExpression = isOptionDynamic(option, this.__dynamic)
-    let dynamicOption: ParseResult | undefined
-    if (dynamicOptionExpression) {
-      dynamicOption = this.__parser.__parse(
-        camelize(dynamicOptionExpression),
-        undefined,
-        undefined,
-        undefined,
-        config.once,
-      )
+  __createBindStops(
+    result: ParseResult,
+    dynamicOption?: ParseResult,
+  ): {
+    result?: StopObserving
+    dynamic?: StopObserving
+    mounted?: StopObserving
+    stop: () => void
+  } {
+    const stops: {
+      result?: StopObserving
+      dynamic?: StopObserving
+      mounted?: StopObserving
+      stop: () => void
+    } = {
+      stop: () => {
+        result.stop()
+        dynamicOption?.stop()
+        stops.result?.()
+        stops.dynamic?.()
+        stops.mounted?.()
+        stops.result = undefined
+        stops.dynamic = undefined
+        stops.mounted = undefined
+      },
     }
-    const dynamicOpt = dynamicOption
-    const hasDynamicOption = dynamicOpt != null
-    let previousValues: any[] = result.value()
-    let previousOption: any = hasDynamicOption
-      ? dynamicOption!.value()[0]
-      : option
+    return stops
+  }
 
-    if (!config.once && hasOnChange) {
-      const stopObserving = (
-        result.subscribe
-          ? result.subscribe(() => {
-              const preValues = previousValues
-              const preOption = previousOption
-              const nextValues = result.value()
-              const nextOption = hasDynamicOption
-                ? dynamicOpt.value()[0]
-                : option
-              previousValues = nextValues
-              previousOption = nextOption
-              config.onChange?.(
-                el,
-                nextValues,
-                preValues,
-                nextOption,
-                preOption,
-                flags,
-              )
-            })
-          : () => {}
-      ) as StopObserving
-      stopObserverList.push(stopObserving)
-      if (dynamicOpt) {
-        const stopObserving = (
-          dynamicOpt.subscribe
-            ? dynamicOpt.subscribe(() => {
-                const preOption = previousOption
-                const nextValues = result.value()
-                const nextOption = dynamicOpt.value()[0]
-                previousValues = nextValues
-                previousOption = nextOption
-                config.onChange?.(
-                  el,
-                  nextValues,
-                  preOption,
-                  nextOption,
-                  preOption,
-                  flags,
-                )
-              })
-            : () => {}
-        ) as StopObserving
-        stopObserverList.push(stopObserving)
-      }
-    }
-    if (config.onBind)
-      stopObserverList.push(
-        config.onBind(
-          el,
-          result,
-          valueExpression,
-          option,
-          dynamicOption,
-          flags,
-        ),
-      )
-    config.onChange?.(
+  __createDirectivePayload(
+    el: HTMLElement,
+    expr: string,
+    result: ParseResult,
+    dynamicOption: ParseResult | undefined,
+    option: string | undefined,
+    flags: string[] | undefined,
+  ): DirectiveUpdatePayload {
+    return {
       el,
-      previousValues,
-      undefined,
-      previousOption,
-      undefined,
+      expr,
+      values: result.value(),
+      previousValues: undefined,
+      option: dynamicOption ? dynamicOption.value()[0] : option,
+      previousOption: undefined,
       flags,
-    )
+      parseResult: result,
+      dynamicOption,
+    }
+  }
+
+  __mountDirective(
+    config: Directive,
+    payload: DirectiveUpdatePayload,
+    stops: { mounted?: StopObserving },
+  ): ((payload: DirectiveUpdatePayload) => void) | undefined {
+    const mounted = config.mount(payload)
+    if (typeof mounted === 'function') {
+      stops.mounted = mounted
+      return undefined
+    }
+    if (mounted?.unmount) {
+      stops.mounted = mounted.unmount
+    }
+    return mounted?.update
+  }
+
+  __createEmitter(
+    payload: DirectiveUpdatePayload,
+    result: ParseResult,
+    dynamicOption: ParseResult | undefined,
+    option: string | undefined,
+    mountedUpdate: (payload: DirectiveUpdatePayload) => void,
+  ): () => void {
+    let previousValues: unknown[] | undefined
+    let previousOption: unknown
+    return () => {
+      const nextValues = result.value()
+      const nextOption = dynamicOption ? dynamicOption.value()[0] : option
+      payload.values = nextValues
+      payload.previousValues = previousValues
+      payload.option = nextOption
+      payload.previousOption = previousOption
+      previousValues = nextValues
+      previousOption = nextOption
+      mountedUpdate(payload)
+    }
   }
 }

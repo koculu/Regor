@@ -47,9 +47,10 @@ export class ComponentBinder {
   ): string {
     if (this.__registeredComponentSize !== registeredComponents.size) {
       const names = [...registeredComponents.keys()]
-      this.__registeredComponentSelector = names
-        .concat(names.map(hyphenate))
-        .join(',')
+      this.__registeredComponentSelector = [
+        ...names,
+        ...names.map(hyphenate),
+      ].join(',')
       this.__registeredComponentSize = registeredComponents.size
     }
     return this.__registeredComponentSelector
@@ -140,7 +141,10 @@ export class ComponentBinder {
               definedProp,
             ]),
           )
-          for (const name of definedProps.concat(definedProps.map(hyphenate))) {
+          for (const name of [
+            ...definedProps,
+            ...definedProps.map(hyphenate),
+          ]) {
             const value = component.getAttribute(name)
             if (value === null) continue
             props[camelize(name)] = value

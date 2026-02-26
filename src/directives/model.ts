@@ -2,7 +2,6 @@ import {
   type AnyRef,
   type Directive,
   type ParseResult,
-  type SRef,
   type Unbinder,
 } from '../api/types'
 import { isArray, isFunction, isSet, isString } from '../common/is-what'
@@ -17,19 +16,12 @@ import { trigger } from '../reactivity/trigger'
  * @internal
  */
 export const modelDirective: Directive = {
-  onChange: (el: HTMLElement, values: any[]) => {
-    updateDomElementValue(el, values[0])
-  },
-  onBind: (
-    el: HTMLElement,
-    parseResult: ParseResult,
-    _expr: string,
-    _option?: string,
-    _dynamicOption?: ParseResult,
-    flags?: string[],
-  ): Unbinder => {
-    return attachDOMChangeListener(el, parseResult, flags)
-  },
+  mount: ({ el, parseResult, flags }) => ({
+    update: ({ values }) => {
+      updateDomElementValue(el, values[0])
+    },
+    unmount: attachDOMChangeListener(el, parseResult, flags),
+  }),
 }
 
 const updateDomElementValue = (el: HTMLElement, value: any): void => {
@@ -172,7 +164,7 @@ const handleInputAndTextArea = (
   el: HTMLInputElement | HTMLTextAreaElement,
   flags: ModelFlags,
   getModelRef: () => AnyRef | undefined,
-  parsedValue: SRef<unknown[]>,
+  parsedValue: () => unknown[],
 ): Unbinder => {
   const isLazy = flags.lazy
   const eventType = isLazy ? 'change' : 'input'
@@ -343,7 +335,7 @@ const handleRadio = (
 const handleSelect = (
   el: HTMLSelectElement,
   getModelRef: () => AnyRef | undefined,
-  parsedValue: SRef<unknown[]>,
+  parsedValue: () => unknown[],
 ): Unbinder => {
   const eventType = 'change'
   const unbinder = (): void => {

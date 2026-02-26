@@ -8,11 +8,17 @@ import { removeNode } from '../cleanup/removeNode'
  * @internal
  */
 export const getNodes = (el: HTMLElement): ChildNode[] => {
-  const childNodes = isTemplate(el) ? el.content.childNodes : [el as ChildNode]
-  return Array.from(childNodes).filter((x) => {
-    const tagName = (x as Element)?.tagName
-    return tagName !== 'SCRIPT' && tagName !== 'STYLE'
-  })
+  const source = isTemplate(el) ? el.content.childNodes : [el as ChildNode]
+  const result: ChildNode[] = []
+  for (let i = 0; i < source.length; ++i) {
+    const node = source[i]
+    if (node.nodeType === 1) {
+      const tagName = (node as Element | undefined)?.tagName
+      if (tagName === 'SCRIPT' || tagName === 'STYLE') continue
+    }
+    result.push(node)
+  }
+  return result
 }
 
 /**

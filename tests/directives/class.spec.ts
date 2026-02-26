@@ -2,6 +2,7 @@ import { expect, test } from 'vitest'
 
 import { createApp, html, ref } from '../../src'
 import { classDirective } from '../../src/directives/class'
+import { updateDirective } from '../directive-test-utils'
 
 test('class directive toggles classes', () => {
   const root = document.createElement('div')
@@ -49,7 +50,8 @@ test('class directive supports array entries and previous-array cleanup', () => 
   const el = document.createElement('div')
   el.className = 'old stale'
 
-  classDirective.onChange!(
+  updateDirective(
+    classDirective,
     el,
     [['new', { keep: true, stale: false }]],
     [['old', { stale: true }]],
@@ -65,7 +67,7 @@ test('class directive removes previous string classes when next is null', () => 
   const el = document.createElement('div')
   el.className = 'a b'
 
-  classDirective.onChange!(el, [null], ['a b'])
+  updateDirective(classDirective, el, [null], ['a b'])
 
   expect(el.classList.contains('a')).toBe(false)
   expect(el.classList.contains('b')).toBe(false)
@@ -75,7 +77,7 @@ test('class directive keeps class list stable when next string equals previous',
   const el = document.createElement('div')
   el.className = 'x y'
 
-  classDirective.onChange!(el, ['x y'], ['x y'])
+  updateDirective(classDirective, el, ['x y'], ['x y'])
 
   expect(el.className).toBe('x y')
 })

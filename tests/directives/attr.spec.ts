@@ -2,6 +2,7 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
 import { attrDirective } from '../../src/directives/attr'
 import { warningHandler } from '../../src/log/warnings'
+import { updateDirective } from '../directive-test-utils'
 
 let originalWarning: (...args: unknown[]) => void
 
@@ -17,7 +18,7 @@ afterEach(() => {
 test('attr directive supports option + camel flag', () => {
   const el = document.createElement('div')
 
-  attrDirective.onChange!(el, ['x'], undefined, 'data-name', undefined, [
+  updateDirective(attrDirective, el, ['x'], undefined, 'data-name', undefined, [
     'camel',
   ])
 
@@ -27,7 +28,7 @@ test('attr directive supports option + camel flag', () => {
 test('attr directive supports kv tuple and object syntaxes', () => {
   const el = document.createElement('div')
 
-  attrDirective.onChange!(el, ['k1', 'v1', ['k2', 'v2'], { k3: 'v3' }])
+  updateDirective(attrDirective, el, ['k1', 'v1', ['k2', 'v2'], { k3: 'v3' }])
 
   expect(el.getAttribute('k1')).toBe('v1')
   expect(el.getAttribute('k2')).toBe('v2')
@@ -37,7 +38,7 @@ test('attr directive supports kv tuple and object syntaxes', () => {
 test('attr directive removes previous key when key changes', () => {
   const el = document.createElement('div')
 
-  attrDirective.onChange!(el, [['k2', 'v2']], [['k1', 'old']])
+  updateDirective(attrDirective, el, [['k2', 'v2']], [['k1', 'old']])
 
   expect(el.getAttribute('k1')).toBe(null)
   expect(el.getAttribute('k2')).toBe('v2')
@@ -46,30 +47,31 @@ test('attr directive removes previous key when key changes', () => {
 test('attr directive handles boolean attributes', () => {
   const el = document.createElement('input')
 
-  attrDirective.onChange!(el, [['disabled', true]])
+  updateDirective(attrDirective, el, [['disabled', true]])
   expect(el.getAttribute('disabled')).toBe('')
 
-  attrDirective.onChange!(el, [['disabled', false]])
+  updateDirective(attrDirective, el, [['disabled', false]])
   expect(el.getAttribute('disabled')).toBe(null)
 
-  attrDirective.onChange!(el, [['disabled', '']])
+  updateDirective(attrDirective, el, [['disabled', '']])
   expect(el.getAttribute('disabled')).toBe('')
 })
 
 test('attr directive handles xlink attributes', () => {
   const el = document.createElement('svg') as any
 
-  attrDirective.onChange!(el, [['xlink:href', '#a']])
+  updateDirective(attrDirective, el, [['xlink:href', '#a']])
   expect(el.getAttribute('xlink:href')).toBe('#a')
 
-  attrDirective.onChange!(el, [['xlink:href', null]])
+  updateDirective(attrDirective, el, [['xlink:href', null]])
   expect(el.getAttribute('xlink:href')).toBe(null)
 })
 
 test('attr directive warns for invalid key types', () => {
   const el = document.createElement('div')
 
-  attrDirective.onChange!(
+  updateDirective(
+    attrDirective,
     el,
     [[{ bad: true }, 'x'] as any],
     undefined,
@@ -78,7 +80,8 @@ test('attr directive warns for invalid key types', () => {
     undefined,
     '@bad',
   )
-  attrDirective.onChange!(
+  updateDirective(
+    attrDirective,
     el,
     [[null, 'x'] as any],
     undefined,

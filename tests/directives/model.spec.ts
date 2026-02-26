@@ -3,6 +3,7 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import { createApp, createComponent, html, ref } from '../../src'
 import { modelDirective } from '../../src/directives/model'
 import { warningHandler } from '../../src/log/warnings'
+import { bindDirective, updateDirective } from '../directive-test-utils'
 
 let originalWarning: (...args: unknown[]) => void
 
@@ -684,10 +685,10 @@ test('model directive updates single select and clears when value is not present
   select.appendChild(a)
   select.appendChild(b)
 
-  modelDirective.onChange!(select, ['b'])
+  updateDirective(modelDirective, select, ['b'])
   expect(select.selectedIndex).toBe(1)
 
-  modelDirective.onChange!(select, ['missing'])
+  updateDirective(modelDirective, select, ['missing'])
   expect(select.selectedIndex).toBe(-1)
 })
 
@@ -708,7 +709,7 @@ test('model directive multiple-select writes selected values to scalar model as 
     refs: [model],
     context: {},
   } as any
-  const unbind = modelDirective.onBind!(select, parseResult, 'expr')
+  const unbind = bindDirective(modelDirective, select, parseResult, 'expr')
 
   a.selected = true
   b.selected = true
@@ -746,7 +747,7 @@ test('model directive multiple-select mutates array model in place', () => {
     refs: [model],
     context: {},
   } as any
-  modelDirective.onBind!(select, parseResult, 'expr')
+  bindDirective(modelDirective, select, parseResult, 'expr')
 
   a.selected = true
   b.selected = false
@@ -759,7 +760,7 @@ test('model directive multiple-select mutates array model in place', () => {
 })
 
 test('model directive warns for unsupported element in onChange', () => {
-  modelDirective.onChange!(document.createElement('div'), ['x'])
+  updateDirective(modelDirective, document.createElement('div'), ['x'])
   expect(warningHandler.warning).toHaveBeenCalled()
 })
 
@@ -771,7 +772,7 @@ test('model directive onBind warns and noops when ref is missing', () => {
     refs: [],
     context: {},
   } as any
-  const unbind = modelDirective.onBind!(input, parseResult, 'expr')
+  const unbind = bindDirective(modelDirective, input, parseResult, 'expr')
 
   input.value = 'next'
   input.dispatchEvent(new Event('input'))
@@ -788,13 +789,13 @@ test('model directive checkbox supports trueValue/falseValue props and attrs', (
   input.type = 'checkbox'
 
   input.trueValue = 'yes'
-  modelDirective.onChange!(input, ['yes'])
+  updateDirective(modelDirective, input, ['yes'])
   expect(input.checked).toBe(true)
 
   input.removeAttribute('true-value')
   delete input.trueValue
   input.setAttribute('true-value', 'attr-yes')
-  modelDirective.onChange!(input, ['attr-yes'])
+  updateDirective(modelDirective, input, ['attr-yes'])
   expect(input.checked).toBe(true)
 
   input.falseValue = 'no'
@@ -805,7 +806,7 @@ test('model directive checkbox supports trueValue/falseValue props and attrs', (
     refs: [model],
     context: {},
   } as any
-  modelDirective.onBind!(input, parseResult, 'expr')
+  bindDirective(modelDirective, input, parseResult, 'expr')
   input.checked = false
   input.dispatchEvent(new Event('change'))
   expect(model()).toBe('no')
@@ -823,7 +824,7 @@ test('model directive radio onBind updates model and unbind stops updates', () =
     context: {},
   } as any
 
-  const unbind = modelDirective.onBind!(radio, parseResult, 'expr')
+  const unbind = bindDirective(modelDirective, radio, parseResult, 'expr')
   radio.dispatchEvent(new Event('change'))
   expect(model()).toBe('r1')
 
@@ -849,7 +850,7 @@ test('model directive single select listener writes selected value', () => {
     refs: [model],
     context: {},
   } as any
-  modelDirective.onBind!(select, parseResult, 'expr')
+  bindDirective(modelDirective, select, parseResult, 'expr')
 
   b.selected = true
   select.dispatchEvent(new Event('change'))

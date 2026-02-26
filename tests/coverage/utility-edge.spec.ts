@@ -29,6 +29,7 @@ import { ref } from '../../src/reactivity/ref'
 import { resume } from '../../src/reactivity/resume'
 import { sref } from '../../src/reactivity/sref'
 import { trigger } from '../../src/reactivity/trigger'
+import { bindDirective } from '../directive-test-utils'
 
 test('warnings handle null handler and object payload branch', () => {
   const prev = warningHandler.warning
@@ -139,10 +140,15 @@ test('props directive ignores non-object payloads', () => {
     refs: [],
     context: {},
   } as any
-  const stop = contextDirective.onBind!(
+  const stop = bindDirective(
+    contextDirective,
     document.createElement('div'),
     parseResult,
     '',
+    undefined,
+    undefined,
+    undefined,
+    { runInitialUpdate: true },
   )
   expect(parseResult.context).toEqual({})
   stop()
@@ -204,4 +210,3 @@ test('batch catches trigger errors from observers', () => {
     spy.mockRestore()
   }
 })
-

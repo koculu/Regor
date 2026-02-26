@@ -220,7 +220,7 @@ Use these when docs/snippets must display `{{ ... }}` without binding.
 
 ## See Also
 
-1. [Directives](../directives)
-2. [Reactivity](./reactivity)
-3. [Components](./components)
-4. [r-for](../directives/r-for)
+1. [Directives](/directives)
+2. [Reactivity](/guide/reactivity)
+3. [Components](/guide/components)
+4. [r-for](/directives/r-for)

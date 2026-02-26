@@ -114,9 +114,10 @@ Use only when component wants to self-remove its rendered block.
 
 ## See Also
 
-1. [API: createApp](../api/createApp)
-2. [API: useScope](../api/useScope)
-3. [API: onMounted](../api/onMounted)
-4. [API: onUnmounted](../api/onUnmounted)
-5. [API: removeNode / drainUnbind](../api/removeNode)
-6. [API: unbind](../api/unbind)
+1. [API: createApp](/api/createApp)
+2. [API: useScope](/api/useScope)
+3. [API: onMounted](/api/onMounted)
+4. [API: onUnmounted](/api/onUnmounted)
+5. [API: removeNode](/api/removeNode)
+6. [API: drainUnbind](/api/drainUnbind)
+7. [API: unbind](/api/unbind)
