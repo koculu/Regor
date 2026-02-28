@@ -4,7 +4,7 @@ import {
   ComponentHead,
   computed,
   createApp,
-  createComponent,
+  defineComponent,
   html,
   observe,
   observeMany,
@@ -151,7 +151,7 @@ test('should create components from TypeScript classes with props and emits', as
     }
   }
 
-  const cardComponent = createComponent<CardComponentContext>(
+  const cardComponent = defineComponent<CardComponentContext>(
     html`<article :class="{ selected: selected }">
       <h4 r-text="title"></h4>
       <input class="editor" r-model="title, 'trim'" />
@@ -313,7 +313,7 @@ test('class component autoProps entangle can sync or isolate refs', () => {
     }
   }
 
-  const entangledInput = createComponent<EntangledInputContext>(
+  const entangledInput = defineComponent<EntangledInputContext>(
     html`<input class="entangled" r-model="value" />`,
     {
       props: ['value'],
@@ -321,7 +321,7 @@ test('class component autoProps entangle can sync or isolate refs', () => {
     },
   )
 
-  const isolatedInput = createComponent<IsolatedInputContext>(
+  const isolatedInput = defineComponent<IsolatedInputContext>(
     html`<input class="isolated" r-model="value" />`,
     {
       props: ['value'],
@@ -394,7 +394,7 @@ test('nested class components run lifecycle hooks and unmount cleanly', async ()
     }
   }
 
-  const childComponent = createComponent<ChildContext>(
+  const childComponent = defineComponent<ChildContext>(
     html`<small>child</small>`,
     {
       context: () => new ChildContext(),
@@ -410,7 +410,7 @@ test('nested class components run lifecycle hooks and unmount cleanly', async ()
     }
   }
 
-  const parentComponent = createComponent<ParentContext>(
+  const parentComponent = defineComponent<ParentContext>(
     html`<div><ChildComponent></ChildComponent></div>`,
     {
       context: () => new ParentContext(),
@@ -475,7 +475,7 @@ test('class component supports :context with class ref fields', () => {
     onceLabel = ref('once-local')
   }
 
-  const labelsComponent = createComponent<LabelContext>(
+  const labelsComponent = defineComponent<LabelContext>(
     html`<div>
       <span class="live">{{ liveLabel }}</span>
       <span class="once">{{ onceLabel }}</span>
@@ -523,7 +523,7 @@ test('class-based components support default slots with parent context', () => {
     }
   }
 
-  const shellComponent = createComponent<ShellContext>(
+  const shellComponent = defineComponent<ShellContext>(
     html`<section><slot></slot></section>`,
     {
       context: (head) => new ShellContext(head),
@@ -563,7 +563,7 @@ test('class r-model binding survives multiple prop target replacements in nested
     }
   }
 
-  const leafInput = createComponent<LeafInputContext>(
+  const leafInput = defineComponent<LeafInputContext>(
     html`<input id="leaf-input" r-model="model" />`,
     {
       props: ['model'],
@@ -580,7 +580,7 @@ test('class r-model binding survives multiple prop target replacements in nested
     }
   }
 
-  const middleInput = createComponent<MiddleInputContext>(
+  const middleInput = defineComponent<MiddleInputContext>(
     html`<LeafInput :model="model"></LeafInput>`,
     {
       props: ['model'],
@@ -632,7 +632,7 @@ test('named slot content should render with class component context', () => {
     }
   }
 
-  const shellComponent = createComponent<ShellContext>(
+  const shellComponent = defineComponent<ShellContext>(
     html`<section>
       <slot></slot>
       <slot name="abc"></slot>

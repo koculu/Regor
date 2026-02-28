@@ -1,6 +1,6 @@
 import {
   type Component,
-  type CreateComponentOptions,
+  type DefineComponentOptions,
   IRegorContext,
   type Template,
 } from '../api/types'
@@ -16,7 +16,7 @@ import { toJsonTemplate } from './toJsonTemplate'
 /**
  * Creates a reusable Regor component definition.
  *
- * `createComponent` prepares a template once, then Regor clones/binds it for each
+ * `defineComponent` prepares a template once, then Regor clones/binds it for each
  * component instance in the app.
  *
  * @typeParam TContext - Component context type.
@@ -30,7 +30,7 @@ import { toJsonTemplate } from './toJsonTemplate'
  *
  * @example
  * ```ts
- * const UserCard = createComponent(
+ * const UserCard = defineComponent(
  *   `<article><h3 r-text="name"></h3></article>`,
  *   {
  *     props: ['name'],
@@ -44,17 +44,17 @@ import { toJsonTemplate } from './toJsonTemplate'
  * @example
  * ```ts
  * // Props shorthand:
- * const CounterLabel = createComponent(
+ * const CounterLabel = defineComponent(
  *   `<span r-text="value"></span>`,
  *   ['value'],
  * )
  * ```
  */
-export const createComponent = <
+export const defineComponent = <
   TContext extends IRegorContext | object = IRegorContext,
 >(
   template: Template | string,
-  options: CreateComponentOptions<TContext> | string[] = {},
+  options: DefineComponentOptions<TContext> | string[] = {},
 ): Component<TContext> => {
   if (isArray(options)) options = { props: options }
   if (isString(template)) template = { template }

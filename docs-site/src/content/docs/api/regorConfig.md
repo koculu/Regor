@@ -132,7 +132,7 @@ The `RegorConfig` class provides default configuration values for various proper
 ## See Also
 
 - [`createApp`](/api/createApp)
-- [`createComponent`](/api/createComponent)
+- [`defineComponent`](/api/defineComponent)
 - [`toFragment`](/api/toFragment)
 - [`toJsonTemplate`](/api/toJsonTemplate)
 

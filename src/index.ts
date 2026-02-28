@@ -24,7 +24,7 @@ export type {
 } from './api/types'
 export { ComponentHead } from './app/ComponentHead'
 export { createApp } from './app/createApp'
-export { createComponent } from './app/createComponent'
+export { defineComponent } from './app/defineComponent'
 export { RegorConfig } from './app/RegorConfig'
 export { toFragment } from './app/toFragment'
 export { toJsonTemplate } from './app/toJsonTemplate'

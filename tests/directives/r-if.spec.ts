@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 
-import { createApp, createComponent, html, ref } from '../../src'
+import { createApp, defineComponent, html, ref } from '../../src'
 
 test('r-if/r-else toggles after selectedHost replacement without component', () => {
   const root = document.createElement('div')
@@ -28,7 +28,7 @@ test('r-if/r-else inside component prop tracks selectedHost replacement', () => 
   const root = document.createElement('div')
   const selectedHost = ref({ hostname: 'alpha' })
 
-  const hostStatusField = createComponent(
+  const hostStatusField = defineComponent(
     html`<div r-if="selectedHost.hostname === 'alpha'">alpha</div>
       <div r-else>other</div>`,
     ['selectedHost'],
@@ -62,7 +62,7 @@ test('r-if/r-else-if/r-else inside component prop tracks selectedHost.tenants le
   const root = document.createElement('div')
   const selectedHost = ref({ tenants: ['t1'] })
 
-  const hostTenantStatus = createComponent(
+  const hostTenantStatus = defineComponent(
     html`<div r-if="selectedHost.tenants.length > 1">many</div>
       <div r-else-if="selectedHost.tenants.length === 1">one</div>
       <div r-else>none</div>`,
@@ -97,12 +97,12 @@ test('r-if/r-else propagates through 3 nested components across selectedHost rep
   const root = document.createElement('div')
   const selectedHost = ref({ hostname: 'alpha' })
 
-  const leafHostStatus = createComponent(
+  const leafHostStatus = defineComponent(
     html`<div r-if="selectedHost.hostname === 'alpha'">alpha</div>
       <div r-else>other</div>`,
     ['selectedHost'],
   )
-  const middleHostStatus = createComponent(
+  const middleHostStatus = defineComponent(
     html`<LeafHostStatus :selectedHost="selectedHost"></LeafHostStatus>`,
     {
       props: ['selectedHost'],
@@ -113,7 +113,7 @@ test('r-if/r-else propagates through 3 nested components across selectedHost rep
       }),
     },
   )
-  const outerHostStatus = createComponent(
+  const outerHostStatus = defineComponent(
     html`<MiddleHostStatus :selectedHost="selectedHost"></MiddleHostStatus>`,
     {
       props: ['selectedHost'],

@@ -70,6 +70,6 @@ The `toFragment` function returns a `DocumentFragment` containing the elements c
 
 - [`toJsonTemplate`](/api/toJsonTemplate)
 - [`createApp`](/api/createApp)
-- [`createComponent`](/api/createComponent)
+- [`defineComponent`](/api/defineComponent)
 
 [Back to the API list](/api/)

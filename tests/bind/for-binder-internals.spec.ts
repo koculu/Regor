@@ -68,7 +68,9 @@ test('ForBinderFastPath: bails when context has own components', () => {
     },
   } as any
 
-  const fastPath = ForBinderFastPath.__create(binder, [document.createElement('div')])
+  const fastPath = ForBinderFastPath.__create(binder, [
+    document.createElement('div'),
+  ])
   expect(fastPath).toBeUndefined()
 })
 
@@ -142,7 +144,8 @@ test('ForBinderKeyedDiff: complex reorder exercises LIS binary-search branch', (
     newValues: next,
     getKey: (v) => (v as { id: string }).id,
     isSameValue: (x, y) => x === y,
-    mountNewValue: (_i, value) => createMountItem(value as { id: string }, host),
+    mountNewValue: (_i, value) =>
+      createMountItem(value as { id: string }, host),
     removeMountItem: () => {},
     endAnchor,
   })

@@ -65,6 +65,6 @@ The `toJsonTemplate` function returns a JSON structure that represents the HTML 
 
 - [`toFragment`](/api/toFragment)
 - [`createApp`](/api/createApp)
-- [`createComponent`](/api/createComponent)
+- [`defineComponent`](/api/defineComponent)
 
 [Back to the API list](/api/)

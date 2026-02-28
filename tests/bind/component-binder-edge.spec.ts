@@ -1,6 +1,6 @@
 import { expect, test, vi } from 'vitest'
 
-import { createComponent } from '../../src/app/createComponent'
+import { defineComponent } from '../../src/app/defineComponent'
 import { RegorConfig } from '../../src/app/RegorConfig'
 import { Binder } from '../../src/bind/Binder'
 import { Parser } from '../../src/parser/Parser'
@@ -15,7 +15,7 @@ test('component binder skips pre-marked and parentless component candidates', ()
   const binder = createBinder([
     {
       components: {
-        Edge: createComponent('<div></div>'),
+        Edge: defineComponent('<div></div>'),
       },
     },
   ])
@@ -36,7 +36,7 @@ test('component binder skips pre-marked and parentless component candidates', ()
 
 test('component binder routes dot-prop directives into singlePropDirective binding', () => {
   const root = document.createElement('div')
-  const comp = createComponent('<div class="slot"></div>', {
+  const comp = defineComponent('<div class="slot"></div>', {
     defaultName: 'DotComp',
     props: ['msg'],
     context: () => ({ msg: '' }),
@@ -72,7 +72,7 @@ test('component binder routes dot-prop directives into singlePropDirective bindi
 
 test('component binder skips unsupported directive names even if option matches a prop', () => {
   const root = document.createElement('div')
-  const comp = createComponent('<div class="slot"></div>', {
+  const comp = defineComponent('<div class="slot"></div>', {
     defaultName: 'SkipComp',
     props: ['msg'],
     context: () => ({ msg: '' }),
@@ -115,7 +115,7 @@ test('component binder skips unsupported directive names even if option matches 
 
 test('component binder ignores :context/r-context during attribute fallthrough transfer', () => {
   const root = document.createElement('div')
-  const comp = createComponent('<div class="inner"></div>', {
+  const comp = defineComponent('<div class="inner"></div>', {
     defaultName: 'PropsSkip',
   })
   const cfg = new RegorConfig()

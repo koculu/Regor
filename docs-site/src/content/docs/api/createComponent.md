@@ -1,16 +1,16 @@
 ---
-title: createComponent
+title: defineComponent
 ---
 
 ## Overview
 
-The `createComponent` function is used to create a Regor component, which encapsulates a part of your user interface (UI) with its own behavior and template. Components allow you to build complex UIs by composing smaller, reusable units.
+The `defineComponent` function is used to create a Regor component, which encapsulates a part of your user interface (UI) with its own behavior and template. Components allow you to build complex UIs by composing smaller, reusable units.
 
 ## Usage
 
 ### Creating a Regor Component
 
-To create a Regor component, call the `createComponent` function with the following parameters:
+To create a Regor component, call the `defineComponent` function with the following parameters:
 
 - `template` (required): An HTML string or an object specifying the template for rendering the component. It can include the following properties:
 
@@ -30,10 +30,10 @@ To create a Regor component, call the `createComponent` function with the follow
 ### Example
 
 ```ts
-import { createComponent, createApp, html } from 'regor'
+import { defineComponent, createApp, html } from 'regor'
 
 // Define a Regor component
-const myComponent = createComponent(
+const myComponent = defineComponent(
   html`<div></div>`, // Define the component content from html string
   {
     context: (head) => ({
@@ -57,7 +57,7 @@ createApp({
 
 ## Return Value
 
-The `createComponent` function returns a component object with the following properties:
+The `defineComponent` function returns a component object with the following properties:
 
 - `context`: The Regor context associated with the component. It defines the component's behavior, data, and reactivity.
 
@@ -94,4 +94,3 @@ The `createComponent` function returns a component object with the following pro
 - [`toJsonTemplate`](/api/toJsonTemplate)
 
 [Back to the API list](/api/)
-

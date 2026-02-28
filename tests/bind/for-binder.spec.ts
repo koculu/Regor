@@ -283,10 +283,7 @@ test('r-for fallback diff handles duplicate keys and mixed insert/remove updates
 
 test('r-for supports array destructuring list aliases', () => {
   const root = document.createElement('div')
-  const rows = ref([
-    ref(['Alice', 30]),
-    ref(['Bob', 25]),
-  ])
+  const rows = ref([ref(['Alice', 30]), ref(['Bob', 25])])
   const app = createApp(
     { rows },
     {

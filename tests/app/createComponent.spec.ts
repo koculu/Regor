@@ -2,7 +2,7 @@ import { expect, test } from 'vitest'
 
 import {
   createApp,
-  createComponent,
+  defineComponent,
   html,
   IRegorContext,
   Ref,
@@ -17,7 +17,7 @@ import { htmlEqual } from '../common/html-equal'
 test('should render components with reactive properties', () => {
   const root = document.createElement('div')
 
-  const myComponent = createComponent(
+  const myComponent = defineComponent(
     html`<div>{{ prop1 + '-' + prop2 }}</div>`,
     {
       context: () => ({
@@ -116,7 +116,7 @@ test('should render components with reactive properties', () => {
 test('should resolve camelCase dynamic prop bindings on components', () => {
   const root = document.createElement('div')
 
-  const myComponent = createComponent(html`<div>{{ wordOne }}</div>`, {
+  const myComponent = defineComponent(html`<div>{{ wordOne }}</div>`, {
     context: (head) => ({
       wordOne: head.props.wordOne ?? 'fallback',
     }),
@@ -153,7 +153,7 @@ test('should resolve camelCase dynamic prop bindings on components', () => {
 test('component binding matrix: declared props, undeclared attrs, :context, and r-bind object', () => {
   const root = document.createElement('div')
 
-  const demoComponent = createComponent(
+  const demoComponent = defineComponent(
     html`<article class="demo">
       <h4 class="title">{{ title }}</h4>
       <p class="extra">{{ extra }}</p>
@@ -254,7 +254,7 @@ test('component binding matrix: declared props, undeclared attrs, :context, and 
 test('component supports r-context alias for :context', () => {
   const root = document.createElement('div')
 
-  const myComponent = createComponent(
+  const myComponent = defineComponent(
     html`<div>
       <span class="title">{{ title }}</span>
       <span class="extra">{{ extra }}</span>
@@ -296,7 +296,7 @@ test('component supports r-context alias for :context', () => {
 test('proof: :context can drive component state, r-bind object cannot', () => {
   const root = document.createElement('div')
 
-  const card = createComponent(
+  const card = defineComponent(
     html`<div>
       <span class="mode">{{ canEdit ? 'edit' : 'view' }}</span>
       <span class="level">{{ accessLevel }}</span>
@@ -355,7 +355,7 @@ test('proof: :context can drive component state, r-bind object cannot', () => {
 test('proof: r-bind single-prop updates component state only for declared props', () => {
   const root = document.createElement('div')
 
-  const card = createComponent(
+  const card = defineComponent(
     html`<div>
       <span class="title">{{ title }}</span>
       <span class="note">{{ note }}</span>
@@ -409,7 +409,7 @@ test('proof: r-bind single-prop updates component state only for declared props'
 test(':context keeps explicit ref(...) entries reactive in object literals', () => {
   const root = document.createElement('div')
 
-  const comp = createComponent(
+  const comp = defineComponent(
     html`<div>
       <span class="live">{{ live }}</span>
       <span class="once">{{ once }}</span>
@@ -456,7 +456,7 @@ test('should preserve context values when autoProps is enabled', () => {
     return href.replace(/^\.\//, '/')
   }
 
-  const myComponent = createComponent<{ href?: string }>(
+  const myComponent = defineComponent<{ href?: string }>(
     html`<a :href="href"></a>`,
     {
       props: ['href'],
@@ -485,7 +485,7 @@ test('should preserve context values when autoProps is enabled', () => {
 test('should render empty component', () => {
   const root = document.createElement('div')
 
-  const myComponent = createComponent(html``)
+  const myComponent = defineComponent(html``)
 
   createApp(
     {
@@ -505,7 +505,7 @@ test('should render empty component', () => {
 test('should render components with kebab-case tags', () => {
   const root = document.createElement('div')
 
-  const myComponent = createComponent(html`<div>kebab</div>`)
+  const myComponent = defineComponent(html`<div>kebab</div>`)
 
   createApp(
     {
@@ -541,7 +541,7 @@ test('should render nested component with reactive properties', () => {
     children: TreeItem[]
   }
 
-  const myComponent = createComponent<MyComponent>(
+  const myComponent = defineComponent<MyComponent>(
     html`<div>
       name: {{ item.name }}
       <MyComponent r-for="child in item.children" :item="child"></MyComponent>
@@ -637,10 +637,10 @@ test('should render nested component with reactive properties', () => {
   )
 })
 
-test('createComponent supports template element and selector sources', () => {
+test('defineComponent supports template element and selector sources', () => {
   const source = document.createElement('template')
   source.innerHTML = '<div class="from-element">x</div>'
-  const fromElement = createComponent({ element: source })
+  const fromElement = defineComponent({ element: source })
   expect(
     (fromElement.template as ParentNode).querySelector('.from-element'),
   ).toBeTruthy()
@@ -650,7 +650,7 @@ test('createComponent supports template element and selector sources', () => {
     '<template id="cc-select"><span class="from-selector">y</span></template>'
   document.body.appendChild(host)
   try {
-    const fromSelector = createComponent({ selector: '#cc-select' })
+    const fromSelector = defineComponent({ selector: '#cc-select' })
     expect(
       (fromSelector.template as ParentNode).querySelector('.from-selector'),
     ).toBeTruthy()
@@ -659,21 +659,21 @@ test('createComponent supports template element and selector sources', () => {
   }
 })
 
-test('createComponent throws for missing selector template', () => {
+test('defineComponent throws for missing selector template', () => {
   expect(() =>
-    createComponent({ selector: '#__regor_component_missing__' }),
+    defineComponent({ selector: '#__regor_component_missing__' }),
   ).toThrow()
 })
 
-test('createComponent supports json templates and svg upgrade path', () => {
-  const fromJson = createComponent({
+test('defineComponent supports json templates and svg upgrade path', () => {
+  const fromJson = defineComponent({
     json: { t: 'div', c: [{ d: 'json-ok' }] },
   })
   expect(
     (fromJson.template as ParentNode).querySelector('div')?.textContent,
   ).toContain('json-ok')
 
-  const fromSvg = createComponent({
+  const fromSvg = defineComponent({
     template:
       '<div isSVG><svg><circle cx="1" cy="1" r="1"></circle></svg></div>',
     isSVG: true,
@@ -684,7 +684,7 @@ test('createComponent supports json templates and svg upgrade path', () => {
 
 test('component inheritAttrs merges class and style from host onto inheritor root', () => {
   const root = document.createElement('div')
-  const boxComp = createComponent(html`<div r-inherit class="base">box</div>`)
+  const boxComp = defineComponent(html`<div r-inherit class="base">box</div>`)
 
   createApp(
     { components: { boxComp } },
@@ -707,7 +707,7 @@ test('component inheritAttrs merges class and style from host onto inheritor roo
 
 test('component named slot fallback renders when slot content is not provided', () => {
   const root = document.createElement('div')
-  const slotComp = createComponent(
+  const slotComp = defineComponent(
     html`<section>
       <slot name="extra"><em class="fallback-extra">fallback-extra</em></slot>
     </section>`,
@@ -728,7 +728,7 @@ test('component named slot fallback renders when slot content is not provided', 
 
 test('component with slot-only root expands default slot content', () => {
   const root = document.createElement('div')
-  const onlySlot = createComponent(html`<slot></slot>`)
+  const onlySlot = defineComponent(html`<slot></slot>`)
 
   createApp(
     { components: { onlySlot } },
@@ -745,7 +745,7 @@ test('component with slot-only root expands default slot content', () => {
 
 test('component named slot falls back to slot body when name is missing in host templates', () => {
   const root = document.createElement('div')
-  const comp = createComponent(
+  const comp = defineComponent(
     html`<section>
       <slot name="missing"><em class="slot-fallback">fallback</em></slot>
     </section>`,
@@ -762,7 +762,7 @@ test('component named slot falls back to slot body when name is missing in host 
 
 test('default slot ignores named-only template shortcuts and keeps element children', () => {
   const root = document.createElement('div')
-  const shell = createComponent(html`<section><slot></slot></section>`)
+  const shell = defineComponent(html`<section><slot></slot></section>`)
   createApp(
     { components: { shell } },
     {
@@ -779,7 +779,7 @@ test('default slot ignores named-only template shortcuts and keeps element child
 
 test('slot switch contexts are released on unmount', async () => {
   const root = document.createElement('div')
-  const shell = createComponent(html`<section><slot></slot></section>`, {
+  const shell = defineComponent(html`<section><slot></slot></section>`, {
     context: (head) => {
       head.enableSwitch = true
       return {}
@@ -803,7 +803,7 @@ test('slot switch contexts are released on unmount', async () => {
 test('enableSwitch controls whether slot bindings use parent or component context', () => {
   const root = document.createElement('div')
 
-  const shellNoSwitch = createComponent(
+  const shellNoSwitch = defineComponent(
     html`<section><slot></slot></section>`,
     {
       context: () => ({
@@ -812,7 +812,7 @@ test('enableSwitch controls whether slot bindings use parent or component contex
     },
   )
 
-  const shellWithSwitch = createComponent(
+  const shellWithSwitch = defineComponent(
     html`<section><slot></slot></section>`,
     {
       context: (head) => {
@@ -858,17 +858,17 @@ test('enableSwitch controls whether slot bindings use parent or component contex
   )
 })
 
-test('createComponent supports disabling interpolation and direct element children scan', () => {
+test('defineComponent supports disabling interpolation and direct element children scan', () => {
   const rootEl = document.createElement('div')
   rootEl.innerHTML = '<p>{{ msg }}</p>'
-  const comp = createComponent({ element: rootEl }, { useInterpolation: false })
+  const comp = defineComponent({ element: rootEl }, { useInterpolation: false })
   const template = comp.template as ParentNode
   expect(template.querySelector('p')?.textContent).toBe('{{ msg }}')
 })
 
 test('component slot shorthand #name on slot element resolves named templates', () => {
   const root = document.createElement('div')
-  const shell = createComponent(
+  const shell = defineComponent(
     html`<section>
       <slot #abc><i class="fallback">fallback</i></slot>
     </section>`,
@@ -891,7 +891,7 @@ test('component slot shorthand #name on slot element resolves named templates', 
 test('registered-only component lookup works without context components', () => {
   const root = document.createElement('div')
   const cfg = new RegorConfig()
-  const regOnly = createComponent('<div class="reg-only">ok</div>', {
+  const regOnly = defineComponent('<div class="reg-only">ok</div>', {
     defaultName: 'RegOnly',
   })
   cfg.addComponent(regOnly)
@@ -910,7 +910,7 @@ test('registered-only component lookup works without context components', () => 
 
 test('dashed context component key is safely skipped when lookup key camelizes differently', () => {
   const root = document.createElement('div')
-  const dashComp = createComponent('<div class="dash">x</div>')
+  const dashComp = defineComponent('<div class="dash">x</div>')
 
   createApp(
     {
@@ -930,7 +930,7 @@ test('dashed context component key is safely skipped when lookup key camelizes d
 
 test('component binder handles components mounted under parent nodes without parentElement', () => {
   const cfg = new RegorConfig()
-  const regOnly = createComponent('<div class="frag">ok</div>', {
+  const regOnly = defineComponent('<div class="frag">ok</div>', {
     defaultName: 'FragOnly',
   })
   cfg.addComponent(regOnly)
@@ -949,7 +949,7 @@ test('component binder handles components mounted under parent nodes without par
 
 test('component props binding accepts .prop and r-bind:prop paths', () => {
   const root = document.createElement('div')
-  const comp = createComponent(html`<div class="msg">{{ msg }}</div>`, {
+  const comp = defineComponent(html`<div class="msg">{{ msg }}</div>`, {
     props: ['msg'],
     context: (head) => ({
       msg: head.props.msg,
@@ -978,7 +978,7 @@ test('component props binding accepts .prop and r-bind:prop paths', () => {
 
 test('component context fallback to empty object works when context() returns undefined', () => {
   const root = document.createElement('div')
-  const undefCtx = createComponent('<div class="ctx-undef">ok</div>', {
+  const undefCtx = defineComponent('<div class="ctx-undef">ok</div>', {
     context: () => undefined as any,
   })
 
@@ -997,7 +997,7 @@ test('component context fallback to empty object works when context() returns un
 
 test('component autoProps can be disabled', () => {
   const root = document.createElement('div')
-  const comp = createComponent(html`<div class="no-auto">{{ msg }}</div>`, {
+  const comp = defineComponent(html`<div class="no-auto">{{ msg }}</div>`, {
     props: ['msg'],
     context: (head) => {
       head.autoProps = false
@@ -1023,7 +1023,7 @@ test('component autoProps can be disabled', () => {
 
 test('component inheritAttrs false keeps host attrs off child root', () => {
   const root = document.createElement('div')
-  const comp = createComponent('<div class="base">x</div>', {
+  const comp = defineComponent('<div class="base">x</div>', {
     inheritAttrs: false,
   })
 

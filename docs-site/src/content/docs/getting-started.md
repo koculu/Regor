@@ -53,7 +53,10 @@ const app = createApp(
 ```html
 <div id="app"></div>
 <script type="module">
-  import { createApp, ref } from 'https://unpkg.com/regor/dist/regor.es2022.esm.prod.js'
+  import {
+    createApp,
+    ref,
+  } from 'https://unpkg.com/regor/dist/regor.es2022.esm.prod.js'
 
   createApp(
     {
@@ -72,10 +75,7 @@ const app = createApp(
 1. Bind existing markup in place:
 
 ```ts
-createApp(
-  { userName: ref('Ada') },
-  { selector: '#profile-island' },
-)
+createApp({ userName: ref('Ada') }, { selector: '#profile-island' })
 ```
 
 2. Replace root content from template string:
@@ -130,9 +130,9 @@ Inside templates, refs are auto-unwrapped, so use `count`, `user.name`, not
 ## Component Quick Example
 
 ```ts
-import { createApp, createComponent, ref } from 'regor'
+import { createApp, defineComponent, ref } from 'regor'
 
-const UserCard = createComponent('<article><h3 r-text="name"></h3></article>', {
+const UserCard = defineComponent('<article><h3 r-text="name"></h3></article>', {
   props: ['name'],
   context: (head) => ({
     name: head.props.name ?? 'Anonymous',

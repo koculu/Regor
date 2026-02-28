@@ -8,7 +8,7 @@ This page describes how Regor turns templates into live bindings, and what expre
 
 ## Template Sources
 
-Regor accepts templates from multiple sources in `createApp(...)` / `createComponent(...)`:
+Regor accepts templates from multiple sources in `createApp(...)` / `defineComponent(...)`:
 
 1. HTML string (`template`)
 2. Existing DOM element (`element`)
@@ -180,7 +180,7 @@ Use this when one region must swap templates/components based on state, while ke
 ### 4) Slot template evaluated in parent context
 
 ```ts
-const Shell = createComponent('<section><slot></slot></section>', {
+const Shell = defineComponent('<section><slot></slot></section>', {
   context: (head) => {
     head.enableSwitch = true
     return {}

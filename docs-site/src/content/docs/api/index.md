@@ -11,7 +11,7 @@ Use this page as an index, then open each API page for signature details and exa
 ## App and Components
 
 1. [`createApp`](/api/createApp)
-2. [`createComponent`](/api/createComponent)
+2. [`defineComponent`](/api/defineComponent)
 3. [`toFragment`](/api/toFragment)
 4. [`toJsonTemplate`](/api/toJsonTemplate)
 5. [`RegorConfig`](/api/regorConfig)
