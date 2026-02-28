@@ -103,6 +103,6 @@ const tableRow = createComponent(
 
 ## See Also
 
-1. [r-if](./r-if)
-2. [r-bind](./r-bind)
-3. [r-text](./r-text)
+1. [r-if](/directives/r-if)
+2. [r-bind](/directives/r-bind)
+3. [r-text](/directives/r-text)

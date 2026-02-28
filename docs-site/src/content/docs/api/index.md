@@ -10,75 +10,75 @@ Use this page as an index, then open each API page for signature details and exa
 
 ## App and Components
 
-1. [`createApp`](./createApp)
-2. [`createComponent`](./createComponent)
-3. [`toFragment`](./toFragment)
-4. [`toJsonTemplate`](./toJsonTemplate)
-5. [`RegorConfig`](./regorConfig)
+1. [`createApp`](/api/createApp)
+2. [`createComponent`](/api/createComponent)
+3. [`toFragment`](/api/toFragment)
+4. [`toJsonTemplate`](/api/toJsonTemplate)
+5. [`RegorConfig`](/api/regorConfig)
 
 ## Reactivity
 
-1. [`ref`](./ref)
-2. [`sref`](./sref)
-3. [`isRef`](./isRef)
-4. [`isDeepRef`](./isDeepRef)
-5. [`unref`](./unref)
-6. [`pause`](./pause)
-7. [`resume`](./resume)
-8. [`trigger`](./trigger)
-9. [`entangle`](./entangle)
+1. [`ref`](/api/ref)
+2. [`sref`](/api/sref)
+3. [`isRef`](/api/isRef)
+4. [`isDeepRef`](/api/isDeepRef)
+5. [`unref`](/api/unref)
+6. [`pause`](/api/pause)
+7. [`resume`](/api/resume)
+8. [`trigger`](/api/trigger)
+9. [`entangle`](/api/entangle)
 
 ## Computed and Effects
 
-1. [`computed`](./computed)
-2. [`computeRef`](./computeRef)
-3. [`computeMany`](./computeMany)
-4. [`watchEffect`](./watchEffect)
-5. [`collectRefs`](./collectRefs)
-6. [`silence`](./silence)
+1. [`computed`](/api/computed)
+2. [`computeRef`](/api/computeRef)
+3. [`computeMany`](/api/computeMany)
+4. [`watchEffect`](/api/watchEffect)
+5. [`collectRefs`](/api/collectRefs)
+6. [`silence`](/api/silence)
 
 ## Observation and Batch
 
-1. [`observe`](./observe)
-2. [`observeMany`](./observeMany)
-3. [`observerCount`](./observerCount)
-4. [`batch`](./batch)
-5. [`startBatch`](./startBatch)
-6. [`endBatch`](./endBatch)
+1. [`observe`](/api/observe)
+2. [`observeMany`](/api/observeMany)
+3. [`observerCount`](/api/observerCount)
+4. [`batch`](/api/batch)
+5. [`startBatch`](/api/startBatch)
+6. [`endBatch`](/api/endBatch)
 
 ## Lifecycle and Scope
 
-1. [`useScope`](./useScope)
-2. [`onMounted`](./onMounted)
-3. [`onUnmounted`](./onUnmounted)
+1. [`useScope`](/api/useScope)
+2. [`onMounted`](/api/onMounted)
+3. [`onUnmounted`](/api/onUnmounted)
 
 ## Cleanup and Unbind
 
-1. [`addUnbinder`](./addUnbinder)
-2. [`getBindData`](./getBindData)
-3. [`removeNode`](./removeNode)
-4. [`unbind`](./unbind)
-5. [`drainUnbind`](./drainUnbind)
+1. [`addUnbinder`](/api/addUnbinder)
+2. [`getBindData`](/api/getBindData)
+3. [`removeNode`](/api/removeNode)
+4. [`unbind`](/api/unbind)
+5. [`drainUnbind`](/api/drainUnbind)
 
 ## Utilities
 
-1. [`flatten`](./flatten)
-2. [`markRaw`](./markRaw)
-3. [`isRaw`](./isRaw)
-4. [`persist`](./persist)
-5. [`html`](./html)
-6. [`raw`](./raw)
+1. [`flatten`](/api/flatten)
+2. [`markRaw`](/api/markRaw)
+3. [`isRaw`](/api/isRaw)
+4. [`persist`](/api/persist)
+5. [`html`](/api/html)
+6. [`raw`](/api/raw)
 
 ## Logging
 
-1. [`warningHandler`](./warningHandler)
+1. [`warningHandler`](/api/warningHandler)
 
 ## Recommendation
 
 Start with:
 
-1. [`createApp`](./createApp)
-2. [`ref`](./ref)
-3. [`sref`](./sref)
-4. [`computed`](./computed)
-5. [`watchEffect`](./watchEffect)
+1. [`createApp`](/api/createApp)
+2. [`ref`](/api/ref)
+3. [`sref`](/api/sref)
+4. [`computed`](/api/computed)
+5. [`watchEffect`](/api/watchEffect)

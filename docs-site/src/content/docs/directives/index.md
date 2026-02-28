@@ -17,27 +17,27 @@ By default, directive names start with `r-`. You can customize the prefix with `
 
 ## Binding
 
-1. [`r-text`](./r-text): text content binding.
-2. [`r-html`](./r-html): HTML content binding.
-3. [`r-bind`](./r-bind): attributes/properties/object binding.
-4. [`r-model`](./r-model): form two-way binding.
-5. [`r-on`](./r-on): event binding.
-6. [`r-show`](./r-show): conditional visibility.
-7. [`:class`](./class): dynamic class binding.
-8. [`:style`](./style): dynamic style binding.
+1. [`r-text`](/directives/r-text): text content binding.
+2. [`r-html`](/directives/r-html): HTML content binding.
+3. [`r-bind`](/directives/r-bind): attributes/properties/object binding.
+4. [`r-model`](/directives/r-model): form two-way binding.
+5. [`r-on`](/directives/r-on): event binding.
+6. [`r-show`](/directives/r-show): conditional visibility.
+7. [`:class`](/directives/class): dynamic class binding.
+8. [`:style`](/directives/style): dynamic style binding.
 
 ## Control Flow
 
-1. [`r-if`](./r-if), `r-else-if`, `r-else`: conditional branches.
-2. [`r-for`](./r-for): list/object iteration with keying support.
+1. [`r-if`](/directives/r-if), `r-else-if`, `r-else`: conditional branches.
+2. [`r-for`](/directives/r-for): list/object iteration with keying support.
 
 ## Component and Utility
 
-1. [`:is`](./is): dynamic component selection.
-2. [`:context`](./context): component prop object binding.
-3. [`:ref`](./ref): element/component references.
-4. [`r-pre`](./r-pre): skip compilation for subtree.
-5. [`r-teleport`](./r-teleport): move DOM subtree to another target.
+1. [`:is`](/directives/is): dynamic component selection.
+2. [`:context`](/directives/context): component prop object binding.
+3. [`:ref`](/directives/ref): element/component references.
+4. [`r-pre`](/directives/r-pre): skip compilation for subtree.
+5. [`r-teleport`](/directives/r-teleport): move DOM subtree to another target.
 
 ## Important Keying Note
 
@@ -49,8 +49,8 @@ Use stable keys whenever list identity matters.
 
 Read in this order:
 
-1. [`r-bind`](./r-bind)
-2. [`r-text`](./r-text)
-3. [`r-if`](./r-if)
-4. [`r-for`](./r-for)
-5. [`r-model`](./r-model)
+1. [`r-bind`](/directives/r-bind)
+2. [`r-text`](/directives/r-text)
+3. [`r-if`](/directives/r-if)
+4. [`r-for`](/directives/r-for)
+5. [`r-model`](/directives/r-model)

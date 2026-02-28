@@ -60,7 +60,7 @@ When dynamic **attribute** key changes, previous attribute is removed and new at
 
 1. Attribute path handles boolean attributes and `xlink:*` attributes.
 2. For DOM properties (`value`, `checked`, `innerHTML`, etc.), use `.` shorthand or `.prop`.
-3. For component prop-object assignment, use [`:context`](./context), not `r-bind="{...}"`.
+3. For component prop-object assignment, use [`:context`](/directives/context), not `r-bind="{...}"`.
 
 ## Example
 
@@ -72,9 +72,9 @@ When dynamic **attribute** key changes, previous attribute is removed and new at
 
 ## See Also
 
-1. [r-text](./r-text)
-2. [r-model](./r-model)
-3. [r-on](./r-on)
-4. [r-for](./r-for)
+1. [r-text](/directives/r-text)
+2. [r-model](/directives/r-model)
+3. [r-on](/directives/r-on)
+4. [r-for](/directives/r-for)
 
 

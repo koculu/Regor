@@ -162,8 +162,8 @@ createApp({
 
 ## Where To Go Next
 
-1. [Overview](./overview)
-2. [Guide](./guide)
-3. [Directives](./directives)
-4. [API Reference](./api)
-5. [Guide: Mounting](./guide/mounting)
+1. [Overview](/overview)
+2. [Guide](/guide)
+3. [Directives](/directives)
+4. [API Reference](/api)
+5. [Guide: Mounting](/guide/mounting)

@@ -38,7 +38,7 @@ Both are valid. Prefer `r-text` when:
 
 1. `r-text` writes plain text, not HTML.
 2. HTML tags in values are escaped as text.
-3. Use [`r-html`](./r-html) only when you intentionally need HTML rendering.
+3. Use [`r-html`](/directives/r-html) only when you intentionally need HTML rendering.
 
 ## Common Patterns
 
@@ -53,6 +53,6 @@ This is a clear and performant default for list text output.
 
 ## See Also
 
-1. [r-bind](./r-bind)
-2. [r-html](./r-html)
-3. [r-for](./r-for)
+1. [r-bind](/directives/r-bind)
+2. [r-html](/directives/r-html)
+3. [r-for](/directives/r-for)
