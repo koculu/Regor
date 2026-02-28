@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 
-import { createApp, createComponent, html, ref, RegorConfig } from '../../src'
+import { createApp, defineComponent, html, ref, RegorConfig } from '../../src'
 import { Binder } from '../../src/bind/Binder'
 import { Parser } from '../../src/parser/Parser'
 
@@ -8,8 +8,8 @@ test('dynamic binder transitions between components and unmounts invalid values'
   const root = document.createElement('div')
   const current = ref<any>('alphaBox')
 
-  const alphaBox = createComponent(html`<p>Alpha</p>`)
-  const betaBox = createComponent(html`<p>Beta</p>`)
+  const alphaBox = defineComponent(html`<p>Alpha</p>`)
+  const betaBox = defineComponent(html`<p>Beta</p>`)
 
   createApp(
     {
@@ -88,7 +88,7 @@ test('dynamic binder leaves plain is attribute values untouched', () => {
 test('dynamic binder mounts child content into resolved component and supports unbind cleanup', () => {
   const root = document.createElement('div')
   const current = ref('boxComp')
-  const boxComp = createComponent(html`<article><slot></slot></article>`)
+  const boxComp = defineComponent(html`<article><slot></slot></article>`)
 
   const app = createApp(
     {

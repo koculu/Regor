@@ -73,7 +73,7 @@ The `createApp` function returns an object with the following properties:
 
 ## See Also
 
-- [`createComponent`](/api/createComponent)
+- [`defineComponent`](/api/defineComponent)
 - [`toFragment`](/api/toFragment)
 - [`toJsonTemplate`](/api/toJsonTemplate)
 

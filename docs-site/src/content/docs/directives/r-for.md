@@ -37,9 +37,7 @@ Object iteration is supported:
 Destructuring is supported:
 
 ```html
-<li r-for="{ name, age }, #i in users">
-  {{ i }} - {{ name }} ({{ age }})
-</li>
+<li r-for="{ name, age }, #i in users">{{ i }} - {{ name }} ({{ age }})</li>
 ```
 
 ## Complex Expressions
@@ -81,11 +79,11 @@ If keys are unstable, DOM reuse quality degrades and updates become less predict
 ```
 
 ```ts
-const tableCell = createComponent(html`<td><span>{{ value }}</span></td>`, {
+const tableCell = defineComponent(html`<td><span>{{ value }}</span></td>`, {
   props: ['value'],
 })
 
-const tableRow = createComponent(
+const tableRow = defineComponent(
   html`<tr>
     <TableCell :value="row.name" />
     <TableCell :value="row.age" />
@@ -103,6 +101,6 @@ const tableRow = createComponent(
 
 ## See Also
 
-1. [r-if](./r-if)
-2. [r-bind](./r-bind)
-3. [r-text](./r-text)
+1. [r-if](/directives/r-if)
+2. [r-bind](/directives/r-bind)
+3. [r-text](/directives/r-text)

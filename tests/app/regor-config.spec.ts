@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
-import { createComponent, html, RegorConfig } from '../../src'
+import { defineComponent, html, RegorConfig } from '../../src'
 import { warningHandler } from '../../src/log/warnings'
 
 let originalWarning: (...args: unknown[]) => void
@@ -28,7 +28,7 @@ test('RegorConfig warns when registering unnamed component', () => {
 
 test('RegorConfig registers named component and allows updates', () => {
   const cfg = new RegorConfig()
-  const named = createComponent(html`<div>x</div>`, { defaultName: 'my-card' })
+  const named = defineComponent(html`<div>x</div>`, { defaultName: 'my-card' })
   cfg.addComponent(named)
 
   expect(cfg.__components.has('My-card')).toBe(true)

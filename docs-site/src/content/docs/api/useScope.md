@@ -6,7 +6,7 @@ title: useScope
 
 The `useScope` function allows you to create a scope for an app or composable, enabling you to manage initialization and cleanup tasks specific to that scope. Scopes are useful for organizing and encapsulating logic within your components.
 
-Components are always created in scope using `createComponent` function.
+Components are always created in scope using `defineComponent` function.
 
 ## Usage
 
@@ -16,9 +16,9 @@ To create a scope for an app or composable, call the `useScope` function and pas
 
 ```ts
 
-import { createApp, createComponent, html, useScope, onUnmounted, ref, computed, watchEffect } from 'regor'
+import { createApp, defineComponent, html, useScope, onUnmounted, ref, computed, watchEffect } from 'regor'
 
-const userRow = createComponent(html`<div></div>`, {
+const userRow = defineComponent(html`<div></div>`, {
   context: () => ({
     // Register an onUnmounted callback
     onUnmounted(() => {

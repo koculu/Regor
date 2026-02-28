@@ -13,7 +13,7 @@ import { callUnmounted } from '../composition/callUnmounted'
  *
  * Typical usage:
  * ```ts
- * const Card = createComponent(
+ * const Card = defineComponent(
  *  `<article><h3 r-text="title"></h3></article>`,
  *  {
  *   props: ['title'],

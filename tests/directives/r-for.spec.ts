@@ -1,6 +1,6 @@
 import { expect, test, vi } from 'vitest'
 
-import { createApp, createComponent, html, ref, sref, unref } from '../../src'
+import { createApp, defineComponent, html, ref, sref, unref } from '../../src'
 
 test('should mount the people into reactive divs.', () => {
   const root = document.createElement('div')
@@ -450,15 +450,15 @@ test('should support native thead and tfoot with r-for', () => {
 test('should support r-for on table custom row and cell components', () => {
   const root = document.createElement('div')
 
-  const tableCell = createComponent(html`<td><span>{{ value }}</span></td>`, {
+  const tableCell = defineComponent(html`<td><span>{{ value }}</span></td>`, {
     props: ['value'],
   })
 
-  const tableCell2 = createComponent(html`<span>{{ value }}</span>`, {
+  const tableCell2 = defineComponent(html`<span>{{ value }}</span>`, {
     props: ['value'],
   })
 
-  const tableRow = createComponent(
+  const tableRow = defineComponent(
     html`<tr>
       <TableCell :value="i" />
       <td><TableCell2 :value="row.name" /></td>
@@ -511,22 +511,22 @@ test('should support r-for on table custom row and cell components', () => {
 test('should support table usage with th and td as components', () => {
   const root = document.createElement('div')
 
-  const tableHeadCell = createComponent(
+  const tableHeadCell = defineComponent(
     html`<th><span>{{ value }}</span></th>`,
     {
       props: ['value'],
     },
   )
-  const tableCell = createComponent(html`<td><span>{{ value }}</span></td>`, {
+  const tableCell = defineComponent(html`<td><span>{{ value }}</span></td>`, {
     props: ['value'],
   })
-  const headerRow = createComponent(
+  const headerRow = defineComponent(
     html`<tr>
       <TableHeadCell r-for="label in headers" :value="label" />
     </tr>`,
     { props: ['headers'] },
   )
-  const tableRow = createComponent(
+  const tableRow = defineComponent(
     html`<tr>
       <TableCell :value="row.name" />
       <TableCell :value="row.age" />
@@ -583,22 +583,22 @@ test('should support table usage with th and td as components', () => {
 test('should support table usage with thead th components (expected to fail for now)', () => {
   const root = document.createElement('div')
 
-  const tableHeadCell = createComponent(
+  const tableHeadCell = defineComponent(
     html`<th><span>{{ value }}</span></th>`,
     {
       props: ['value'],
     },
   )
-  const tableCell = createComponent(html`<td><span>{{ value }}</span></td>`, {
+  const tableCell = defineComponent(html`<td><span>{{ value }}</span></td>`, {
     props: ['value'],
   })
-  const headerRow = createComponent(
+  const headerRow = defineComponent(
     html`<tr>
       <TableHeadCell r-for="label in headers" :value="label" />
     </tr>`,
     { props: ['headers'] },
   )
-  const tableRow = createComponent(
+  const tableRow = defineComponent(
     html`<tr>
       <TableCell :value="row.name" />
       <TableCell :value="row.age" />
@@ -645,22 +645,22 @@ test('should support table usage with thead th components (expected to fail for 
 test('should support simple table usage without thead/tbody (expected to fail for now)', () => {
   const root = document.createElement('div')
 
-  const tableHeadCell = createComponent(
+  const tableHeadCell = defineComponent(
     html`<th><span>{{ value }}</span></th>`,
     {
       props: ['value'],
     },
   )
-  const tableCell = createComponent(html`<td><span>{{ value }}</span></td>`, {
+  const tableCell = defineComponent(html`<td><span>{{ value }}</span></td>`, {
     props: ['value'],
   })
-  const headerRow = createComponent(
+  const headerRow = defineComponent(
     html`<tr>
       <TableHeadCell r-for="label in headers" :value="label" />
     </tr>`,
     { props: ['headers'] },
   )
-  const tableRow = createComponent(
+  const tableRow = defineComponent(
     html`<tr>
       <TableCell :value="row.name" />
       <TableCell :value="row.age" />
@@ -703,10 +703,10 @@ test('should support simple table usage without thead/tbody (expected to fail fo
 test('should support table usage with tfoot and component cells', () => {
   const root = document.createElement('div')
 
-  const tableCell = createComponent(html`<td><span>{{ value }}</span></td>`, {
+  const tableCell = defineComponent(html`<td><span>{{ value }}</span></td>`, {
     props: ['value'],
   })
-  const footerRow = createComponent(
+  const footerRow = defineComponent(
     html`<tr>
       <TableCell r-for="value in totals" :value="value" />
     </tr>`,
@@ -805,7 +805,7 @@ test('should start from selected host tenants when adding first tenant via compo
   ])
   const selectedHost = ref(hostItems()[0]())
 
-  const hostTenantsField = createComponent(
+  const hostTenantsField = defineComponent(
     html`<div class="form-block__field">
       <span class="form-block__label">Tenants</span>
       <div class="form-block__meta" r-for="tenantValue in selectedHost.tenants">
@@ -913,12 +913,12 @@ test('repro with hosts-like component hierarchy and table selection path', async
     selectHost('host-a')
   }
 
-  const hostInputField = createComponent(
+  const hostInputField = defineComponent(
     html`<input type="text" r-model="model" />`,
     ['model'],
   )
 
-  const hostTenantsField = createComponent(
+  const hostTenantsField = defineComponent(
     html`<div>
       <div class="tenant-row" r-for="tenantValue in selectedHost.tenants">
         <input type="text" r-model="tenantValue" />
@@ -927,7 +927,7 @@ test('repro with hosts-like component hierarchy and table selection path', async
     </div>`,
   )
 
-  const hostEditor = createComponent(
+  const hostEditor = defineComponent(
     html`<div>
       <HostInputField :model="selectedHost.hostname"></HostInputField>
       <HostTenantsField></HostTenantsField>
@@ -942,7 +942,7 @@ test('repro with hosts-like component hierarchy and table selection path', async
     },
   )
 
-  const hostTableRow = createComponent(
+  const hostTableRow = defineComponent(
     html`<tr @click="selectHost(host.hostname)">
       <td>{{ host.hostname }}</td>
       <td>
@@ -957,7 +957,7 @@ test('repro with hosts-like component hierarchy and table selection path', async
     },
   )
 
-  const hostsClientApp = createComponent(
+  const hostsClientApp = defineComponent(
     html`<section>
       <table>
         <tbody>

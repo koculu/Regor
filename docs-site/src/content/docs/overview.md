@@ -94,9 +94,9 @@ The upside is that Regor keeps optimization options open:
 
 ## Recommended Reading Order
 
-1. [Getting Started](./getting-started)
-2. [Guide](./guide)
-3. [Directives](./directives)
-4. [API Reference](./api)
-5. [Performance Guide](./guide/performance)
+1. [Getting Started](/getting-started)
+2. [Guide](/guide)
+3. [Directives](/directives)
+4. [API Reference](/api)
+5. [Performance Guide](/guide/performance)
 

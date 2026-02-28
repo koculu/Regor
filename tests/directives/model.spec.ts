@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
-import { createApp, createComponent, html, ref } from '../../src'
+import { createApp, defineComponent, html, ref } from '../../src'
 import { modelDirective } from '../../src/directives/model'
 import { warningHandler } from '../../src/log/warnings'
 import { bindDirective, updateDirective } from '../directive-test-utils'
@@ -140,7 +140,7 @@ test('r-model input type number retargets after selected ref replacement without
 test('r-model input type number retargets through component prop after selected ref replacement', () => {
   const root = document.createElement('div')
   const selectedHost = ref({ port: 1 })
-  const hostInputField = createComponent(
+  const hostInputField = defineComponent(
     html`<input type="number" r-model="model" />`,
     ['model'],
   )
@@ -234,7 +234,7 @@ test('r-model with select multiple populates set', () => {
 test('demonstrates stale model target through component prop after selected ref replacement', () => {
   const root = document.createElement('div')
   const selectedHost = ref({ hostname: 'alpha' })
-  const hostInputField = createComponent(
+  const hostInputField = defineComponent(
     html`<input type="text" r-model="model" />`,
     ['model'],
   )
@@ -297,7 +297,7 @@ test('demonstrates stale model target after selected ref replacement without com
 test('r-model through component prop tracks writes after selected ref replacement', () => {
   const root = document.createElement('div')
   const selectedHost = ref({ hostname: 'alpha' })
-  const hostInputField = createComponent(
+  const hostInputField = defineComponent(
     html`<input type="text" r-model="model" />`,
     ['model'],
   )
@@ -336,7 +336,7 @@ test('r-model through component prop tracks writes after selected ref replacemen
 test('r-model through component prop keeps parent-to-input sync after selected ref replacement', () => {
   const root = document.createElement('div')
   const selectedHost = ref({ hostname: 'alpha' })
-  const hostInputField = createComponent(
+  const hostInputField = defineComponent(
     html`<input type="text" r-model="model" />`,
     ['model'],
   )
@@ -401,7 +401,7 @@ test('r-model direct binding tracks latest ref across multiple selected ref repl
 test('edge case: r-model through component prop breaks after second selected ref replacement', () => {
   const root = document.createElement('div')
   const selectedHost = ref({ hostname: 'alpha' })
-  const hostInputField = createComponent(
+  const hostInputField = defineComponent(
     html`<input type="text" r-model="model" />`,
     ['model'],
   )
@@ -446,7 +446,7 @@ test('edge case: r-model through component prop breaks after second selected ref
 test('two-way component model binding syncs parent and child without replacement', () => {
   const root = document.createElement('div')
   const selectedHost = ref({ hostname: 'alpha' })
-  const hostInputField = createComponent(
+  const hostInputField = defineComponent(
     html`<input type="text" r-model="model" />`,
     ['model'],
   )
@@ -480,7 +480,7 @@ test('two-way component model binding syncs parent and child without replacement
 test('two-way component model binding survives alternating parent and child updates after replacement', () => {
   const root = document.createElement('div')
   const selectedHost = ref({ hostname: 'alpha' })
-  const hostInputField = createComponent(
+  const hostInputField = defineComponent(
     html`<input type="text" r-model="model" />`,
     ['model'],
   )
@@ -519,7 +519,7 @@ test('two-way component model binding survives alternating parent and child upda
 test('two-way component model binding stays connected across multiple replacements', () => {
   const root = document.createElement('div')
   const selectedHost = ref({ hostname: 'alpha' })
-  const hostInputField = createComponent(
+  const hostInputField = defineComponent(
     html`<input type="text" r-model="model" />`,
     ['model'],
   )
@@ -566,11 +566,11 @@ test('three nested components keep :model two-way binding across replacements', 
   const root = document.createElement('div')
   const selectedHost = ref({ hostname: 'alpha' })
 
-  const leafInputField = createComponent(
+  const leafInputField = defineComponent(
     html`<input type="text" r-model="model" />`,
     ['model'],
   )
-  const middleInputField = createComponent(
+  const middleInputField = defineComponent(
     html`<LeafInputField :model="model"></LeafInputField>`,
     {
       props: ['model'],
@@ -581,7 +581,7 @@ test('three nested components keep :model two-way binding across replacements', 
       }),
     },
   )
-  const outerInputField = createComponent(
+  const outerInputField = defineComponent(
     html`<MiddleInputField :model="model"></MiddleInputField>`,
     {
       props: ['model'],
@@ -642,7 +642,7 @@ test('regression: selecting host from list should not overwrite previous host it
   const root = document.createElement('div')
   const hostItems = ref([{ hostname: 'host-a' }, { hostname: 'host-b' }])
   const selectedHost = ref(hostItems()[0]())
-  const hostInputField = createComponent(
+  const hostInputField = defineComponent(
     html`<input type="text" r-model="model" />`,
     ['model'],
   )

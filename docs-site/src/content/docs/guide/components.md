@@ -9,17 +9,17 @@ This guide documents how Regor components work in runtime, based on current impl
 ## Create a Component
 
 ```ts
-import { createComponent, html } from 'regor'
+import { defineComponent, html } from 'regor'
 
-export const UserCard = createComponent(
+export const UserCard = defineComponent(
   html`<article><h3 r-text="title"></h3></article>`,
   { props: ['title'] },
 )
 ```
 
-`createComponent(template, options)` supports:
+`defineComponent(template, options)` supports:
 
-1. Template from string: `createComponent('<div>...</div>')`
+1. Template from string: `defineComponent('<div>...</div>')`
 2. Template object with `template`
 3. Template object with `element`
 4. Template object with `selector`
@@ -67,7 +67,7 @@ class CardContext {
   save = () => this.$emit?.('save', { title: this.title() })
 }
 
-const Card = createComponent('<button @click="save">Save</button>', {
+const Card = defineComponent('<button @click="save">Save</button>', {
   context: () => new CardContext(),
 })
 ```
@@ -96,7 +96,7 @@ Use:
 These are treated as component props **only if `x` is declared in `props: [...]`**.
 
 ```ts
-const Card = createComponent('<h3 r-text="title"></h3>', {
+const Card = defineComponent('<h3 r-text="title"></h3>', {
   props: ['title'],
   context: (head) => ({ title: head.props.title }),
 })
@@ -200,7 +200,7 @@ Unmount cleans child component bindings and observers.
 
 ## See Also
 
-1. [createComponent API](/api/createComponent)
+1. [defineComponent API](/api/defineComponent)
 2. [Directive: :is](/directives/is)
 3. [Directive: :context](/directives/context)
 4. [TypeScript Guide](/guide/typescript)

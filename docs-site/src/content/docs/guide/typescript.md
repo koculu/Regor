@@ -65,7 +65,7 @@ createApp(
 ## Typed component props and context with `ComponentHead<TProps>`
 
 ```ts
-import { ComponentHead, createComponent, html, type Ref, ref } from 'regor'
+import { ComponentHead, defineComponent, html, type Ref, ref } from 'regor'
 
 type CardProps = {
   title: Ref<string>
@@ -80,7 +80,7 @@ class CardContext {
   }
 }
 
-const Card = createComponent<CardContext>(
+const Card = defineComponent<CardContext>(
   html`<article :class="{ selected: selected }">
     <h3 r-text="title"></h3>
   </article>`,
@@ -106,5 +106,5 @@ You can type `head` in class constructors and use runtime behavior flags intenti
 ## See Also
 
 1. [Components](/guide/components)
-2. [createComponent API](/api/createComponent)
+2. [defineComponent API](/api/defineComponent)
 3. [createApp API](/api/createApp)

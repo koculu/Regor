@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 
-import { createApp, createComponent, drainUnbind, html, ref } from '../../src'
+import { createApp, defineComponent, drainUnbind, html, ref } from '../../src'
 
 type KeyedLabelSource = {
   payload: string
@@ -177,13 +177,13 @@ test('e2e: :is component switching keeps prop reactivity and detaches old source
   const currentCard = ref('cardA')
   const item = ref<CardItem>({ title: 'first' })
 
-  const cardA = createComponent(
+  const cardA = defineComponent(
     html`<article class="a"><h3 r-text="item.title"></h3></article>`,
     {
       props: ['item'],
     },
   )
-  const cardB = createComponent(
+  const cardB = defineComponent(
     html`<article class="b"><h3 r-text="item.title"></h3></article>`,
     {
       props: ['item'],
@@ -232,11 +232,11 @@ test('e2e: mixed binders detach after unmount (post-unmount source churn is safe
   const meta = ref<MetaSource>({ payload: 'x' })
   const currentCard = ref('cardA')
 
-  const cardA = createComponent(
+  const cardA = defineComponent(
     html`<article class="a"><span r-text="meta.payload"></span></article>`,
     { props: ['meta'] },
   )
-  const cardB = createComponent(
+  const cardB = defineComponent(
     html`<article class="b"><span r-text="meta.payload"></span></article>`,
     { props: ['meta'] },
   )

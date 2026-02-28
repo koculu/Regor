@@ -242,40 +242,40 @@ export interface JSONTemplate {
  * - Define either 'selector' or 'element' to specify the mounting point.
  * - Optionally, 'html' or 'json' can be defined to override the inner HTML of the mounting point.
  * - If neither 'html' nor 'json' template is defined, the mounting point's inner HTML remains unchanged.
- * If used with 'createComponent':
+ * If used with 'defineComponent':
  * - Define only one option: 'selector', 'element', 'html', or 'json'. The single option defines the component's HTML template.
  */
 export interface Template {
   /**
    * If used with 'createApp', specifies the target root element for mounting the application.
-   * If used with 'createComponent', identifies the component template using a selector.
+   * If used with 'defineComponent', identifies the component template using a selector.
    */
   selector?: string
 
   /**
    * If used with 'createApp', represents the actual DOM element where the app will be mounted.
-   * If used with 'createComponent', specifies the component template using an element.
+   * If used with 'defineComponent', specifies the component template using an element.
    * Use this property if you already have a reference to the target element.
    */
   element?: Node
 
   /**
    *  If used with 'createApp', HTML template string that will replace the content of the root element defined by 'selector' or 'element'.
-   * If used with 'createComponent', this template populates the content of the component.
+   * If used with 'defineComponent', this template populates the content of the component.
    */
   template?: string
 
   /**
    * JSON-based template representation, enabling rendering within secure contexts.
    * Can be a single JSONTemplate object or an array of JSONTemplate objects.
-   * This property is applicable to both 'createApp' and 'createComponent'.
+   * This property is applicable to both 'createApp' and 'defineComponent'.
    */
   json?: JSONTemplate | JSONTemplate[]
 
   /**
    * Indicates whether the component template contains SVG elements.
    * Enable this flag if SVG content is present to ensure proper rendering.
-   * This property is applicable to both 'createApp' and 'createComponent'.
+   * This property is applicable to both 'createApp' and 'defineComponent'.
    */
   isSVG?: boolean
 }
@@ -327,7 +327,7 @@ export interface Component<
 export type OnMounted = () => void
 export type OnUnmounted = () => void
 
-export interface CreateComponentOptions<
+export interface DefineComponentOptions<
   TContext extends IRegorContext | object = IRegorContext,
 > {
   /**
@@ -401,7 +401,7 @@ export interface CreateComponentOptions<
    *
    * Example:
    * ```ts
-   * const Card = createComponent('<div>...</div>', { defaultName: 'CardView' })
+   * const Card = defineComponent('<div>...</div>', { defaultName: 'CardView' })
    * cfg.addComponent(Card)
    * // usable as <CardView></CardView>
    * ```

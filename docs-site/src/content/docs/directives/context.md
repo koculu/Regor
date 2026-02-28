@@ -36,7 +36,7 @@ Use object-form attribute binding (`r-bind="{...}"` or `:="{...}"`) for normal h
 ```
 
 ```ts
-const UserCard = createComponent('<section>...</section>', {
+const UserCard = defineComponent('<section>...</section>', {
   props: ['userId'],
   context: (head) => ({
     userId: head.props.userId,

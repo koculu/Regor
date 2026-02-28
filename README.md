@@ -62,7 +62,7 @@ HTML:
 Defining component:
 
 ```ts
-import { createApp, createComponent, ref, html, type Ref } from 'regor'
+import { createApp, defineComponent, ref, html, type Ref } from 'regor'
 
 interface MyComponent {
   message: Ref<string>
@@ -74,7 +74,7 @@ const template = html`<button @click="count++">
 
 const props = ['message']
 
-const myComponent = createComponent<MyComponent>(template, {
+const myComponent = defineComponent<MyComponent>(template, {
   context: (head) => ({
     message: head.props.message,
     count: ref(0),
@@ -120,7 +120,7 @@ Example:
 ```
 
 ```ts
-const tableRow = createComponent(
+const tableRow = defineComponent(
   html`<tr>
     <TableCell :value="row.name" />
     <TableCell :value="row.age" />
@@ -222,7 +222,7 @@ These directives empower you to create dynamic and interactive user interfaces, 
 **App / Component Template Functions**
 
 - **`createApp`** Similar to Vue's `createApp`, it initializes a Regor application instance.
-- **`createComponent`** Creates a Regor component instance.
+- **`defineComponent`** Creates a Regor component instance.
 - **`toFragment`** Converts a JSON template to a document fragment.
 - **`toJsonTemplate`** Converts a DOM element to a JSON template.
 

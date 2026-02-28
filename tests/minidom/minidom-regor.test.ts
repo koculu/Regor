@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { createApp, createComponent, html } from '../../src'
+import { createApp, defineComponent, html } from '../../src'
 import { createDom } from './createDom'
 
 function withDom<T>(markup: string, run: () => T): T {
@@ -13,7 +13,7 @@ function withDom<T>(markup: string, run: () => T): T {
 }
 
 function mountTemplate(template: string, document: Document) {
-  const component = createComponent(html`${template}`)
+  const component = defineComponent(html`${template}`)
   const wrapper = document.createElement('div')
   wrapper.appendChild(component.template.cloneNode(true))
   return wrapper
@@ -93,7 +93,7 @@ describe('regor + minidom compatibility', () => {
         const teleportHost = document.querySelector('#teleport-host')
         if (!teleportHost) throw new Error('missing #teleport-host')
 
-        const teleportProbe = createComponent(
+        const teleportProbe = defineComponent(
           html`<section class="teleport-probe" r-teleport="#teleport-host">
             <span>Teleported payload</span>
           </section>`,
@@ -127,7 +127,7 @@ describe('regor + minidom compatibility', () => {
         const appRoot = document.querySelector('#app')
         if (!appRoot) throw new Error('missing #app root')
 
-        const styleProbe = createComponent(
+        const styleProbe = defineComponent(
           html`<p
             class="probe"
             :style="{ fontSize: '18px', lineHeight: '1.4' }"
@@ -161,7 +161,7 @@ describe('regor + minidom compatibility', () => {
         const appRoot = document.querySelector('#app')
         if (!appRoot) throw new Error('missing #app root')
 
-        const shellComponent = createComponent(
+        const shellComponent = defineComponent(
           html`<section>
             <slot></slot>
             <slot name="abc"></slot>

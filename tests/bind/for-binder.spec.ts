@@ -233,3 +233,94 @@ test('r-for keeps reactivity for simple r-text and :class template', () => {
   expect(nextText).toStrictEqual(['A2', 'B'])
   expect(nextClasses).toStrictEqual(['k-a', 'k-b2'])
 })
+
+test('r-for fallback diff handles duplicate keys and mixed insert/remove updates', () => {
+  const root = document.createElement('div')
+  const rows = ref([
+    ref({ id: 1, name: 'a' }),
+    ref({ id: 2, name: 'b' }),
+    ref({ id: 3, name: 'c' }),
+    ref({ id: 4, name: 'd' }),
+    ref({ id: 5, name: 'e' }),
+  ])
+  const config = new RegorConfig()
+  config.forGrowThreshold = 3
+
+  const app = createApp(
+    { rows },
+    {
+      element: root,
+      template: html`<ul>
+        <li r-for="row in rows" :key="row.id">{{ row.name }}</li>
+      </ul>`,
+    },
+    config,
+  )
+
+  // Duplicate keys force keyed patcher fallback.
+  rows([
+    ref({ id: 3, name: 'c1' }),
+    ref({ id: 3, name: 'c2' }),
+    ref({ id: 5, name: 'e1' }),
+  ])
+  expect(texts(root)).toStrictEqual(['c1', 'c2', 'e1'])
+
+  // Exercise fallback grow/insert paths.
+  rows([
+    ref({ id: 3, name: 'c1' }),
+    ref({ id: 9, name: 'x1' }),
+    ref({ id: 9, name: 'x2' }),
+    ref({ id: 5, name: 'e1' }),
+    ref({ id: 10, name: 'z' }),
+  ])
+  expect(texts(root)).toStrictEqual(['c1', 'x1', 'x2', 'e1', 'z'])
+
+  // Exercise fallback removals/tail shrink.
+  rows([ref({ id: 3, name: 'c1' }), ref({ id: 9, name: 'x1' })])
+  expect(texts(root)).toStrictEqual(['c1', 'x1'])
+  app.unbind()
+})
+
+test('r-for supports array destructuring list aliases', () => {
+  const root = document.createElement('div')
+  const rows = ref([ref(['Alice', 30]), ref(['Bob', 25])])
+  const app = createApp(
+    { rows },
+    {
+      element: root,
+      template: html`<ul>
+        <li r-for="[name, age] in rows">{{ name }}-{{ age }}</li>
+      </ul>`,
+    },
+  )
+
+  expect(texts(root)).toStrictEqual(['Alice-30', 'Bob-25'])
+  app.unbind()
+})
+
+test('r-for fallback replace path is used when growth threshold is zero', () => {
+  const root = document.createElement('div')
+  const rows = ref([ref({ id: 1, name: 'a' }), ref({ id: 2, name: 'b' })])
+  const config = new RegorConfig()
+  config.forGrowThreshold = 0
+
+  createApp(
+    { rows },
+    {
+      element: root,
+      template: html`<ul>
+        <li r-for="row in rows" :key="row.id">{{ row.name }}</li>
+      </ul>`,
+    },
+    config,
+  )
+
+  // Duplicate key forces keyed diff fallback; zero threshold forces replace path.
+  rows([
+    ref({ id: 1, name: 'a1' }),
+    ref({ id: 9, name: 'x1' }),
+    ref({ id: 9, name: 'x2' }),
+  ])
+
+  expect(texts(root)).toStrictEqual(['a1', 'x1', 'x2'])
+})
