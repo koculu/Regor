@@ -2,6 +2,8 @@ import { type IRegorContext } from '../api/types'
 import { removeNode } from '../cleanup/removeNode'
 import { callUnmounted } from '../composition/callUnmounted'
 
+export type ContextClass<TValue> = abstract new (...args: never[]) => TValue
+
 /**
  * Runtime metadata passed to a component's `context(head)` factory.
  *
@@ -157,6 +159,73 @@ export class ComponentHead<
   emit = (event: string, args: Record<string, unknown>): void => {
     this.__element.dispatchEvent(
       new CustomEvent<Record<string, unknown>>(event, { detail: args }),
+    )
+  }
+
+  /**
+   * Finds a parent context instance by constructor type from the captured
+   * context stack.
+   *
+   * Matching uses `instanceof` and respects stack order.
+   *
+   * `occurrence` selects which matching instance to return:
+   * - `0` (default): first match
+   * - `1`: second match
+   * - `2`: third match
+   * - negative values: always `undefined`
+   *
+   * Example:
+   * ```ts
+   * // stack: [RootCtx, ParentCtx, ParentCtx]
+   * head.findContext(ParentCtx)    // first ParentCtx
+   * head.findContext(ParentCtx, 1) // second ParentCtx
+   * ```
+   *
+   * @param constructor - Class constructor used for `instanceof` matching.
+   * @param occurrence - Zero-based index of the matching instance to return.
+   * @returns The matching parent context instance, or `undefined` when not found.
+   */
+  findContext<TValue>(
+    constructor: ContextClass<TValue>,
+    occurrence = 0,
+  ): TValue | undefined {
+    if (occurrence < 0) return undefined
+    let current = 0
+    for (const value of this.ctx ?? []) {
+      if (!(value instanceof constructor)) continue
+      if (current === occurrence) return value
+      ++current
+    }
+    return undefined
+  }
+
+  /**
+   * Returns a parent context instance by constructor type from the captured
+   * context stack.
+   *
+   * The stack is scanned in order and each entry is checked with `instanceof`.
+   * `occurrence` is zero-based (`0` = first match, `1` = second match, ...).
+   * If no instance exists at the requested occurrence, this method throws.
+   *
+   * Example:
+   * ```ts
+   * const auth = head.requireContext(AuthContext)     // first AuthContext
+   * const outer = head.requireContext(LayoutCtx, 1)   // second LayoutCtx
+   * ```
+   *
+   * @param constructor - Class constructor used for `instanceof` matching.
+   * @param occurrence - Zero-based index of the instance to return.
+   * @returns The parent context instance at the requested occurrence.
+   * @throws Error when no matching instance exists at the requested occurrence.
+   */
+  requireContext<TValue>(
+    constructor: ContextClass<TValue>,
+    occurrence = 0,
+  ): TValue {
+    const value = this.findContext(constructor, occurrence)
+    if (value !== undefined) return value
+    throw new Error(
+      `${constructor} was not found in the context stack at occurrence ${occurrence}.`,
     )
   }
 

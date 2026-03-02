@@ -102,6 +102,25 @@ You can type `head` in class constructors and use runtime behavior flags intenti
 1. `head.autoProps` to disable automatic parent-input assignment.
 2. `head.entangle` to choose two-way ref sync vs snapshot behavior.
 3. `head.enableSwitch` for parent-context slot evaluation.
+4. `head.findContext(ServiceClass, occurrence?)` for optional parent context lookup.
+5. `head.requireContext(ServiceClass, occurrence?)` for required parent context lookup.
+
+Example:
+
+```ts
+class AppServices {
+  readonly apiBase = '/v1'
+}
+
+class ChildContext {
+  apiBase: string
+
+  constructor(head: ComponentHead<object>) {
+    const services = head.requireContext(AppServices)
+    this.apiBase = services.apiBase
+  }
+}
+```
 
 ## See Also
 

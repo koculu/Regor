@@ -6,7 +6,7 @@ sidebar:
 
 This guide documents how Regor components work in runtime, based on current implementation and tests.
 
-## Create a Component
+## Define a Component
 
 ```ts
 import { defineComponent, html } from 'regor'
@@ -56,7 +56,15 @@ Component context is created by `options.context(head)`.
 4. `head.entangle` (default `true`): if both sides are refs, parent and component refs are two-way entangled during auto-props.
 5. `head.enableSwitch` (default `false`): enables slot context switching to parent for slot templates.
 6. `head.onAutoPropsAssigned`: callback after auto props assignment.
-7. `head.unmount()`: removes mounted nodes in component range and calls unmounted hooks.
+7. `head.findContext(ContextClass, occurrence?)`: returns matching parent context instance from `head.ctx` by `instanceof`, or `undefined`.
+8. `head.requireContext(ContextClass, occurrence?)`: resolves matching parent context instance from `head.ctx` by `instanceof`; throws if the selected occurrence does not exist.
+9. `head.unmount()`: removes mounted nodes in component range and calls unmounted hooks.
+
+`occurrence` is zero-based:
+
+1. `0` (default): first match
+2. `1`: second match
+3. `2`: third match
 
 ### Emit Example
 
@@ -76,6 +84,24 @@ In parent:
 
 ```html
 <Card @save="onSave($event)" />
+```
+
+### Parent context lookup example
+
+```ts
+class AppServices {
+  api = '/v1'
+}
+
+class OuterLayoutContext {}
+
+const Child = defineComponent('<div></div>', {
+  context: (head) => {
+    const services = head.requireContext(AppServices)
+    const secondLayout = head.findContext(OuterLayoutContext, 1)
+    return { services, secondLayout }
+  },
+})
 ```
 
 ## How Component Inputs Are Routed
