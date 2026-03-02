@@ -231,3 +231,4 @@ Unmount cleans child component bindings and observers.
 3. [Directive: :context](/directives/context)
 4. [TypeScript Guide](/guide/typescript)
 5. [Directive: r-for](/directives/r-for)
+6. [contextRegistry API](/api/contextRegistry)
