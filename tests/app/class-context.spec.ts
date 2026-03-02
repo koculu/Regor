@@ -3,6 +3,7 @@ import { expect, test, vi } from 'vitest'
 import {
   ComponentHead,
   computed,
+  ContextRegistry,
   createApp,
   defineComponent,
   html,
@@ -382,6 +383,138 @@ test('class component autoProps entangle can sync or isolate refs', () => {
   app.context.sharedB('parent-after-child')
   expect(isolated.value).toBe('child-local')
   expect(app.context.sharedB()).toBe('parent-after-child')
+})
+
+test('child resolves parent-provided ContextRegistry via head.requireContext', () => {
+  class AppServices {
+    readonly apiBase = '/v1'
+  }
+
+  class Parent {
+    components = { child }
+    registry = new ContextRegistry()
+
+    constructor() {
+      this.registry.register(new AppServices())
+    }
+  }
+
+  class Child {
+    readonly apiBase: string
+
+    constructor(head: ComponentHead<object>) {
+      const parent = head.requireContext(Parent)
+      const services = parent.registry.require(AppServices)
+      this.apiBase = services.apiBase
+    }
+  }
+
+  const child = defineComponent<Child>(
+    html`<p class="api-base" r-text="apiBase"></p>`,
+    {
+      context: (head) => new Child(head),
+    },
+  )
+
+  const parent = defineComponent<Parent>(
+    html`<section><Child></Child></section>`,
+    {
+      context: () => new Parent(),
+    },
+  )
+
+  const root = document.createElement('div')
+  createApp(
+    {
+      components: { parent },
+    },
+    {
+      element: root,
+      template: html`<Parent></Parent>`,
+    },
+  )
+
+  expect(root.querySelector('.api-base')?.textContent).toBe('/v1')
+})
+
+test('sibling component contexts communicate through parent ContextRegistry', () => {
+  class Parent {
+    components = { producer, consumer }
+    registry = new ContextRegistry()
+  }
+
+  class Consumer {
+    message = ref('idle')
+    private readonly parent: Parent
+
+    constructor(head: ComponentHead<object>) {
+      this.parent = head.requireContext(Parent)
+      this.parent.registry.register(this)
+      onUnmounted(() => this.parent.registry.unregister(this))
+    }
+
+    receive = (next: string): void => {
+      this.message(next)
+    }
+  }
+
+  class Producer {
+    private readonly parent: Parent
+
+    constructor(head: ComponentHead<object>) {
+      this.parent = head.requireContext(Parent)
+      this.parent.registry.register(this)
+      onUnmounted(() => this.parent.registry.unregister(this))
+    }
+
+    send = (): void => {
+      const consumer = this.parent.registry.require(Consumer)
+      consumer.receive('message-from-producer')
+    }
+  }
+
+  const producer = defineComponent<Producer>(
+    html`<button class="send" @click="send">send</button>`,
+    {
+      context: (head) => new Producer(head),
+    },
+  )
+
+  const consumer = defineComponent<Consumer>(
+    html`<p class="value">{{ message }}</p>`,
+    {
+      context: (head) => new Consumer(head),
+    },
+  )
+
+  const parent = defineComponent<Parent>(
+    html`<section>
+      <Producer></Producer>
+      <Consumer></Consumer>
+    </section>`,
+    {
+      context: () => new Parent(),
+    },
+  )
+
+  const root = document.createElement('div')
+  createApp(
+    {
+      components: { parent },
+    },
+    {
+      element: root,
+      template: html`<Parent></Parent>`,
+    },
+  )
+
+  const value = () => root.querySelector('.value')?.textContent?.trim()
+  const sendButton = root.querySelector('.send') as HTMLButtonElement | null
+  if (!sendButton) throw new Error('missing send button')
+
+  expect(value()).toBe('idle')
+  sendButton.click()
+  expect(value()).toBe('message-from-producer')
 })
 
 test('nested class components run lifecycle hooks and unmount cleanly', async () => {

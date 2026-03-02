@@ -127,3 +127,4 @@ class ChildContext {
 1. [Components](/guide/components)
 2. [defineComponent API](/api/defineComponent)
 3. [createApp API](/api/createApp)
+4. [contextRegistry API](/api/contextRegistry)

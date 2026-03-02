@@ -51,6 +51,7 @@ Use this page as an index, then open each API page for signature details and exa
 1. [`useScope`](/api/useScope)
 2. [`onMounted`](/api/onMounted)
 3. [`onUnmounted`](/api/onUnmounted)
+4. [`contextRegistry`](/api/contextRegistry)
 
 ## Cleanup and Unbind
 

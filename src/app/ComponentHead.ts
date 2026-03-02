@@ -2,7 +2,9 @@ import { type IRegorContext } from '../api/types'
 import { removeNode } from '../cleanup/removeNode'
 import { callUnmounted } from '../composition/callUnmounted'
 
-export type ContextClass<TValue> = abstract new (...args: never[]) => TValue
+export type ContextClass<TValue extends object> = abstract new (
+  ...args: never[]
+) => TValue
 
 /**
  * Runtime metadata passed to a component's `context(head)` factory.
@@ -185,7 +187,7 @@ export class ComponentHead<
    * @param occurrence - Zero-based index of the matching instance to return.
    * @returns The matching parent context instance, or `undefined` when not found.
    */
-  findContext<TValue>(
+  findContext<TValue extends object>(
     constructor: ContextClass<TValue>,
     occurrence = 0,
   ): TValue | undefined {
@@ -218,7 +220,7 @@ export class ComponentHead<
    * @returns The parent context instance at the requested occurrence.
    * @throws Error when no matching instance exists at the requested occurrence.
    */
-  requireContext<TValue>(
+  requireContext<TValue extends object>(
     constructor: ContextClass<TValue>,
     occurrence = 0,
   ): TValue {
