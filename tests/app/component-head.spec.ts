@@ -49,3 +49,48 @@ test('component head unmount removes nodes between markers and calls unmounted h
   expect(host.contains(n1)).toBe(false)
   expect(stop).toHaveBeenCalledTimes(1)
 })
+
+test('component head findContext returns first matching parent context', () => {
+  class ParentContext {
+    constructor(readonly value: number) {}
+  }
+  class OtherContext {
+    readonly name = 'other'
+  }
+
+  const host = document.createElement('div')
+  const start = document.createComment('s')
+  const end = document.createComment('e')
+  const other = new OtherContext()
+  const parent1 = new ParentContext(1)
+  const parent2 = new ParentContext(2)
+  const head = new ComponentHead(
+    {},
+    host,
+    [other, parent1, parent2 as any],
+    start,
+    end,
+  )
+
+  expect(head.findContext(ParentContext)).toBe(parent1)
+  expect(head.findContext(ParentContext, 1)).toBe(parent2)
+  expect(head.findContext(ParentContext, 2)).toBeUndefined()
+  expect(head.findContext(ParentContext, -1)).toBeUndefined()
+  expect(head.findContext(Date)).toBeUndefined()
+})
+
+test('component head requireContext throws when parent context is missing', () => {
+  class ParentContext {}
+
+  const host = document.createElement('div')
+  const start = document.createComment('s')
+  const end = document.createComment('e')
+  const head = new ComponentHead({}, host, [], start, end)
+
+  expect(() => head.requireContext(ParentContext)).toThrow(
+    `${ParentContext} was not found in the context stack at occurrence 0.`,
+  )
+  expect(() => head.requireContext(ParentContext, 1)).toThrow(
+    `${ParentContext} was not found in the context stack at occurrence 1.`,
+  )
+})

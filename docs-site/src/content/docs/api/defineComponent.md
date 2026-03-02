@@ -4,13 +4,13 @@ title: defineComponent
 
 ## Overview
 
-The `defineComponent` function is used to create a Regor component, which encapsulates a part of your user interface (UI) with its own behavior and template. Components allow you to build complex UIs by composing smaller, reusable units.
+The `defineComponent` function is used to define a Regor component, which encapsulates a part of your user interface (UI) with its own behavior and template. Components allow you to build complex UIs by composing smaller, reusable units.
 
 ## Usage
 
-### Creating a Regor Component
+### Defining a Regor Component
 
-To create a Regor component, call the `defineComponent` function with the following parameters:
+To define a Regor component, call the `defineComponent` function with the following parameters:
 
 - `template` (required): An HTML string or an object specifying the template for rendering the component. It can include the following properties:
 
@@ -26,6 +26,9 @@ To create a Regor component, call the `defineComponent` function with the follow
     - `head.entangle`: Keeps refs defined in the component context entangled with `head.props` refs. Defaults to `true`.
     - `head.enableSwitch`: Enables slot context switching to the parent. Defaults to `false`.
     - `head.onAutoPropsAssigned`: Callback invoked after auto props get assigned to the component context.
+    - `head.findContext(ContextClass, occurrence?)`: Finds a parent context instance by `instanceof` from the captured context stack and returns `undefined` when missing.
+    - `head.requireContext(ContextClass, occurrence?)`: Resolves a parent context instance by `instanceof` from the captured context stack and throws if the selected occurrence is missing.
+    - `head.unmount()`: Unmounts this component range and runs unmounted handlers for captured contexts.
 
 ### Example
 
