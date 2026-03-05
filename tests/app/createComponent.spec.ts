@@ -13,6 +13,7 @@ import { Binder } from '../../src/bind/Binder'
 import { hasSwitch } from '../../src/bind/switch'
 import { Parser } from '../../src/parser/Parser'
 import { htmlEqual } from '../common/html-equal'
+import { createDom } from '../minidom/createDom'
 
 test('should render components with reactive properties', () => {
   const root = document.createElement('div')
@@ -703,6 +704,142 @@ test('component inheritAttrs merges class and style from host onto inheritor roo
   expect(div.classList.contains('host-b')).toBe(true)
   expect(div.style.color).toBe('red')
   expect(div.style.marginTop).toBe('5px')
+})
+
+test('component attribute fallthrough can carry :r-teleport to component root', () => {
+  const cleanup = createDom(
+    '<html><body><div id="app"></div><div id="teleport-host"></div></body></html>',
+  )
+  try {
+    const root = document.querySelector('#app') as HTMLElement
+    const teleComp = defineComponent(
+      html`<section class="tele-root">teleported</section>`,
+    )
+
+    createApp(
+      {
+        components: { teleComp },
+        target: '#teleport-host',
+      },
+      {
+        element: root,
+        template: html`<main>
+          <TeleComp
+            :r-teleport="target"
+            class="from-host"
+            data-origin="host"
+          ></TeleComp>
+        </main>`,
+      },
+    )
+
+    const host = document.querySelector('#teleport-host') as HTMLElement
+    const moved = host.querySelector('.tele-root') as HTMLElement | null
+    expect(moved).toBeTruthy()
+    expect(moved?.classList.contains('from-host')).toBe(true)
+    expect(moved?.getAttribute('data-origin')).toBe('host')
+    expect(root.innerHTML).toContain("teleported => '#teleport-host'")
+  } finally {
+    cleanup()
+  }
+})
+
+test('nested component tree teleports when parent host binds :r-teleport', () => {
+  const cleanup = createDom(
+    '<html><body><div id="app"></div><div id="teleport-host"></div></body></html>',
+  )
+  try {
+    const root = document.querySelector('#app') as HTMLElement
+
+    const childComp = defineComponent(
+      html`<span class="nested-child">nested payload</span>`,
+    )
+    const parentComp = defineComponent(
+      html`<section class="parent-root" r-inherit>
+        <ChildComp></ChildComp>
+      </section>`,
+    )
+
+    createApp(
+      {
+        components: { parentComp, childComp },
+        target: '#teleport-host',
+      },
+      {
+        element: root,
+        template: html`<main>
+          <ParentComp
+            :r-teleport="target"
+            class="from-parent-host"
+            data-parent="yes"
+          ></ParentComp>
+        </main>`,
+      },
+    )
+
+    const host = document.querySelector('#teleport-host') as HTMLElement
+    const moved = host.querySelector('.parent-root') as HTMLElement | null
+    const nested = host.querySelector('.nested-child') as HTMLElement | null
+
+    expect(moved).toBeTruthy()
+    expect(moved?.classList.contains('from-parent-host')).toBe(true)
+    expect(moved?.getAttribute('data-parent')).toBe('yes')
+    expect(nested?.textContent?.trim()).toBe('nested payload')
+    expect(root.innerHTML).toContain("teleported => '#teleport-host'")
+  } finally {
+    cleanup()
+  }
+})
+
+test('nested component tree teleports when parent binds :r-teleport on ChildComp', () => {
+  const cleanup = createDom(
+    '<html><body><div id="app"></div><div id="teleport-host"></div></body></html>',
+  )
+  try {
+    const root = document.querySelector('#app') as HTMLElement
+
+    const childComp = defineComponent(
+      html`<article class="child-root">
+        <span class="inner-child">inner payload</span>
+      </article>`,
+    )
+    const parentComp = defineComponent(
+      html`<section class="parent-shell">
+        <ChildComp
+          :r-teleport="target"
+          class="child-from-parent"
+          data-from-parent="yes"
+        ></ChildComp>
+      </section>`,
+      {
+        context: () => ({
+          target: '#teleport-host',
+        }),
+      },
+    )
+
+    createApp(
+      {
+        components: { parentComp, childComp },
+      },
+      {
+        element: root,
+        template: html`<main><ParentComp></ParentComp></main>`,
+      },
+    )
+    const host = document.querySelector('#teleport-host') as HTMLElement
+    const moved = host.querySelector('.child-root') as HTMLElement | null
+    const nested = host.querySelector('.inner-child') as HTMLElement | null
+
+    expect(moved).toBeTruthy()
+    expect(moved?.classList.contains('child-from-parent')).toBe(true)
+    expect(moved?.getAttribute('data-from-parent')).toBe('yes')
+    expect(nested?.textContent?.trim()).toBe('inner payload')
+    expect(root.querySelector('.parent-shell')).toBeTruthy()
+    expect(root.innerHTML).toContain("teleported => '#teleport-host'")
+  } finally {
+    cleanup()
+  }
 })
 
 test('component named slot fallback renders when slot content is not provided', () => {

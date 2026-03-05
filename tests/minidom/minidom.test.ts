@@ -130,6 +130,21 @@ describe('minidom templates', () => {
 })
 
 describe('minidom parsing and serialization', () => {
+  it('links document head and body from html documents', () =>
+    withDom(
+      '<html><head><meta charset="utf-8"></head><body><main>ok</main></body></html>',
+      ({ document }) => {
+        expect(document.head?.querySelector('meta')).not.toBeNull()
+        expect(document.body?.querySelector('main')?.textContent).toBe('ok')
+      },
+    ))
+
+  it('links document head when document has head only', () =>
+    withDom('<html><head><title>x</title></head></html>', ({ document }) => {
+      expect(document.head?.querySelector('title')?.textContent).toBe('x')
+      expect(document.body).toBeNull()
+    }))
+
   it('keeps raw text in script and style nodes', () =>
     withDom(
       '<html><body><script>if (a < b && c > d) { x = "&lt;raw&gt;" }</script></body></html>',

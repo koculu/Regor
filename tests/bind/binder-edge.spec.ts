@@ -147,3 +147,33 @@ test('binder teleport handler covers whitespace and missing parent/target paths'
     target.remove()
   }
 })
+
+test('detached :r-teleport path falls back to parent-chain root when document lookup is unavailable at bind time', () => {
+  const binder = createBinder()
+  const root = document.createElement('div')
+  const host = document.createElement('div')
+  const el = document.createElement('div')
+  const target = document.createElement('div')
+  target.id = 'teleport-edge-missing-doc'
+  root.appendChild(host)
+  root.appendChild(target)
+  host.appendChild(el)
+
+  const prevDocument = (globalThis as any).document
+  try {
+    ;(globalThis as any).document = undefined
+    expect(() => {
+      binder.__bindToExpression(
+        teleportDirective as any,
+        el,
+        '#teleport-edge-missing-doc',
+      )
+    }).not.toThrow()
+    expect(target.contains(el)).toBe(true)
+    expect(host.innerHTML).toContain(
+      "teleported => '#teleport-edge-missing-doc'",
+    )
+  } finally {
+    ;(globalThis as any).document = prevDocument
+  }
+})
