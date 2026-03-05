@@ -307,6 +307,7 @@ class MiniNode {
 
 class MiniDocument extends MiniNode {
   documentElement: MiniElement | null = null
+  head: MiniElement | null = null
   body: MiniElement | null = null
 
   constructor() {
@@ -373,12 +374,24 @@ class MiniDocument extends MiniNode {
   }
 
   linkHtmlBody() {
+    this.head = null
+    this.body = null
     const html = this.querySelector('html')
     if (html && html instanceof MiniElement) {
       this.documentElement = html
+      const head = html.querySelector('head')
+      if (head && head instanceof MiniElement) {
+        this.head = head
+      }
       const body = html.querySelector('body')
       if (body && body instanceof MiniElement) {
         this.body = body
+      }
+    }
+    if (!this.head) {
+      const head = this.querySelector('head')
+      if (head && head instanceof MiniElement) {
+        this.head = head
       }
     }
     if (!this.body) {
