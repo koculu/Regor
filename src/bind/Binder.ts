@@ -141,21 +141,25 @@ export class Binder {
   ): boolean {
     if (config !== teleportDirective) return false
     if (isNullOrWhitespace(valueExpression)) return true
-    const teleportTo = document.querySelector(valueExpression)
-    if (teleportTo) {
-      const parent = el.parentElement
-      if (!parent) return true
-      const placeholder = new Comment(`teleported => '${valueExpression}'`)
-      parent.insertBefore(placeholder, el)
-      ;(el as HTMLElement & { teleportedFrom: Node }).teleportedFrom =
-        placeholder
-      ;(placeholder as Comment & { teleportedTo: HTMLElement }).teleportedTo =
-        el
-      addUnbinder(placeholder, () => {
-        removeNode(el)
-      })
-      teleportTo.appendChild(el)
+    let queryRoot = document as ParentNode
+    if (!queryRoot) {
+      let root = el.parentNode
+      while (root?.parentNode) root = root.parentNode
+      if (root) queryRoot = root
+      else return true
     }
+    const teleportTo = queryRoot.querySelector(valueExpression)
+    if (!teleportTo) return true
+    const parent = el.parentElement
+    if (!parent) return true
+    const placeholder = new Comment(`teleported => '${valueExpression}'`)
+    parent.insertBefore(placeholder, el)
+    ;(el as HTMLElement & { teleportedFrom: Node }).teleportedFrom = placeholder
+    ;(placeholder as Comment & { teleportedTo: HTMLElement }).teleportedTo = el
+    addUnbinder(placeholder, () => {
+      removeNode(el)
+    })
+    teleportTo.appendChild(el)
     return true
   }
 
