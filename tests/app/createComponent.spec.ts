@@ -842,6 +842,72 @@ test('nested component tree teleports when parent binds :r-teleport on ChildComp
   }
 })
 
+test('r-teleport fallthrough can target markup rendered by another nested component tree lazily', () => {
+  const cleanup = createDom('<html><body><div id="app"></div></body></html>')
+  try {
+    const root = document.querySelector('#app') as HTMLElement
+
+    const firstChild = defineComponent(
+      html`<article class="first-child-root">
+        <span class="first-payload">from first</span>
+      </article>`,
+    )
+    const firstParent = defineComponent(
+      html`<section class="first-parent-shell">
+        <FirstChild
+          :r-teleport="target"
+          class="first-fallthrough"
+          data-flow="from-parent-1"
+        ></FirstChild>
+      </section>`,
+      {
+        context: () => ({
+          target: '#second-child-target',
+        }),
+      },
+    )
+
+    const secondChild = defineComponent(
+      html`<div id="second-child-target" class="second-child-target">
+        <p class="second-static">target host</p>
+      </div>`,
+    )
+    const secondParent = defineComponent(
+      html`<section class="second-parent-shell">
+        <SecondChild></SecondChild>
+      </section>`,
+    )
+
+    createApp(
+      {
+        components: { firstParent, firstChild, secondParent, secondChild },
+      },
+      {
+        element: root,
+        // render second tree first so teleport target exists before first child bind
+        template: html`<main>
+          <FirstParent></FirstParent>
+          <SecondParent></SecondParent>
+        </main>`,
+      },
+    )
+    const target = root.querySelector('#second-child-target') as HTMLElement
+    const moved = target.querySelector(
+      '.first-child-root',
+    ) as HTMLElement | null
+    expect(moved).toBeTruthy()
+    expect(moved?.classList.contains('first-fallthrough')).toBe(true)
+    expect(moved?.getAttribute('data-flow')).toBe('from-parent-1')
+    expect(target.querySelector('.first-payload')?.textContent?.trim()).toBe(
+      'from first',
+    )
+    expect(root.querySelector('.first-parent-shell')).toBeTruthy()
+    expect(root.innerHTML).toContain("teleported => '#second-child-target'")
+  } finally {
+    cleanup()
+  }
+})
+
 test('component named slot fallback renders when slot content is not provided', () => {
   const root = document.createElement('div')
   const slotComp = defineComponent(
