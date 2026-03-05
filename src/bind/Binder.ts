@@ -28,6 +28,9 @@ import { getSwitch, hasSwitch, rswitch } from './switch'
  * @internal
  */
 export class Binder {
+  __bindDepth = 0
+  __pendingTeleports = new Map<HTMLElement, string>()
+
   __parser: Parser
   __ifBinder: IfBinder
   __forBinder: ForBinder
@@ -70,17 +73,63 @@ export class Binder {
   }
 
   __bindDefault(element: Element): void {
-    if (
-      element.nodeType !== Node.ELEMENT_NODE ||
-      element.hasAttribute(this.__pre)
-    )
-      return
-    if (this.__ifBinder.__bindAll(element)) return
-    if (this.__forBinder.__bindAll(element)) return
-    if (this.__dynamicBinder.__bindAll(element)) return
-    this.__componentBinder.__bindAll(element)
-    this.__unwrapTemplates(element)
-    this.__bindAttributes(element, true)
+    ++this.__bindDepth
+    try {
+      if (
+        element.nodeType !== Node.ELEMENT_NODE ||
+        element.hasAttribute(this.__pre)
+      )
+        return
+      if (this.__ifBinder.__bindAll(element)) return
+      if (this.__forBinder.__bindAll(element)) return
+      if (this.__dynamicBinder.__bindAll(element)) return
+      this.__componentBinder.__bindAll(element)
+      this.__unwrapTemplates(element)
+      this.__bindAttributes(element, true)
+    } finally {
+      --this.__bindDepth
+      if (this.__bindDepth === 0) this.__flushPendingTeleports()
+    }
+  }
+
+  __resolveTeleportTarget(el: HTMLElement, selector: string): Element | null {
+    let queryRoot = document as ParentNode
+    if (!queryRoot) {
+      let root = el.parentNode
+      while (root?.parentNode) root = root.parentNode
+      if (!root) return null
+      queryRoot = root
+    }
+    return queryRoot.querySelector(selector)
+  }
+
+  __performTeleport(el: HTMLElement, selector: string): boolean {
+    const teleportTo = this.__resolveTeleportTarget(el, selector)
+    if (!teleportTo) return false
+    const parent = el.parentElement
+    if (!parent) return false
+    const placeholder = new Comment(`teleported => '${selector}'`)
+    parent.insertBefore(placeholder, el)
+    ;(el as HTMLElement & { teleportedFrom: Node }).teleportedFrom = placeholder
+    ;(placeholder as Comment & { teleportedTo: HTMLElement }).teleportedTo = el
+    addUnbinder(placeholder, () => {
+      removeNode(el)
+    })
+    teleportTo.appendChild(el)
+    return true
+  }
+
+  __queueTeleport(el: HTMLElement, selector: string): void {
+    this.__pendingTeleports.set(el, selector)
+  }
+
+  __flushPendingTeleports(): void {
+    const pending = this.__pendingTeleports
+    if (pending.size === 0) return
+    this.__pendingTeleports = new Map<HTMLElement, string>()
+    for (const [el, selector] of pending.entries()) {
+      this.__performTeleport(el, selector)
+    }
   }
 
   __bindAttributes(element: Element, isRecursive: boolean): void {
@@ -141,25 +190,9 @@ export class Binder {
   ): boolean {
     if (config !== teleportDirective) return false
     if (isNullOrWhitespace(valueExpression)) return true
-    let queryRoot = document as ParentNode
-    if (!queryRoot) {
-      let root = el.parentNode
-      while (root?.parentNode) root = root.parentNode
-      if (root) queryRoot = root
-      else return true
+    if (!this.__performTeleport(el, valueExpression)) {
+      this.__queueTeleport(el, valueExpression)
     }
-    const teleportTo = queryRoot.querySelector(valueExpression)
-    if (!teleportTo) return true
-    const parent = el.parentElement
-    if (!parent) return true
-    const placeholder = new Comment(`teleported => '${valueExpression}'`)
-    parent.insertBefore(placeholder, el)
-    ;(el as HTMLElement & { teleportedFrom: Node }).teleportedFrom = placeholder
-    ;(placeholder as Comment & { teleportedTo: HTMLElement }).teleportedTo = el
-    addUnbinder(placeholder, () => {
-      removeNode(el)
-    })
-    teleportTo.appendChild(el)
     return true
   }
 
