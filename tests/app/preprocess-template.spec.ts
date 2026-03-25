@@ -3,8 +3,8 @@ import { expect, test } from 'vitest'
 import { preprocess } from '../../src/app/preprocess-template'
 
 test('returns original template when tbody does not exist', () => {
-  const template = '<div><Foo /></div>'
-  expect(preprocess(template)).toBe(template)
+  const template = '<div><Foo/></div>'
+  expect(preprocess(template)).toBe('<div><Foo></Foo></div>')
 })
 
 test('rewrites tr/td outside tbody into alias hosts', () => {
@@ -24,7 +24,7 @@ test('rewrites th outside tbody into alias host', () => {
 test('replaces direct tbody child non-tr self-closing tag', () => {
   const template = '<table><tbody>  <TableRow a="1" /> </tbody></table>'
   expect(preprocess(template)).toBe(
-    '<table><tbody>  <tr is="regor:TableRow" a="1" /> </tbody></table>',
+    '<table><tbody>  <tr is="regor:TableRow" a="1" ></tr> </tbody></table>',
   )
 })
 
@@ -40,7 +40,7 @@ test('rewrites direct tr children to td and keeps nested structure', () => {
   const template =
     '<table><tbody><tr><Cell /></tr><Custom><tr><Widget>X</Widget></tr></Custom></tbody></table>'
   expect(preprocess(template)).toBe(
-    '<table><tbody><tr><td is="regor:Cell" /></tr><tr is="regor:Custom"><td is="regor:tr"><Widget>X</Widget></td></tr></tbody></table>',
+    '<table><tbody><tr><td is="regor:Cell" ></td></tr><tr is="regor:Custom"><td is="regor:tr"><Widget>X</Widget></td></tr></tbody></table>',
   )
 })
 
@@ -68,6 +68,21 @@ test('should normalize self-closing kebab-case components in aliased tr', () => 
   const template = '<tr><table-cell /></tr>'
   expect(preprocess(template)).toBe(
     '<trx is="r-tr"><table-cell ></table-cell></trx>',
+  )
+})
+
+test('normalizes self-closing custom tags outside table context', () => {
+  expect(preprocess('<section><Icon /></section>')).toBe(
+    '<section><Icon ></Icon></section>',
+  )
+  expect(preprocess('<btn><Icon /><span>x</span><Icon /></btn>')).toBe(
+    '<btn><Icon ></Icon><span>x</span><Icon ></Icon></btn>',
+  )
+})
+
+test('keeps void elements self-closing', () => {
+  expect(preprocess('<div><img /><input /></div>')).toBe(
+    '<div><img /><input /></div>',
   )
 })
 
