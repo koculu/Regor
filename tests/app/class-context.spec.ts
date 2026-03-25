@@ -804,6 +804,65 @@ test('named slot content should render with class component context', () => {
   expect(root.querySelector('.extra')?.textContent).toBe('x')
 })
 
+test('renders interpolated slot content inside button with icon when nested in another component', () => {
+  class IconContext {
+    showIcon = true
+  }
+
+  class BtnContext {
+    showStartIcon = true
+    iconOnly = false
+  }
+
+  class Toolbar {
+    components = { icon, btn }
+    busy = ref(false)
+  }
+
+  const icon = defineComponent<IconContext>(
+    html`<span class="icon" r-if="showIcon">*</span>`,
+    {
+      context: () => new IconContext(),
+    },
+  )
+
+  const btn = defineComponent<BtnContext>(
+    html`<button class="btn">
+      <Icon class="btn__icon" r-if="showStartIcon"></Icon>
+      <span class="btn__label" r-if="!iconOnly"><slot></slot></span>
+    </button>`,
+    {
+      context: () => new BtnContext(),
+    },
+  )
+
+  const toolbar = defineComponent<Toolbar>(
+    html`<div class="toolbar">
+      <Btn>
+        {{ busy ? 'Saving...' : 'Save Host' }}
+      </Btn>
+    </div>`,
+    {
+      context: () => new Toolbar(),
+    },
+  )
+
+  const root = document.createElement('div')
+  createApp(
+    {
+      components: { icon, btn, toolbar },
+    },
+    {
+      element: root,
+      template: html`<Toolbar></Toolbar>`,
+    },
+  )
+
+  expect(root.innerHTML).toContain('class="icon btn__icon"')
+  expect(root.innerHTML).toContain('<span class="btn__label">')
+  expect(root.innerHTML).toContain('Save Host')
+})
+
 test('r-for with r-if on same node should update without binder errors', () => {
   const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
   try {
