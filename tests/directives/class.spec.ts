@@ -81,3 +81,15 @@ test('class directive keeps class list stable when next string equals previous',
 
   expect(el.className).toBe('x y')
 })
+
+test('class directive ignores empty tokens in string values', () => {
+  const el = document.createElement('div')
+
+  expect(() =>
+    updateDirective(classDirective, el, ['   foo   bar   '], ['   ']),
+  ).not.toThrow()
+
+  expect(el.classList.contains('foo')).toBe(true)
+  expect(el.classList.contains('bar')).toBe(true)
+  expect(el.classList.length).toBe(2)
+})
