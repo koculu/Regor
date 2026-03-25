@@ -908,6 +908,33 @@ test('r-teleport fallthrough can target markup rendered by another nested compon
   }
 })
 
+test('component template supports self-closing child components', () => {
+  const root = document.createElement('div')
+
+  const Icon = defineComponent(html`<span>icon</span>`)
+  const btn = defineComponent(
+    html`<button>
+      <Icon /><span><slot></slot></span><Icon />
+    </button>`,
+  )
+
+  createApp(
+    {
+      components: { Icon, btn },
+    },
+    {
+      element: root,
+      template: html`<btn>Save</btn>`,
+    },
+  )
+
+  const icons = root.querySelectorAll('button > span')
+  expect(icons).toHaveLength(3)
+  expect(icons[0]?.textContent?.trim()).toBe('icon')
+  expect(icons[1]?.textContent?.trim()).toBe('Save')
+  expect(icons[2]?.textContent?.trim()).toBe('icon')
+})
+
 test('component named slot fallback renders when slot content is not provided', () => {
   const root = document.createElement('div')
   const slotComp = defineComponent(

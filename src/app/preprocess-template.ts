@@ -105,6 +105,33 @@ const tableDirectAllowed = new Set([
   'tfoot',
   'tr',
 ])
+const voidElements = new Set([
+  'area',
+  'base',
+  'br',
+  'col',
+  'embed',
+  'hr',
+  'img',
+  'input',
+  'link',
+  'meta',
+  'param',
+  'source',
+  'track',
+  'wbr',
+])
+
+const expandSelfClosingTag = (tagText: string, tagName: string): string => {
+  let end = tagText.length - 2
+  while (end > 0) {
+    const ch = tagText.charCodeAt(end - 1)
+    if (ch !== 32 && ch !== 10 && ch !== 13 && ch !== 9) break
+    --end
+  }
+  const openTag = tagText.slice(0, end)
+  return `${openTag}></${tagName}>`
+}
 
 export const preprocess = (template: string): string => {
   let i = 0
@@ -186,18 +213,26 @@ export const preprocess = (template: string): string => {
       replacementHost = tagName === 'td' || tagName === 'th' ? null : 'td'
     }
 
+    const shouldExpandSelfClosing =
+      selfClosing && !voidElements.has(replacementHost || tagName)
+
     if (replacementHost) {
       const isAlias =
         replacementHost === 'trx' ||
         replacementHost === 'tdx' ||
         replacementHost === 'thx'
+      const rewrittenTag = `${rawTag.slice(0, range.start)}${replacementHost} is="${isAlias ? `r-${tagName}` : `regor:${tagName}`}"${rawTag.slice(range.end)}`
       out.push(
-        `${rawTag.slice(0, range.start)}${replacementHost} is="${isAlias ? `r-${tagName}` : `regor:${tagName}`}"${rawTag.slice(range.end)}`,
+        shouldExpandSelfClosing
+          ? expandSelfClosingTag(rewrittenTag, replacementHost)
+          : rewrittenTag,
       )
-    } else if (selfClosing && parent?.effectiveTag === 'tr') {
-      out.push(`${rawTag.slice(0, rawTag.length - 2)}></${tagName}>`)
     } else {
-      out.push(rawTag)
+      out.push(
+        shouldExpandSelfClosing
+          ? expandSelfClosingTag(rawTag, tagName)
+          : rawTag,
+      )
     }
 
     if (!selfClosing) {
