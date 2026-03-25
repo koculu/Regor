@@ -122,16 +122,8 @@ const voidElements = new Set([
   'wbr',
 ])
 
-const expandSelfClosingTag = (tagText: string, tagName: string): string => {
-  let end = tagText.length - 2
-  while (end > 0) {
-    const ch = tagText.charCodeAt(end - 1)
-    if (ch !== 32 && ch !== 10 && ch !== 13 && ch !== 9) break
-    --end
-  }
-  const openTag = tagText.slice(0, end)
-  return `${openTag}></${tagName}>`
-}
+const expandSelfClosingTag = (tagText: string, tagName: string): string =>
+  `${tagText.slice(0, tagText.length - 2)}></${tagName}>`
 
 export const preprocess = (template: string): string => {
   let i = 0
