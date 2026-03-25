@@ -235,19 +235,30 @@ export class ComponentBinder {
       const isEmptyComponent = component.childNodes.length === 0
       const expandSlot = (slot: HTMLSlotElement): void => {
         const parent = slot.parentElement as HTMLElement
-        if (isEmptyComponent) {
-          // fallback slot content
-          for (const slotChild of [...slot.childNodes]) {
-            parent.insertBefore(slotChild, slot)
-          }
-          return
-        }
         let name = slot.name
         if (isNullOrWhitespace(name)) {
           name = slot.getAttributeNames().filter((x) => x.startsWith('#'))[0]
           if (isNullOrWhitespace(name)) {
             name = 'default'
           } else name = name.substring(1)
+        }
+        if (isEmptyComponent) {
+          if (name === 'default') {
+            const textAttr = binder.__config.__builtInNames.text
+            const expression = component.getAttribute(textAttr)
+            if (!isNullOrWhitespace(expression)) {
+              const slotText = document.createElement('span')
+              slotText.setAttribute(textAttr, expression)
+              parent.insertBefore(slotText, slot)
+              component.removeAttribute(textAttr)
+              return
+            }
+          }
+          // fallback slot content
+          for (const slotChild of [...slot.childNodes]) {
+            parent.insertBefore(slotChild, slot)
+          }
+          return
         }
         let compTemplate = component.querySelector(
           `template[name='${name}'], template[\\#${name}]`,
