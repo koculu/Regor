@@ -1,4 +1,5 @@
 import { type Directive } from '../api/types'
+import { toClassTokens } from '../common/class-tokens'
 import { isArray, isString } from '../common/is-what'
 
 /**
@@ -56,11 +57,14 @@ const patchClass = (el: HTMLElement, next: Class, prev: Class): void => {
   } else {
     if (isClassString) {
       if (prev !== next) {
-        if (isPrevClassString) classList.remove(...prev.trim().split(/\s+/))
-        classList.add(...next.trim().split(/\s+/))
+        const prevTokens = isPrevClassString ? toClassTokens(prev) : []
+        const nextTokens = toClassTokens(next)
+        if (prevTokens.length > 0) classList.remove(...prevTokens)
+        if (nextTokens.length > 0) classList.add(...nextTokens)
       }
     } else if (prev) {
-      if (isPrevClassString) classList.remove(...prev.trim().split(/\s+/))
+      const prevTokens = isPrevClassString ? toClassTokens(prev) : []
+      if (prevTokens.length > 0) classList.remove(...prevTokens)
     }
   }
 }

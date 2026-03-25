@@ -2,6 +2,7 @@ import { type Component, type IRegorContext } from '../api/types'
 import { ComponentHead } from '../app/ComponentHead'
 import { addUnbinder } from '../cleanup/addUnbinder'
 import { unbind } from '../cleanup/unbind'
+import { toClassTokens } from '../common/class-tokens'
 import {
   bindChildNodes,
   camelize,
@@ -360,7 +361,8 @@ export class ComponentBinder {
             continue
           const value = component.getAttribute(attrName) as string
           if (attrName === 'class') {
-            inheritor.classList.add(...value.split(' '))
+            const classTokens = toClassTokens(value)
+            if (classTokens.length > 0) inheritor.classList.add(...classTokens)
           } else if (attrName === 'style') {
             const inheritorStyle = inheritor.style
             const componentStyle = component.style

@@ -706,6 +706,27 @@ test('component inheritAttrs merges class and style from host onto inheritor roo
   expect(div.style.marginTop).toBe('5px')
 })
 
+test('component inheritAttrs ignores empty class tokens from host', () => {
+  const root = document.createElement('div')
+  const boxComp = defineComponent(html`<div r-inherit class="base">box</div>`)
+
+  expect(() =>
+    createApp(
+      { components: { boxComp } },
+      {
+        element: root,
+        template: html`<BoxComp class=" host-a   host-b  "></BoxComp>`,
+      },
+    ),
+  ).not.toThrow()
+
+  const div = root.querySelector('div') as HTMLDivElement
+  expect(div.classList.contains('base')).toBe(true)
+  expect(div.classList.contains('host-a')).toBe(true)
+  expect(div.classList.contains('host-b')).toBe(true)
+  expect(div.classList.length).toBe(3)
+})
+
 test('component attribute fallthrough can carry :r-teleport to component root', () => {
   const cleanup = createDom(
     '<html><body><div id="app"></div><div id="teleport-host"></div></body></html>',

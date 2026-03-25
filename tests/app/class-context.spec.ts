@@ -838,9 +838,7 @@ test('renders interpolated slot content inside button with icon when nested in a
 
   const toolbar = defineComponent<Toolbar>(
     html`<div class="toolbar">
-      <Btn>
-        {{ busy ? 'Saving...' : 'Save Host' }}
-      </Btn>
+      <Btn> {{ busy ? 'Saving...' : 'Save Host' }} </Btn>
     </div>`,
     {
       context: () => new Toolbar(),
