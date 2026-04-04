@@ -80,10 +80,13 @@ export class IfBinder {
 
   __bindAll(element: Element): boolean {
     const isIfElement = element.hasAttribute(this.__if)
-    const elements = findElements(element, this.__ifSelector)
-    for (const el of elements) {
-      this.__bind(el)
-    }
+    if (isIfElement) this.__bind(element as HTMLElement)
+    this.__binder.__componentBinder.__forEachBindableDescendant(
+      element,
+      (el) => {
+        if (el.hasAttribute(this.__if)) this.__bind(el)
+      },
+    )
     return isIfElement
   }
 

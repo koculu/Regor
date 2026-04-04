@@ -41,10 +41,13 @@ export class ForBinder {
 
   __bindAll(element: Element): boolean {
     const isForElement = element.hasAttribute(this.__for)
-    const elements = findElements(element, this.__forSelector)
-    for (const el of elements) {
-      this.__bindFor(el)
-    }
+    if (isForElement) this.__bindFor(element as HTMLElement)
+    this.__binder.__componentBinder.__forEachBindableDescendant(
+      element,
+      (el) => {
+        if (el.hasAttribute(this.__for)) this.__bindFor(el)
+      },
+    )
     return isForElement
   }
 
