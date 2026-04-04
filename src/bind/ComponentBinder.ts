@@ -68,6 +68,19 @@ export class ComponentBinder {
     return false
   }
 
+  __isNamedSlotTemplateShortcut(node: ChildNode): node is HTMLTemplateElement {
+    if (!isTemplate(node)) return false
+    const attributeNames = node.getAttributeNames()
+    if (node.hasAttribute('name')) return true
+    return attributeNames.some((x) => x.startsWith('#'))
+  }
+
+  __isDefaultSlotTemplateShortcut(
+    node: ChildNode,
+  ): node is HTMLTemplateElement {
+    return isTemplate(node) && node.getAttributeNames().length === 0
+  }
+
   __unwrapComponents(element: Element): void {
     const binder = this.__binder
     const parser = binder.__parser
@@ -81,19 +94,9 @@ export class ComponentBinder {
     }
 
     const contextComponents = parser.__getComponents()
-    const contextComponentSelectors = parser.__getComponentSelectors()
-    const registeredSelector =
-      this.__getRegisteredComponentSelector(registeredComponents)
-    const selector = [
-      ...(registeredSelector ? [registeredSelector] : []),
-      ...contextComponentSelectors,
-      ...contextComponentSelectors.map(hyphenate),
-    ].join(',')
+    const selector = this.__getComponentSelector()
     if (isNullOrWhitespace(selector)) return
-    const list = element.querySelectorAll<HTMLElement>(selector)
-    const components = element.matches?.(selector)
-      ? [element as HTMLElement, ...list]
-      : list
+    const components = this.__collectTopLevelComponentHosts(element, selector)
     for (const component of components) {
       if (component.hasAttribute(binder.__pre)) continue
       const parent = component.parentNode
@@ -261,17 +264,18 @@ export class ComponentBinder {
           }
           return
         }
-        let compTemplate = component.querySelector(
+        let compTemplate: HTMLTemplateElement | null = component.querySelector(
           `template[name='${name}'], template[\\#${name}]`,
         )
         if (!compTemplate && name === 'default') {
-          compTemplate = component.querySelector('template:not([name])')
-          if (
-            compTemplate &&
-            compTemplate.getAttributeNames().filter((x) => x.startsWith('#'))
-              .length > 0
-          )
-            compTemplate = null
+          const unnamedTemplates =
+            component.querySelectorAll<HTMLTemplateElement>(
+              'template:not([name])',
+            )
+          compTemplate =
+            [...unnamedTemplates].find((x) =>
+              this.__isDefaultSlotTemplateShortcut(x),
+            ) ?? null
         }
 
         const createSwitchContext = (childNodes: ChildNode[]): void => {
@@ -311,7 +315,7 @@ export class ComponentBinder {
             return
           }
           const childNodes = [...getChildNodes(component)].filter(
-            (x) => !isTemplate(x),
+            (x) => !this.__isNamedSlotTemplateShortcut(x),
           )
           for (const slotChild of childNodes) {
             parent.insertBefore(slotChild, slot)
@@ -405,5 +409,74 @@ export class ComponentBinder {
       }
       parser.__scoped(capturedContext, bindComponent)
     }
+  }
+
+  __getComponentSelector(): string {
+    const binder = this.__binder
+    const parser = binder.__parser
+    const registeredComponents = binder.__config.__components
+    const contextComponentSelectors = parser.__getComponentSelectors()
+    const registeredSelector =
+      this.__getRegisteredComponentSelector(registeredComponents)
+    return [
+      ...(registeredSelector ? [registeredSelector] : []),
+      ...contextComponentSelectors,
+      ...contextComponentSelectors.map(hyphenate),
+    ].join(',')
+  }
+
+  __collectTopLevelComponentHosts(
+    root: Element,
+    selector: string,
+  ): HTMLElement[] {
+    const result: HTMLElement[] = []
+    if (isNullOrWhitespace(selector)) return result
+    if (root.matches?.(selector)) return [root as HTMLElement]
+    const stack = this.__getChildElements(root).reverse()
+    while (stack.length > 0) {
+      const current = stack.pop() as HTMLElement
+      if (current.matches(selector)) {
+        result.push(current)
+        continue
+      }
+      stack.push(...this.__getChildElements(current).reverse())
+    }
+    return result
+  }
+
+  __forEachBindableDescendant(
+    root: Element,
+    action: (element: HTMLElement) => void,
+  ): void {
+    const selector = this.__getComponentSelector()
+    const stack = this.__getChildElements(root).reverse()
+    while (stack.length > 0) {
+      const current = stack.pop() as HTMLElement
+      action(current)
+      if (!isNullOrWhitespace(selector) && current.matches(selector)) continue
+      stack.push(...this.__getChildElements(current).reverse())
+    }
+  }
+
+  __getChildElements(root: any): HTMLElement[] {
+    const children = root?.children
+    if (children?.length != null) {
+      const result: HTMLElement[] = []
+      for (let i = 0; i < children.length; ++i) {
+        const child = children[i]
+        if (isElement(child)) result.push(child as HTMLElement)
+      }
+      return result
+    }
+    const childNodes = root?.childNodes
+    if (childNodes?.length != null) {
+      const result: HTMLElement[] = []
+      for (let i = 0; i < childNodes.length; ++i) {
+        const child = childNodes[i]
+        if (isElement(child)) result.push(child as HTMLElement)
+      }
+      return result
+    }
+    return []
   }
 }

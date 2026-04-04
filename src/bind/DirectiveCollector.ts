@@ -109,15 +109,10 @@ export class DirectiveCollector {
     }
     processNode(element)
     if (!isRecursive || !element.firstElementChild) return map
-    // IMPORTANT:
-    // Keep this on native `querySelectorAll('*')`.
-    // Browser engines optimize this traversal heavily and it is faster than
-    // handmade JS tree walking in real DOM benchmarks.
-    // Do not replace with custom recursion/stack traversal.
-    const nodes = element.querySelectorAll<HTMLElement>('*')
-    for (const node of nodes) {
-      processNode(node)
-    }
+    this.__binder.__componentBinder.__forEachBindableDescendant(
+      element,
+      processNode,
+    )
     return map
   }
 }

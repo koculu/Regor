@@ -706,6 +706,34 @@ test('component inheritAttrs merges class and style from host onto inheritor roo
   expect(div.style.marginTop).toBe('5px')
 })
 
+test('component merges host style with component :style binding from context', () => {
+  const root = document.createElement('div')
+  const boxComp = defineComponent(html`<div :style="localStyle">box</div>`, {
+    context: () => ({
+      localStyle: {
+        backgroundColor: 'blue',
+        borderTopWidth: '2px',
+        borderTopStyle: 'solid',
+      },
+    }),
+  })
+
+  createApp(
+    { components: { boxComp } },
+    {
+      element: root,
+      template: html`<BoxComp style="color: red; margin-top: 5px"></BoxComp>`,
+    },
+  )
+
+  const div = root.querySelector('div') as HTMLDivElement
+  expect(div.style.backgroundColor).toBe('blue')
+  expect(div.style.borderTopWidth).toBe('2px')
+  expect(div.style.borderTopStyle).toBe('solid')
+  expect(div.style.color).toBe('red')
+  expect(div.style.marginTop).toBe('5px')
+})
+
 test('component inheritAttrs ignores empty class tokens from host', () => {
   const root = document.createElement('div')
   const boxComp = defineComponent(html`<div r-inherit class="base">box</div>`)
@@ -1288,4 +1316,96 @@ test('component inheritAttrs false keeps host attrs off child root', () => {
 
   const child = root.querySelector('.base') as HTMLElement
   expect(child.classList.contains('host-class')).toBe(false)
+})
+
+test('component context with default slot r-for', () => {
+  const root = document.createElement('div')
+  const tabsItems = ref(['tab1', 'tab2', 'tab3'])
+  class Tabs {
+    title = 'My Tabs'
+    items = tabsItems
+  }
+  interface TabPane {
+    id: string
+  }
+
+  const tabs = defineComponent('<div>Tabs: <slot></slot></div>', {
+    context: () => new Tabs(),
+  })
+  const tabPane = defineComponent<TabPane>('<div>TabPane: <slot></slot></div>')
+
+  createApp(
+    { components: { tabs, tabPane } },
+    {
+      element: root,
+      template:
+        '<div><Tabs><TabPane r-for="id in items">{{ id }} - {{ title }}</TabPane></Tabs></div>',
+    },
+  )
+
+  const getPaneTexts = (): string[] =>
+    [...root.querySelectorAll('div > div > div')]
+      .map((x) => x.textContent?.replace(/\s+/g, ' ').trim() ?? '')
+      .filter((x) => x.startsWith('TabPane:'))
+
+  expect(root.innerHTML).toContain('__begin__ r-for => id in items')
+  expect(root.innerHTML).toContain('__end__ r-for => id in items')
+  expect(getPaneTexts()).toEqual([
+    'TabPane: tab1 - My Tabs',
+    'TabPane: tab2 - My Tabs',
+    'TabPane: tab3 - My Tabs',
+  ])
+
+  tabsItems([ref('next-1'), ref('next-2')])
+
+  expect(getPaneTexts()).toEqual([
+    'TabPane: next-1 - My Tabs',
+    'TabPane: next-2 - My Tabs',
+  ])
+})
+
+test('component context with default slot template r-for', () => {
+  const root = document.createElement('div')
+  const tabsItems = ref(['tab1', 'tab2', 'tab3'])
+  class Tabs {
+    title = 'My Tabs'
+    items = tabsItems
+  }
+  interface TabPane {
+    id: string
+  }
+
+  const tabs = defineComponent('<div>Tabs: <slot></slot></div>', {
+    context: () => new Tabs(),
+  })
+  const tabPane = defineComponent<TabPane>('<div>TabPane: <slot></slot></div>')
+
+  createApp(
+    { components: { tabs, tabPane } },
+    {
+      element: root,
+      template:
+        '<div><Tabs><template r-for="id in items"><TabPane>{{ id }} - {{ title }}</TabPane></template></Tabs></div>',
+    },
+  )
+
+  const getPaneTexts = (): string[] =>
+    [...root.querySelectorAll('div > div > div')]
+      .map((x) => x.textContent?.replace(/\s+/g, ' ').trim() ?? '')
+      .filter((x) => x.startsWith('TabPane:'))
+
+  expect(root.innerHTML).toContain('__begin__ r-for => id in items')
+  expect(root.innerHTML).toContain('__end__ r-for => id in items')
+  expect(getPaneTexts()).toEqual([
+    'TabPane: tab1 - My Tabs',
+    'TabPane: tab2 - My Tabs',
+    'TabPane: tab3 - My Tabs',
+  ])
+
+  tabsItems([ref('next-1'), ref('next-2')])
+
+  expect(getPaneTexts()).toEqual([
+    'TabPane: next-1 - My Tabs',
+    'TabPane: next-2 - My Tabs',
+  ])
 })

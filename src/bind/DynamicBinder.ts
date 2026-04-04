@@ -1,13 +1,7 @@
 import { type StopObserving } from '../api/types'
 import { addUnbinder } from '../cleanup/addUnbinder'
 import { removeNode } from '../cleanup/removeNode'
-import {
-  findElements,
-  getNodes,
-  isTemplate,
-  toSelector,
-  unmount,
-} from '../common/common'
+import { getNodes, isTemplate, unmount } from '../common/common'
 import { isNullOrWhitespace, isObject, isString } from '../common/is-what'
 import { type Binder } from './Binder'
 import { setSwitchOwner } from './switch'
@@ -29,20 +23,21 @@ export class DynamicBinder {
 
   __is: string
 
-  __isSelector: string
-
   constructor(binder: Binder) {
     this.__binder = binder
     this.__is = binder.__config.__builtInNames.is
-    this.__isSelector = toSelector(this.__is) + ', [is]'
   }
 
   __bindAll(element: Element): boolean {
     const isComponentElement = element.hasAttribute(this.__is)
-    const elements = findElements(element, this.__isSelector)
-    for (const el of elements) {
-      this.__bind(el)
-    }
+    if (isComponentElement || element.hasAttribute('is'))
+      this.__bind(element as HTMLElement)
+    this.__binder.__componentBinder.__forEachBindableDescendant(
+      element,
+      (el) => {
+        if (el.hasAttribute(this.__is) || el.hasAttribute('is')) this.__bind(el)
+      },
+    )
     return isComponentElement
   }
 
