@@ -1363,3 +1363,49 @@ test('component context with default slot r-for', () => {
     'TabPane: next-2 - My Tabs',
   ])
 })
+
+test('component context with default slot template r-for', () => {
+  const root = document.createElement('div')
+  const tabsItems = ref(['tab1', 'tab2', 'tab3'])
+  class Tabs {
+    title = 'My Tabs'
+    items = tabsItems
+  }
+  interface TabPane {
+    id: string
+  }
+
+  const tabs = defineComponent('<div>Tabs: <slot></slot></div>', {
+    context: () => new Tabs(),
+  })
+  const tabPane = defineComponent<TabPane>('<div>TabPane: <slot></slot></div>')
+
+  createApp(
+    { components: { tabs, tabPane } },
+    {
+      element: root,
+      template:
+        '<div><Tabs><template r-for="id in items"><TabPane>{{ id }} - {{ title }}</TabPane></template></Tabs></div>',
+    },
+  )
+
+  const getPaneTexts = (): string[] =>
+    [...root.querySelectorAll('div > div > div')]
+      .map((x) => x.textContent?.replace(/\s+/g, ' ').trim() ?? '')
+      .filter((x) => x.startsWith('TabPane:'))
+
+  expect(root.innerHTML).toContain('__begin__ r-for => id in items')
+  expect(root.innerHTML).toContain('__end__ r-for => id in items')
+  expect(getPaneTexts()).toEqual([
+    'TabPane: tab1 - My Tabs',
+    'TabPane: tab2 - My Tabs',
+    'TabPane: tab3 - My Tabs',
+  ])
+
+  tabsItems([ref('next-1'), ref('next-2')])
+
+  expect(getPaneTexts()).toEqual([
+    'TabPane: next-1 - My Tabs',
+    'TabPane: next-2 - My Tabs',
+  ])
+})

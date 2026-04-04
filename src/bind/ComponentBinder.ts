@@ -68,6 +68,19 @@ export class ComponentBinder {
     return false
   }
 
+  __isNamedSlotTemplateShortcut(node: ChildNode): node is HTMLTemplateElement {
+    if (!isTemplate(node)) return false
+    const attributeNames = node.getAttributeNames()
+    if (node.hasAttribute('name')) return true
+    return attributeNames.some((x) => x.startsWith('#'))
+  }
+
+  __isDefaultSlotTemplateShortcut(
+    node: ChildNode,
+  ): node is HTMLTemplateElement {
+    return isTemplate(node) && node.getAttributeNames().length === 0
+  }
+
   __unwrapComponents(element: Element): void {
     const binder = this.__binder
     const parser = binder.__parser
@@ -251,17 +264,18 @@ export class ComponentBinder {
           }
           return
         }
-        let compTemplate = component.querySelector(
+        let compTemplate: HTMLTemplateElement | null = component.querySelector(
           `template[name='${name}'], template[\\#${name}]`,
         )
         if (!compTemplate && name === 'default') {
-          compTemplate = component.querySelector('template:not([name])')
-          if (
-            compTemplate &&
-            compTemplate.getAttributeNames().filter((x) => x.startsWith('#'))
-              .length > 0
-          )
-            compTemplate = null
+          const unnamedTemplates =
+            component.querySelectorAll<HTMLTemplateElement>(
+              'template:not([name])',
+            )
+          compTemplate =
+            [...unnamedTemplates].find((x) =>
+              this.__isDefaultSlotTemplateShortcut(x),
+            ) ?? null
         }
 
         const createSwitchContext = (childNodes: ChildNode[]): void => {
@@ -301,7 +315,7 @@ export class ComponentBinder {
             return
           }
           const childNodes = [...getChildNodes(component)].filter(
-            (x) => !isTemplate(x),
+            (x) => !this.__isNamedSlotTemplateShortcut(x),
           )
           for (const slotChild of childNodes) {
             parent.insertBefore(slotChild, slot)
