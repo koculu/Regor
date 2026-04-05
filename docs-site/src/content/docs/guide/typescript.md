@@ -95,6 +95,82 @@ const Card = defineComponent<CardContext>(
 <Card :title="user.name"></Card>
 ```
 
+## Typed runtime prop validation with `head.validateProps(...)`
+
+`validateProps(...)` is typed from `ComponentHead<T>`, so editor completion can suggest known prop keys while you write the schema.
+
+Use the built-in validators through `pval`:
+
+```ts
+import { ComponentHead, defineComponent, html, pval } from 'regor'
+
+type EditorCard = {
+  title: string
+  count?: number
+  mode: 'create' | 'edit'
+  summary?: string
+}
+
+const EditorCard = defineComponent<EditorCard>(
+  html`<article>{{ summary }}</article>`,
+  {
+    props: ['title', 'count', 'mode'],
+    context: (head: ComponentHead<EditorCard>) => {
+      head.validateProps({
+        title: pval.isString,
+        count: pval.optional(pval.isNumber),
+        mode: pval.oneOf(['create', 'edit'] as const),
+      })
+
+      return {
+        ...head.props,
+        summary: `${head.props.title}:${head.props.mode}:${head.props.count ?? 'none'}`,
+      }
+    },
+  },
+)
+```
+
+For dynamic single-prop bindings that arrive as refs, type the prop accordingly and validate with `pval.refOf(...)`:
+
+```ts
+import { ComponentHead, defineComponent, html, pval, type Ref } from 'regor'
+
+type TitleCard = {
+  title: Ref<string>
+  summary?: string
+}
+
+const TitleCard = defineComponent<TitleCard>(
+  html`<h3>{{ summary }}</h3>`,
+  {
+    props: ['title'],
+    context: (head: ComponentHead<TitleCard>) => {
+      head.validateProps({
+        title: pval.refOf(pval.isString),
+      })
+
+      return {
+        ...head.props,
+        summary: head.props.title(),
+      }
+    },
+  },
+)
+```
+
+You can also write custom validators:
+
+```ts
+import { type PropValidator } from 'regor'
+
+const isNonEmptyString: PropValidator<string> = (value, name) => {
+  if (typeof value !== 'string' || value.trim() === '') {
+    throw new Error(`Invalid prop "${name}": expected non-empty string.`)
+  }
+}
+```
+
 ## Typed class components and behavior controls
 
 You can type `head` in class constructors and use runtime behavior flags intentionally:
@@ -126,5 +202,6 @@ class ChildContext {
 
 1. [Components](/guide/components)
 2. [defineComponent API](/api/defineComponent)
-3. [createApp API](/api/createApp)
-4. [contextRegistry API](/api/contextRegistry)
+3. [pval API](/api/pval)
+4. [createApp API](/api/createApp)
+5. [contextRegistry API](/api/contextRegistry)

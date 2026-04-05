@@ -28,6 +28,7 @@ To define a Regor component, call the `defineComponent` function with the follow
     - `head.onAutoPropsAssigned`: Callback invoked after auto props get assigned to the component context.
     - `head.findContext(ContextClass, occurrence?)`: Finds a parent context instance by `instanceof` from the captured context stack and returns `undefined` when missing.
     - `head.requireContext(ContextClass, occurrence?)`: Resolves a parent context instance by `instanceof` from the captured context stack and throws if the selected occurrence is missing.
+    - `head.validateProps(schema)`: Validates selected incoming props at runtime using assertion-style validators.
     - `head.unmount()`: Unmounts this component range and runs unmounted handlers for captured contexts.
 
 ### Example
@@ -58,6 +59,69 @@ createApp({
 
 - `options` (optional): An array of strings that defines component properties or an object that configures various options for the component, including whether to use interpolation, props, the component's default name, or the component context.
 
+## Runtime prop validation
+
+Inside `context(head)`, you can validate incoming props explicitly:
+
+```ts
+import { defineComponent, html, pval } from 'regor'
+
+type Card = {
+  title: string
+  count?: number
+  summary?: string
+}
+
+const Card = defineComponent<Card>(html`<article>{{ summary }}</article>`, {
+  props: ['title', 'count'],
+  context: (head) => {
+    head.validateProps({
+      title: pval.isString,
+      count: pval.optional(pval.isNumber),
+    })
+
+    return {
+      ...head.props,
+      summary: `${head.props.title}:${head.props.count ?? 'none'}`,
+    }
+  },
+})
+```
+
+Behavior:
+
+- validates only the listed keys
+- throws on first invalid prop
+- does not mutate `head.props`
+- does not coerce values
+
+### Dynamic bindings and refs
+
+Dynamic single-prop bindings such as `:title="titleRef"` arrive as refs. Validate them with `pval.refOf(...)`:
+
+```ts
+type Card = {
+  title: Ref<string>
+  summary?: string
+}
+
+const Card = defineComponent<Card>(html`<article>{{ summary }}</article>`, {
+  props: ['title'],
+  context: (head) => {
+    head.validateProps({
+      title: pval.refOf(pval.isString),
+    })
+
+    return {
+      ...head.props,
+      summary: head.props.title(),
+    }
+  },
+})
+```
+
+For object-style `:context="{ ... }"` values, validate the object shape directly with `pval.shape(...)`.
+
 ## Return Value
 
 The `defineComponent` function returns a component object with the following properties:
@@ -85,6 +149,7 @@ The `defineComponent` function returns a component object with the following pro
 - Component tags can be used in PascalCase, camelCase, or kebab-case (for example, `<MyComponent>`, `<myComponent>`, or `<my-component>`).
 
 - The component context is configured through the `options.context` callback, which defines the behavior and data of your component.
+- Runtime prop validation is opt-in and local to `context(head)` through `head.validateProps(...)`.
 
 - The `options` parameter allows you to configure various aspects of the component, such as enabling or disabling interpolation, specifying props, setting a default name, or providing the component context.
 
@@ -93,6 +158,7 @@ The `defineComponent` function returns a component object with the following pro
 ## See Also
 
 - [`createApp`](/api/createApp)
+- [`pval`](/api/pval)
 - [`toFragment`](/api/toFragment)
 - [`toJsonTemplate`](/api/toJsonTemplate)
 

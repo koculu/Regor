@@ -1,6 +1,11 @@
 import { type IRegorContext } from '../api/types'
 import { removeNode } from '../cleanup/removeNode'
 import { callUnmounted } from '../composition/callUnmounted'
+import {
+  type InferPropValidationSchema,
+  type PropValidationSchemaFor,
+  type PropValidator,
+} from './propValidators'
 
 export type ContextClass<TValue extends object> = abstract new (
   ...args: never[]
@@ -229,6 +234,42 @@ export class ComponentHead<
     throw new Error(
       `${constructor} was not found in the context stack at occurrence ${occurrence}.`,
     )
+  }
+
+  /**
+   * Validates selected incoming props using assertion-style validators.
+   *
+   * Only keys listed in `schema` are checked. Validation throws immediately
+   * on the first invalid prop and does not mutate `head.props`.
+   *
+   * The schema is keyed from `head.props`, so editor completion can suggest
+   * known prop names while still allowing you to validate only a subset.
+   *
+   * Validators typically come from `pval`, but custom user validators are also
+   * supported.
+   *
+   * Example:
+   * ```ts
+   * head.validateProps({
+   *   title: pval.isString,
+   *   count: pval.optional(pval.isNumber),
+   * })
+   * ```
+   *
+   * @param schema - Validators to apply to selected incoming props.
+   */
+  validateProps<TSchema extends PropValidationSchemaFor<TContext>>(
+    schema: TSchema,
+  ): asserts this is ComponentHead<
+    TContext & InferPropValidationSchema<TSchema>
+  > {
+    const props = this.props as Record<string, unknown>
+    for (const name in schema) {
+      const validator: PropValidator<unknown> | undefined = schema[name]
+      if (!validator) continue
+      const validateProp: PropValidator<unknown> = validator
+      validateProp(props[name], name, this)
+    }
   }
 
   /**

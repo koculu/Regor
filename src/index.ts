@@ -25,6 +25,12 @@ export type {
 export { ComponentHead } from './app/ComponentHead'
 export { createApp } from './app/createApp'
 export { defineComponent } from './app/defineComponent'
+export type {
+  InferPropValidationSchema,
+  PropValidationSchemaFor,
+  PropValidator,
+} from './app/propValidators'
+export { pval } from './app/propValidators'
 export { RegorConfig } from './app/RegorConfig'
 export { toFragment } from './app/toFragment'
 export { toJsonTemplate } from './app/toJsonTemplate'

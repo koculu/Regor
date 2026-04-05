@@ -97,6 +97,132 @@ HTML:
 </div>
 ```
 
+## Component Props Validation
+
+Regor components can validate incoming props at runtime inside `context(head)`.
+
+This is opt-in and local to the component author:
+
+- it does not change `defineComponent(...)`
+- it validates only the keys you list
+- it throws immediately on the first invalid prop
+- it does not coerce values
+- it does not mutate `head.props`
+
+Use `head.validateProps(...)` together with `pval`:
+
+```ts
+import { defineComponent, html, pval } from 'regor'
+
+type EditorCard = {
+  title: string
+  count?: number
+  mode: 'create' | 'edit'
+  summary?: string
+}
+
+const editorCard = defineComponent<EditorCard>(
+  html`<article>{{ summary }}</article>`,
+  {
+    props: ['title', 'count', 'mode'],
+    context: (head) => {
+      head.validateProps({
+        title: pval.isString,
+        count: pval.optional(pval.isNumber),
+        mode: pval.oneOf(['create', 'edit'] as const),
+      })
+
+      return {
+        ...head.props,
+        summary: `${head.props.title}:${head.props.mode}:${head.props.count ?? 'none'}`,
+      }
+    },
+  },
+)
+```
+
+### Built-in validators
+
+```ts
+import { pval } from 'regor'
+
+pval.isString
+pval.isNumber
+pval.isBoolean
+pval.isClass(MyClass)
+pval.optional(pval.isString)
+pval.nullable(pval.isNumber)
+pval.oneOf(['create', 'edit'] as const)
+pval.arrayOf(pval.isString)
+pval.shape({ title: pval.isString, count: pval.isNumber })
+pval.refOf(pval.isString)
+```
+
+### Dynamic bindings and refs
+
+Single-prop dynamic bindings like `:title="titleRef"` flow into component props as refs.
+When validating those runtime values, use `pval.refOf(...)`:
+
+```ts
+type CardProps = {
+  title: Ref<string>
+  summary?: string
+}
+
+const card = defineComponent<CardProps>(html`<h3>{{ summary }}</h3>`, {
+  props: ['title'],
+  context: (head) => {
+    head.validateProps({
+      title: pval.refOf(pval.isString),
+    })
+
+    return {
+      ...head.props,
+      summary: head.props.title(),
+    }
+  },
+})
+```
+
+For object-style `:context="{ ... }"` values, validate the plain runtime shape directly:
+
+```ts
+head.validateProps({
+  meta: pval.shape({
+    slug: pval.isString,
+  }),
+})
+```
+
+### Custom validators
+
+Users can provide their own validators as long as they match the `PropValidator<T>` signature:
+
+```ts
+import { type PropValidator } from 'regor'
+
+const isNonEmptyString: PropValidator<string> = (value, name) => {
+  if (typeof value !== 'string' || value.trim() === '') {
+    throw new Error(`Invalid prop "${name}": expected non-empty string.`)
+  }
+}
+
+head.validateProps({
+  title: isNonEmptyString,
+})
+```
+
+Custom validators can also use the third `head` argument:
+
+```ts
+const startsWithPrefix: PropValidator<string> = (value, name, head) => {
+  const ctx = head.requireContext(AppServices)
+  if (typeof value !== 'string' || !value.startsWith(ctx.prefix)) {
+    throw new Error(`Invalid prop "${name}": expected prefixed value.`)
+  }
+}
+```
+
 ## Table Templates and Components
 
 Regor preprocesses table-related templates to keep markup valid when using
@@ -223,6 +349,7 @@ These directives empower you to create dynamic and interactive user interfaces, 
 
 - **`createApp`** Similar to Vue's `createApp`, it initializes a Regor application instance.
 - **`defineComponent`** Creates a Regor component instance.
+- **`pval`** Built-in component prop validators used with `head.validateProps(...)`.
 - **`toFragment`** Converts a JSON template to a document fragment.
 - **`toJsonTemplate`** Converts a DOM element to a JSON template.
 

@@ -58,7 +58,8 @@ Component context is created by `options.context(head)`.
 6. `head.onAutoPropsAssigned`: callback after auto props assignment.
 7. `head.findContext(ContextClass, occurrence?)`: returns matching parent context instance from `head.ctx` by `instanceof`, or `undefined`.
 8. `head.requireContext(ContextClass, occurrence?)`: resolves matching parent context instance from `head.ctx` by `instanceof`; throws if the selected occurrence does not exist.
-9. `head.unmount()`: removes mounted nodes in component range and calls unmounted hooks.
+9. `head.validateProps(schema)`: validates selected incoming props at runtime using assertion-style validators.
+10. `head.unmount()`: removes mounted nodes in component range and calls unmounted hooks.
 
 `occurrence` is zero-based:
 
@@ -103,6 +104,159 @@ const Child = defineComponent('<div></div>', {
   },
 })
 ```
+
+## Runtime Prop Validation
+
+Regor lets component authors validate incoming props inside `context(head)`.
+
+This validation model is intentionally runtime-first:
+
+1. It is fully opt-in.
+2. It validates only the keys you list.
+3. It throws immediately on the first invalid prop.
+4. It does not coerce values.
+5. It does not mutate `head.props`.
+
+Use the built-in validators through `pval`:
+
+```ts
+import { defineComponent, html, pval } from 'regor'
+
+type EditorCard = {
+  title: string
+  count?: number
+  mode: 'create' | 'edit'
+  summary?: string
+}
+
+const EditorCard = defineComponent<EditorCard>(
+  html`<article>{{ summary }}</article>`,
+  {
+    props: ['title', 'count', 'mode'],
+    context: (head) => {
+      head.validateProps({
+        title: pval.isString,
+        count: pval.optional(pval.isNumber),
+        mode: pval.oneOf(['create', 'edit'] as const),
+      })
+
+      return {
+        ...head.props,
+        summary: `${head.props.title}:${head.props.mode}:${head.props.count ?? 'none'}`,
+      }
+    },
+  },
+)
+```
+
+### Built-in validators
+
+`pval` currently provides:
+
+1. `pval.isString`
+2. `pval.isNumber`
+3. `pval.isBoolean`
+4. `pval.isClass(SomeClass)`
+5. `pval.optional(validator)`
+6. `pval.nullable(validator)`
+7. `pval.oneOf([...])`
+8. `pval.arrayOf(validator)`
+9. `pval.shape({ ... })`
+10. `pval.refOf(validator)`
+
+Example:
+
+```ts
+head.validateProps({
+  title: pval.isString,
+  count: pval.optional(pval.isNumber),
+  mode: pval.oneOf(['create', 'edit'] as const),
+  tags: pval.arrayOf(pval.isString),
+  meta: pval.shape({
+    slug: pval.isString,
+    retries: pval.nullable(pval.isNumber),
+  }),
+})
+```
+
+### Single-prop bindings and refs
+
+Dynamic single-prop bindings such as `:title="titleRef"` flow into component props as refs.
+When validating that runtime value, use `pval.refOf(...)`:
+
+```ts
+type TitleCard = {
+  title: Ref<string>
+  summary?: string
+}
+
+const TitleCard = defineComponent<TitleCard>(
+  html`<h3>{{ summary }}</h3>`,
+  {
+    props: ['title'],
+    context: (head) => {
+      head.validateProps({
+        title: pval.refOf(pval.isString),
+      })
+
+      return {
+        ...head.props,
+        summary: head.props.title(),
+      }
+    },
+  },
+)
+```
+
+### Object input validation
+
+For object-style `:context="{ ... }"` values, validate the plain runtime object shape:
+
+```ts
+head.validateProps({
+  meta: pval.shape({
+    slug: pval.isString,
+  }),
+})
+```
+
+### Custom validators
+
+Users are not limited to the built-in validators. Any function matching `PropValidator<T>` can be used:
+
+```ts
+import { type PropValidator } from 'regor'
+
+const isNonEmptyString: PropValidator<string> = (value, name) => {
+  if (typeof value !== 'string' || value.trim() === '') {
+    throw new Error(`Invalid prop "${name}": expected non-empty string.`)
+  }
+}
+
+head.validateProps({
+  title: isNonEmptyString,
+})
+```
+
+Custom validators can also use the third `head` argument:
+
+```ts
+const startsWithParentPrefix: PropValidator<string> = (value, name, head) => {
+  const ctx = head.requireContext(AppServices)
+  if (typeof value !== 'string' || !value.startsWith(ctx.prefix)) {
+    throw new Error(`Invalid prop "${name}": expected prefixed value.`)
+  }
+}
+```
+
+### When to use validation
+
+Validation is most useful when:
+
+1. The component depends on a required runtime contract.
+2. The same component is used in many places.
+3. You want an explicit runtime guard before local state mapping.
+4. You set `head.autoProps = false` and map incoming props manually.
 
 ## How Component Inputs Are Routed
 
@@ -219,16 +373,19 @@ Unmount cleans child component bindings and observers.
 
 1. Declare single props in `props` when using individual bindings.
 2. Use `:context` for object-style prop passing.
-3. Use `head.enableSwitch = true` when slot content must evaluate in parent context.
-4. Decide `autoProps` + `entangle` explicitly when designing parent-child data ownership.
-5. Keep fallback slot content for robust component defaults.
-6. Use stable keys for component lists rendered with `r-for`.
+3. Use `head.validateProps(...)` for explicit runtime prop contracts.
+4. Use `pval.refOf(...)` for dynamic single-prop bindings that arrive as refs.
+5. Use `head.enableSwitch = true` when slot content must evaluate in parent context.
+6. Decide `autoProps` + `entangle` explicitly when designing parent-child data ownership.
+7. Keep fallback slot content for robust component defaults.
+8. Use stable keys for component lists rendered with `r-for`.
 
 ## See Also
 
 1. [defineComponent API](/api/defineComponent)
-2. [Directive: :is](/directives/is)
-3. [Directive: :context](/directives/context)
-4. [TypeScript Guide](/guide/typescript)
-5. [Directive: r-for](/directives/r-for)
-6. [contextRegistry API](/api/contextRegistry)
+2. [pval API](/api/pval)
+3. [Directive: :is](/directives/is)
+4. [Directive: :context](/directives/context)
+5. [TypeScript Guide](/guide/typescript)
+6. [Directive: r-for](/directives/r-for)
+7. [contextRegistry API](/api/contextRegistry)
