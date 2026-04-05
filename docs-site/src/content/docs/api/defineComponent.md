@@ -28,7 +28,7 @@ To define a Regor component, call the `defineComponent` function with the follow
     - `head.onAutoPropsAssigned`: Callback invoked after auto props get assigned to the component context.
     - `head.findContext(ContextClass, occurrence?)`: Finds a parent context instance by `instanceof` from the captured context stack and returns `undefined` when missing.
     - `head.requireContext(ContextClass, occurrence?)`: Resolves a parent context instance by `instanceof` from the captured context stack and throws if the selected occurrence is missing.
-    - `head.validateProps(schema)`: Validates selected incoming props at runtime using assertion-style validators.
+    - `head.validateProps(schema)`: Validates selected incoming props at runtime.
     - `head.unmount()`: Unmounts this component range and runs unmounted handlers for captured contexts.
 
 ### Example

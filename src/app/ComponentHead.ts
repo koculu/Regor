@@ -3,7 +3,6 @@ import { removeNode } from '../cleanup/removeNode'
 import { callUnmounted } from '../composition/callUnmounted'
 import { warningHandler } from '../log/warnings'
 import {
-  type InferPropValidationSchema,
   PropValidationError,
   type PropValidationSchemaFor,
   type PropValidator,
@@ -279,7 +278,7 @@ export class ComponentHead<
   }
 
   /**
-   * Validates selected incoming props using assertion-style validators.
+   * Validates selected incoming props at runtime.
    *
    * Only keys listed in `schema` are checked. Validation throws immediately
    * on the first invalid prop and does not mutate `head.props`.
@@ -312,9 +311,7 @@ export class ComponentHead<
    */
   validateProps<TSchema extends PropValidationSchemaFor<TContext>>(
     schema: TSchema,
-  ): asserts this is ComponentHead<
-    TContext & InferPropValidationSchema<TSchema>
-  > {
+  ): void {
     if (this.__propValidationMode === 'off') return
     const props = this.props as Record<string, unknown>
     for (const name in schema) {

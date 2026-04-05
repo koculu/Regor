@@ -58,7 +58,7 @@ Component context is created by `options.context(head)`.
 6. `head.onAutoPropsAssigned`: callback after auto props assignment.
 7. `head.findContext(ContextClass, occurrence?)`: returns matching parent context instance from `head.ctx` by `instanceof`, or `undefined`.
 8. `head.requireContext(ContextClass, occurrence?)`: resolves matching parent context instance from `head.ctx` by `instanceof`; throws if the selected occurrence does not exist.
-9. `head.validateProps(schema)`: validates selected incoming props at runtime using assertion-style validators.
+9. `head.validateProps(schema)`: validates selected incoming props at runtime.
 10. `head.unmount()`: removes mounted nodes in component range and calls unmounted hooks.
 
 `occurrence` is zero-based:
