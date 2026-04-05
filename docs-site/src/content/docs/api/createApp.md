@@ -23,6 +23,7 @@ To create a Regor application, call the `createApp` function with the following 
   - `isSVG` (boolean, optional): Indicates whether the template contains SVG elements.
 
 - `config` (optional): An optional configuration object for customizing Regor's behavior.
+  - `config.propValidationMode`: Controls whether component prop validation throws, warns, or is disabled.
 
 ### Example
 
@@ -44,6 +45,17 @@ const app = createApp(appContext) // default template: { selector: '#app'}
 - `template` (optional): An HTML string or an object specifying the template for rendering the application. This can include the root element's selector, element reference, HTML content, JSON structure, and SVG indication.
 
 - `config` (optional): An optional configuration object that customizes Regor's behavior. It allows you to specify various options.
+
+Example:
+
+```ts
+import { createApp, RegorConfig } from 'regor'
+
+const config = new RegorConfig()
+config.propValidationMode = 'warn'
+
+createApp(appContext, template, config)
+```
 
 ## Return Value
 
@@ -68,12 +80,15 @@ The `createApp` function returns an object with the following properties:
   `tbody`, and `tfoot`.
 
 - The `config` parameter lets you customize Regor's behavior to suit your application's requirements.
+- `config.propValidationMode` controls how `head.validateProps(...)` behaves for components created under that app.
 
 - You can use the `unmount` and `unbind` functions to clean up and remove the app from the DOM when it's no longer needed.
 
 ## See Also
 
 - [`defineComponent`](/api/defineComponent)
+- [`RegorConfig`](/api/regorConfig)
+- [`pval`](/api/pval)
 - [`toFragment`](/api/toFragment)
 - [`toJsonTemplate`](/api/toJsonTemplate)
 

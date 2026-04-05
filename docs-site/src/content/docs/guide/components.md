@@ -113,7 +113,7 @@ This validation model is intentionally runtime-first:
 
 1. It is fully opt-in.
 2. It validates only the keys you list.
-3. It throws immediately on the first invalid prop.
+3. It follows the active `propValidationMode` config.
 4. It does not coerce values.
 5. It does not mutate `head.props`.
 
@@ -163,6 +163,7 @@ const EditorCard = defineComponent<EditorCard>(
 8. `pval.arrayOf(validator)`
 9. `pval.shape({ ... })`
 10. `pval.refOf(validator)`
+11. `pval.fail(name, detail)`
 
 Example:
 
@@ -225,11 +226,11 @@ head.validateProps({
 Users are not limited to the built-in validators. Any function matching `PropValidator<T>` can be used:
 
 ```ts
-import { type PropValidator } from 'regor'
+import { pval, type PropValidator } from 'regor'
 
 const isNonEmptyString: PropValidator<string> = (value, name) => {
   if (typeof value !== 'string' || value.trim() === '') {
-    throw new Error(`Invalid prop "${name}": expected non-empty string.`)
+    pval.fail(name, 'expected non-empty string')
   }
 }
 
@@ -244,7 +245,7 @@ Custom validators can also use the third `head` argument:
 const startsWithParentPrefix: PropValidator<string> = (value, name, head) => {
   const ctx = head.requireContext(AppServices)
   if (typeof value !== 'string' || !value.startsWith(ctx.prefix)) {
-    throw new Error(`Invalid prop "${name}": expected prefixed value.`)
+    pval.fail(name, 'expected prefixed value')
   }
 }
 ```
@@ -257,6 +258,29 @@ Validation is most useful when:
 2. The same component is used in many places.
 3. You want an explicit runtime guard before local state mapping.
 4. You set `head.autoProps = false` and map incoming props manually.
+
+### Validation mode
+
+Validation behavior is configured through `RegorConfig.propValidationMode`:
+
+```ts
+import { RegorConfig } from 'regor'
+
+const config = new RegorConfig()
+config.propValidationMode = 'warn'
+```
+
+Modes:
+
+1. `'throw'` (default): throws on the first invalid prop.
+2. `'warn'`: sends the validation failure to `warningHandler.warning(...)` and continues.
+3. `'off'`: skips runtime prop validation.
+
+Pass the config into `createApp(...)` to apply the mode for that app:
+
+```ts
+createApp(appContext, template, config)
+```
 
 ## How Component Inputs Are Routed
 

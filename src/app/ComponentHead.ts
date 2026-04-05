@@ -1,15 +1,49 @@
 import { type IRegorContext } from '../api/types'
 import { removeNode } from '../cleanup/removeNode'
 import { callUnmounted } from '../composition/callUnmounted'
+import { warningHandler } from '../log/warnings'
 import {
   type InferPropValidationSchema,
+  PropValidationError,
   type PropValidationSchemaFor,
   type PropValidator,
 } from './propValidators'
+import { type PropValidationMode } from './RegorConfig'
 
 export type ContextClass<TValue extends object> = abstract new (
   ...args: never[]
 ) => TValue
+
+const formatComponentValidationError = (
+  element: Element,
+  propName: string,
+  error: unknown,
+): Error => {
+  const tagName = element.tagName?.toLowerCase?.() || 'unknown'
+  const finalPropName =
+    error instanceof PropValidationError ? error.propPath : propName
+  const detail =
+    error instanceof PropValidationError
+      ? error.detail
+      : error instanceof Error
+        ? error.message
+        : String(error)
+
+  if (error instanceof Error) {
+    return new Error(
+      `Invalid prop "${finalPropName}" on <${tagName}>: ${detail}`,
+      {
+        cause: error,
+      },
+    )
+  }
+  return new Error(
+    `Invalid prop "${finalPropName}" on <${tagName}>: ${detail}`,
+    {
+      cause: error,
+    },
+  )
+}
 
 /**
  * Runtime metadata passed to a component's `context(head)` factory.
@@ -136,18 +170,26 @@ export class ComponentHead<
    */
   __element: Element
 
+  /**
+   * Runtime behavior used when `validateProps(...)` encounters invalid input.
+   * Defaults to `'throw'`.
+   */
+  __propValidationMode: PropValidationMode
+
   constructor(
     props: TContext,
     element: Element,
     ctx: IRegorContext[],
     start: Comment,
     end: Comment,
+    propValidationMode: PropValidationMode,
   ) {
     this.props = props
     this.__element = element
     this.ctx = ctx
     this.start = start
     this.end = end
+    this.__propValidationMode = propValidationMode
   }
 
   /**
@@ -246,7 +288,8 @@ export class ComponentHead<
    * known prop names while still allowing you to validate only a subset.
    *
    * Validators typically come from `pval`, but custom user validators are also
-   * supported.
+   * supported. Custom validators may throw their own `Error`, though `pval.fail(...)`
+   * is recommended so nested validators can preserve the exact failing prop path.
    *
    * Example:
    * ```ts
@@ -256,6 +299,15 @@ export class ComponentHead<
    * })
    * ```
    *
+   * Example with a custom validator:
+   * ```ts
+   * const isNonEmptyString: PropValidator<string> = (value, name) => {
+   *   if (typeof value !== 'string' || value.trim() === '') {
+   *     pval.fail(name, 'expected non-empty string')
+   *   }
+   * }
+   * ```
+   *
    * @param schema - Validators to apply to selected incoming props.
    */
   validateProps<TSchema extends PropValidationSchemaFor<TContext>>(
@@ -263,12 +315,26 @@ export class ComponentHead<
   ): asserts this is ComponentHead<
     TContext & InferPropValidationSchema<TSchema>
   > {
+    if (this.__propValidationMode === 'off') return
     const props = this.props as Record<string, unknown>
     for (const name in schema) {
       const validator: PropValidator<unknown> | undefined = schema[name]
       if (!validator) continue
       const validateProp: PropValidator<unknown> = validator
-      validateProp(props[name], name, this)
+      try {
+        validateProp(props[name], name, this)
+      } catch (error) {
+        const enrichedError = formatComponentValidationError(
+          this.__element,
+          name,
+          error,
+        )
+        if (this.__propValidationMode === 'warn') {
+          warningHandler.warning(enrichedError.message, enrichedError)
+          continue
+        }
+        throw enrichedError
+      }
     }
   }
 

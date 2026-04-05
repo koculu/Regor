@@ -30,7 +30,24 @@ Validation is:
 2. local to the component
 3. runtime-only
 4. non-coercive
-5. fail-fast
+5. controlled by `RegorConfig.propValidationMode`
+
+## Validation mode
+
+Runtime prop-validation behavior is controlled through `RegorConfig.propValidationMode`:
+
+```ts
+import { RegorConfig } from 'regor'
+
+const config = new RegorConfig()
+config.propValidationMode = 'warn'
+```
+
+Modes:
+
+1. `'throw'` (default): invalid props throw immediately.
+2. `'warn'`: invalid props are reported through `warningHandler.warning(...)`.
+3. `'off'`: runtime prop validation is skipped.
 
 ## Built-in validators
 
@@ -153,6 +170,22 @@ head.validateProps({
 })
 ```
 
+### `pval.fail(name, detail)`
+
+Throws the same structured validation failure used by Regor's built-in validators.
+
+This is the recommended way for custom validators to report invalid input,
+because it preserves nested prop paths and lets `head.validateProps(...)`
+format the final component-aware error consistently.
+
+```ts
+const isNonEmptyString: PropValidator<string> = (value, name) => {
+  if (typeof value !== 'string' || value.trim() === '') {
+    pval.fail(name, 'expected non-empty string')
+  }
+}
+```
+
 ## Dynamic props vs object props
 
 Single-prop bindings like `:title="titleRef"` may arrive as refs at runtime, so `pval.refOf(...)` is appropriate there.
@@ -164,11 +197,11 @@ Object-style `:context="{ meta: { slug: 'x' } }"` values can be validated direct
 You are not limited to `pval`. Users can write any validator that matches `PropValidator<T>`:
 
 ```ts
-import { type PropValidator } from 'regor'
+import { pval, type PropValidator } from 'regor'
 
 const isNonEmptyString: PropValidator<string> = (value, name) => {
   if (typeof value !== 'string' || value.trim() === '') {
-    throw new Error(`Invalid prop "${name}": expected non-empty string.`)
+    pval.fail(name, 'expected non-empty string')
   }
 }
 ```
@@ -179,7 +212,7 @@ Custom validators also receive `head` as the third argument:
 const startsWithPrefix: PropValidator<string> = (value, name, head) => {
   const services = head.requireContext(AppServices)
   if (typeof value !== 'string' || !value.startsWith(services.prefix)) {
-    throw new Error(`Invalid prop "${name}": expected prefixed value.`)
+    pval.fail(name, 'expected prefixed value')
   }
 }
 ```

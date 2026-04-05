@@ -189,6 +189,7 @@ export class ComponentBinder {
           capturedContext,
           startOfComponent,
           endOfComponent,
+          binder.__config.propValidationMode,
         )
         const componentCtx = useScope(() => {
           return (

@@ -162,11 +162,11 @@ const TitleCard = defineComponent<TitleCard>(
 You can also write custom validators:
 
 ```ts
-import { type PropValidator } from 'regor'
+import { pval, type PropValidator } from 'regor'
 
 const isNonEmptyString: PropValidator<string> = (value, name) => {
   if (typeof value !== 'string' || value.trim() === '') {
-    throw new Error(`Invalid prop "${name}": expected non-empty string.`)
+    pval.fail(name, 'expected non-empty string')
   }
 }
 ```

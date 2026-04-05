@@ -17,6 +17,8 @@ import { flatten } from '../misc/flatten'
 import { ref } from '../reactivity/ref'
 import { sref } from '../reactivity/sref'
 
+export type PropValidationMode = 'throw' | 'warn' | 'off'
+
 export class RegorConfig {
   static getDefault(): RegorConfig {
     return (
@@ -73,6 +75,16 @@ export class RegorConfig {
   globalContext: Record<string, unknown>
 
   useInterpolation = true
+
+  /**
+   * Controls how `head.validateProps(...)` behaves when a validator fails.
+   *
+   * - `'throw'` (default): rethrows the validation error immediately.
+   * - `'warn'`: forwards the validation error to `warningHandler.warning(...)`
+   *   and continues.
+   * - `'off'`: skips runtime prop validation entirely.
+   */
+  propValidationMode: PropValidationMode = 'throw'
 
   constructor(globalContext?: Record<string, unknown>) {
     this.setDirectives('r-')

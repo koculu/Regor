@@ -8,6 +8,7 @@ import {
   pushScope,
   setScope,
 } from '../../src/composition/stack'
+import { warningHandler } from '../../src/log/warnings'
 
 test('component head emits custom events from source element', () => {
   const host = document.createElement('div')
@@ -15,7 +16,7 @@ test('component head emits custom events from source element', () => {
   const end = document.createComment('e')
   host.appendChild(start)
   host.appendChild(end)
-  const head = new ComponentHead({}, host, [], start, end)
+  const head = new ComponentHead({}, host, [], start, end, 'throw')
   const spy = vi.fn()
   host.addEventListener('save', spy)
 
@@ -42,7 +43,7 @@ test('component head unmount removes nodes between markers and calls unmounted h
   setScope(ctx)
   ;(peekScope() as any).onUnmounted.push(stop)
   popScope()
-  const head = new ComponentHead({}, host, [ctx], start, end)
+  const head = new ComponentHead({}, host, [ctx], start, end, 'throw')
 
   head.unmount()
   await new Promise((resolve) => setTimeout(resolve, 5))
@@ -71,6 +72,7 @@ test('component head findContext returns first matching parent context', () => {
     [other, parent1, parent2 as any],
     start,
     end,
+    'throw',
   )
 
   expect(head.findContext(ParentContext)).toBe(parent1)
@@ -86,7 +88,7 @@ test('component head requireContext throws when parent context is missing', () =
   const host = document.createElement('div')
   const start = document.createComment('s')
   const end = document.createComment('e')
-  const head = new ComponentHead({}, host, [], start, end)
+  const head = new ComponentHead({}, host, [], start, end, 'throw')
 
   expect(() => head.requireContext(ParentContext)).toThrow(
     `${ParentContext} was not found in the context stack at occurrence 0.`,
@@ -120,7 +122,7 @@ test('component head validateProps validates selected props without mutating pro
       retries: null,
     },
   }
-  const head = new ComponentHead(props, host, [], start, end)
+  const head = new ComponentHead(props, host, [], start, end, 'throw')
 
   expect(() =>
     head.validateProps({
@@ -152,6 +154,7 @@ test('component head validateProps throws with nested prop path details', () => 
     [],
     start,
     end,
+    'throw',
   )
 
   expect(() =>
@@ -160,7 +163,7 @@ test('component head validateProps throws with nested prop path details', () => 
         tags: pval.arrayOf(pval.isString),
       }),
     }),
-  ).toThrow('Invalid prop "meta.tags[1]": expected string.')
+  ).toThrow('Invalid prop "meta.tags[1]" on <div>: expected string.')
 })
 
 test('component head validator utilities support class and ref validation', () => {
@@ -180,6 +183,7 @@ test('component head validator utilities support class and ref validation', () =
     [],
     start,
     end,
+    'throw',
   )
 
   expect(() =>
@@ -202,11 +206,12 @@ test('component head validateProps accepts custom user validators', () => {
     [],
     start,
     end,
+    'throw',
   )
 
   const isNonEmptyString: PropValidator<string> = (value, name) => {
     if (typeof value !== 'string' || value.trim() === '') {
-      throw new Error(`Invalid prop "${name}": expected non-empty string.`)
+      pval.fail(name, 'expected non-empty string')
     }
   }
 
@@ -224,13 +229,14 @@ test('component head validateProps accepts custom user validators', () => {
     [],
     start,
     end,
+    'throw',
   )
 
   expect(() =>
     badHead.validateProps({
       title: isNonEmptyString,
     }),
-  ).toThrow('Invalid prop "title": expected non-empty string.')
+  ).toThrow('Invalid prop "title" on <div>: expected non-empty string.')
 })
 
 test('component head validateProps custom validators can use head context', () => {
@@ -256,6 +262,7 @@ test('component head validateProps custom validators can use head context', () =
     [parent],
     start,
     end,
+    'throw',
   )
 
   const startsWithParentPrefix: PropValidator<string> = (
@@ -276,4 +283,69 @@ test('component head validateProps custom validators can use head context', () =
       title: startsWithParentPrefix,
     }),
   ).not.toThrow()
+})
+
+test('component head validateProps warns instead of throwing in warn mode', () => {
+  const host = document.createElement('div')
+  const start = document.createComment('s')
+  const end = document.createComment('e')
+  const warnSpy = vi
+    .spyOn(warningHandler, 'warning')
+    .mockImplementation(() => {})
+
+  try {
+    const head = new ComponentHead(
+      {
+        count: 'bad',
+      },
+      host,
+      [],
+      start,
+      end,
+      'warn',
+    )
+
+    expect(() =>
+      head.validateProps({
+        count: pval.isNumber,
+      }),
+    ).not.toThrow()
+    expect(warnSpy).toHaveBeenCalledTimes(1)
+    expect(String(warnSpy.mock.calls[0][0])).toContain(
+      'Invalid prop "count" on <div>: expected number.',
+    )
+  } finally {
+    warnSpy.mockRestore()
+  }
+})
+
+test('component head validateProps skips validation in off mode', () => {
+  const host = document.createElement('div')
+  const start = document.createComment('s')
+  const end = document.createComment('e')
+  const warnSpy = vi
+    .spyOn(warningHandler, 'warning')
+    .mockImplementation(() => {})
+
+  try {
+    const head = new ComponentHead(
+      {
+        count: 'bad',
+      },
+      host,
+      [],
+      start,
+      end,
+      'off',
+    )
+
+    expect(() =>
+      head.validateProps({
+        count: pval.isNumber,
+      }),
+    ).not.toThrow()
+    expect(warnSpy).not.toHaveBeenCalled()
+  } finally {
+    warnSpy.mockRestore()
+  }
 })

@@ -105,7 +105,7 @@ This is opt-in and local to the component author:
 
 - it does not change `defineComponent(...)`
 - it validates only the keys you list
-- it throws immediately on the first invalid prop
+- it follows `config.propValidationMode`
 - it does not coerce values
 - it does not mutate `head.props`
 
@@ -156,6 +156,7 @@ pval.oneOf(['create', 'edit'] as const)
 pval.arrayOf(pval.isString)
 pval.shape({ title: pval.isString, count: pval.isNumber })
 pval.refOf(pval.isString)
+pval.fail('title', 'expected non-empty string')
 ```
 
 ### Dynamic bindings and refs
@@ -199,11 +200,11 @@ head.validateProps({
 Users can provide their own validators as long as they match the `PropValidator<T>` signature:
 
 ```ts
-import { type PropValidator } from 'regor'
+import { pval, type PropValidator } from 'regor'
 
 const isNonEmptyString: PropValidator<string> = (value, name) => {
   if (typeof value !== 'string' || value.trim() === '') {
-    throw new Error(`Invalid prop "${name}": expected non-empty string.`)
+    pval.fail(name, 'expected non-empty string')
   }
 }
 
@@ -218,9 +219,32 @@ Custom validators can also use the third `head` argument:
 const startsWithPrefix: PropValidator<string> = (value, name, head) => {
   const ctx = head.requireContext(AppServices)
   if (typeof value !== 'string' || !value.startsWith(ctx.prefix)) {
-    throw new Error(`Invalid prop "${name}": expected prefixed value.`)
+    pval.fail(name, 'expected prefixed value')
   }
 }
+```
+
+### Validation mode
+
+Validation behavior is controlled through `RegorConfig.propValidationMode`:
+
+```ts
+import { RegorConfig } from 'regor'
+
+const config = new RegorConfig()
+config.propValidationMode = 'warn'
+```
+
+Available modes:
+
+- `'throw'` (default): throw immediately on invalid prop
+- `'warn'`: report through `warningHandler.warning(...)` and continue
+- `'off'`: skip runtime prop validation entirely
+
+Pass the config into `createApp(...)` when you want app-level control:
+
+```ts
+createApp(appContext, template, config)
 ```
 
 ## Table Templates and Components

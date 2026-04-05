@@ -4,6 +4,25 @@ import { isRef } from '../reactivity/isRef'
 import { type ComponentHead } from './ComponentHead'
 
 /**
+ * Internal error used by built-in validators to carry an exact prop path and a
+ * plain failure detail without baking final message formatting into each
+ * validator.
+ *
+ * @internal
+ */
+export class PropValidationError extends Error {
+  propPath: string
+  detail: string
+
+  constructor(propPath: string, detail: string) {
+    super(detail)
+    this.name = 'PropValidationError'
+    this.propPath = propPath
+    this.detail = detail
+  }
+}
+
+/**
  * Assertion-style runtime validator used by `head.validateProps(...)`.
  *
  * A validator should throw when the value is invalid and return normally when
@@ -46,8 +65,29 @@ export type InferPropValidationSchema<TSchema extends Record<string, unknown>> =
       : never
   }
 
-const fail = (name: string, message: string): never => {
-  throw new Error(`Invalid prop "${name}": ${message}.`)
+/**
+ * Throws a structured validation failure for the given prop path.
+ *
+ * This is the preferred way for custom validators to fail because it preserves
+ * the exact prop path for nested validators such as `shape(...)`, `arrayOf(...)`,
+ * and `refOf(...)`. `ComponentHead.validateProps(...)` then wraps that failure
+ * with the component host information.
+ *
+ * Example:
+ * ```ts
+ * const isNonEmptyString: PropValidator<string> = (value, name) => {
+ *   if (typeof value !== 'string' || value.trim() === '') {
+ *     pval.fail(name, 'expected non-empty string')
+ *   }
+ * }
+ * ```
+ *
+ * @param name - Prop name or nested prop path being validated.
+ * @param message - Failure detail without the final prop/component prefix.
+ * @throws PropValidationError Always throws.
+ */
+export const fail = (name: string, message: string): never => {
+  throw new PropValidationError(name, `${message}.`)
 }
 
 const describeValue = (value: unknown): string => {
@@ -207,15 +247,23 @@ export const refOf = <TValue>(
 /**
  * Built-in prop-validator namespace used with `head.validateProps(...)`.
  *
+ * This namespace includes both ready-made validators and composition helpers.
+ * Custom validators can also use `pval.fail(...)` to produce the same
+ * structured failure shape as Regor's built-in validators.
+ *
  * Example:
  * ```ts
  * head.validateProps({
  *   title: pval.isString,
  *   count: pval.optional(pval.isNumber),
+ *   meta: pval.shape({
+ *     slug: pval.isString,
+ *   }),
  * })
  * ```
  */
 export const pval = {
+  fail,
   isString,
   isNumber,
   isBoolean,
