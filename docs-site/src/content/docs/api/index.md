@@ -12,9 +12,10 @@ Use this page as an index, then open each API page for signature details and exa
 
 1. [`createApp`](/api/createApp)
 2. [`defineComponent`](/api/defineComponent)
-3. [`toFragment`](/api/toFragment)
-4. [`toJsonTemplate`](/api/toJsonTemplate)
-5. [`RegorConfig`](/api/regorConfig)
+3. [`pval`](/api/pval)
+4. [`toFragment`](/api/toFragment)
+5. [`toJsonTemplate`](/api/toJsonTemplate)
+6. [`RegorConfig`](/api/regorConfig)
 
 ## Reactivity
 
