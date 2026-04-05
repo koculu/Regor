@@ -30,7 +30,24 @@ Validation is:
 2. local to the component
 3. runtime-only
 4. non-coercive
-5. fail-fast
+5. controlled by `RegorConfig.propValidationMode`
+
+## Validation mode
+
+Runtime prop-validation behavior is controlled through `RegorConfig.propValidationMode`:
+
+```ts
+import { RegorConfig } from 'regor'
+
+const config = new RegorConfig()
+config.propValidationMode = 'warn'
+```
+
+Modes:
+
+1. `'throw'` (default): invalid props throw immediately.
+2. `'warn'`: invalid props are reported through `warningHandler.warning(...)`.
+3. `'off'`: runtime prop validation is skipped.
 
 ## Built-in validators
 

@@ -91,7 +91,7 @@ const Card = defineComponent<Card>(html`<article>{{ summary }}</article>`, {
 Behavior:
 
 - validates only the listed keys
-- throws on first invalid prop
+- follows `config.propValidationMode`
 - does not mutate `head.props`
 - does not coerce values
 
@@ -121,6 +121,16 @@ const Card = defineComponent<Card>(html`<article>{{ summary }}</article>`, {
 ```
 
 For object-style `:context="{ ... }"` values, validate the object shape directly with `pval.shape(...)`.
+
+### Validation mode
+
+`head.validateProps(...)` follows the active `RegorConfig.propValidationMode`:
+
+- `'throw'` (default): throw on invalid prop
+- `'warn'`: warn and continue
+- `'off'`: disable runtime validation
+
+Set it on the config passed to `createApp(...)`.
 
 ## Return Value
 

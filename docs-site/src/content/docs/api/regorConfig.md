@@ -48,6 +48,27 @@ This property holds the global context object, which can be used to define globa
 This property controls whether Regor should enable interpolation for data binding. When set to `true`, Regor will automatically perform data binding using the `{{ }}` syntax in templates.
 Interpolation also supports the `[[ ]]` syntax.
 
+### `propValidationMode` (`'throw' | 'warn' | 'off'`)
+
+- Default: `'throw'`
+
+Controls how `head.validateProps(...)` behaves when a validator fails.
+
+- `'throw'`: throw immediately on invalid prop
+- `'warn'`: forward the validation failure to `warningHandler.warning(...)` and continue
+- `'off'`: disable runtime prop validation
+
+Example:
+
+```ts
+import { RegorConfig, createApp } from 'regor'
+
+const config = new RegorConfig()
+config.propValidationMode = 'warn'
+
+createApp(appContext, template, config)
+```
+
 ## Methods
 
 ### `addComponent(...)`
@@ -122,6 +143,7 @@ The `RegorConfig` class provides default configuration values for various proper
 
 - The `useInterpolation` property enables or disables the use of `{{}}` syntax for data binding in templates.
 - Interpolation supports both `{{ }}` and `[[ ]]` syntaxes.
+- The `propValidationMode` property controls whether component prop validation throws, warns, or is disabled.
 
 - Registering custom components using `addComponent` makes those components available for use in your Regor templates.
 
@@ -133,6 +155,7 @@ The `RegorConfig` class provides default configuration values for various proper
 
 - [`createApp`](/api/createApp)
 - [`defineComponent`](/api/defineComponent)
+- [`pval`](/api/pval)
 - [`toFragment`](/api/toFragment)
 - [`toJsonTemplate`](/api/toJsonTemplate)
 

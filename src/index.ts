@@ -31,6 +31,7 @@ export type {
   PropValidator,
 } from './app/propValidators'
 export { pval } from './app/propValidators'
+export type { PropValidationMode } from './app/RegorConfig'
 export { RegorConfig } from './app/RegorConfig'
 export { toFragment } from './app/toFragment'
 export { toJsonTemplate } from './app/toJsonTemplate'

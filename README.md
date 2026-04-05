@@ -105,7 +105,7 @@ This is opt-in and local to the component author:
 
 - it does not change `defineComponent(...)`
 - it validates only the keys you list
-- it throws immediately on the first invalid prop
+- it follows `config.propValidationMode`
 - it does not coerce values
 - it does not mutate `head.props`
 
@@ -221,6 +221,29 @@ const startsWithPrefix: PropValidator<string> = (value, name, head) => {
     throw new Error(`Invalid prop "${name}": expected prefixed value.`)
   }
 }
+```
+
+### Validation mode
+
+Validation behavior is controlled through `RegorConfig.propValidationMode`:
+
+```ts
+import { RegorConfig } from 'regor'
+
+const config = new RegorConfig()
+config.propValidationMode = 'warn'
+```
+
+Available modes:
+
+- `'throw'` (default): throw immediately on invalid prop
+- `'warn'`: report through `warningHandler.warning(...)` and continue
+- `'off'`: skip runtime prop validation entirely
+
+Pass the config into `createApp(...)` when you want app-level control:
+
+```ts
+createApp(appContext, template, config)
 ```
 
 ## Table Templates and Components

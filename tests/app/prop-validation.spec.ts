@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest'
+import { expect, test, vi } from 'vitest'
 
 import {
   ComponentHead,
@@ -8,7 +8,9 @@ import {
   pval,
   type Ref,
   ref,
+  RegorConfig,
 } from '../../src'
+import { warningHandler } from '../../src/log/warnings'
 
 test('component props validation allows validated props to be used during mount', () => {
   const root = document.createElement('div')
@@ -138,4 +140,104 @@ test('component props validation throws before invalid component mount completes
     ),
   ).toThrow('Invalid prop "count": expected number.')
   expect(root.querySelector('.summary')).toBeNull()
+})
+
+test('component props validation warns and continues mount when config mode is warn', () => {
+  const root = document.createElement('div')
+  const cfg = new RegorConfig()
+  cfg.propValidationMode = 'warn'
+  const warnSpy = vi
+    .spyOn(warningHandler, 'warning')
+    .mockImplementation(() => {})
+
+  type CountProps = {
+    count: number
+    summary?: string
+  }
+
+  const validatedCard = defineComponent<CountProps>(
+    html`<article class="summary">{{ summary }}</article>`,
+    {
+      props: ['count'],
+      context: (head: ComponentHead<CountProps>) => {
+        head.validateProps({
+          count: pval.isNumber,
+        })
+
+        return {
+          ...head.props,
+          summary: String(head.props.count),
+        }
+      },
+    },
+  )
+
+  try {
+    expect(() =>
+      createApp(
+        {
+          components: { validatedCard },
+        },
+        {
+          element: root,
+          template: html`<ValidatedCard count="oops"></ValidatedCard>`,
+        },
+        cfg,
+      ),
+    ).not.toThrow()
+    expect(warnSpy).toHaveBeenCalledTimes(1)
+    expect(root.querySelector('.summary')?.textContent).toBe('oops')
+  } finally {
+    warnSpy.mockRestore()
+  }
+})
+
+test('component props validation can be disabled through config mode off', () => {
+  const root = document.createElement('div')
+  const cfg = new RegorConfig()
+  cfg.propValidationMode = 'off'
+  const warnSpy = vi
+    .spyOn(warningHandler, 'warning')
+    .mockImplementation(() => {})
+
+  type CountProps = {
+    count: number
+    summary?: string
+  }
+
+  const validatedCard = defineComponent<CountProps>(
+    html`<article class="summary">{{ summary }}</article>`,
+    {
+      props: ['count'],
+      context: (head: ComponentHead<CountProps>) => {
+        head.validateProps({
+          count: pval.isNumber,
+        })
+
+        return {
+          ...head.props,
+          summary: String(head.props.count),
+        }
+      },
+    },
+  )
+
+  try {
+    expect(() =>
+      createApp(
+        {
+          components: { validatedCard },
+        },
+        {
+          element: root,
+          template: html`<ValidatedCard count="oops"></ValidatedCard>`,
+        },
+        cfg,
+      ),
+    ).not.toThrow()
+    expect(warnSpy).not.toHaveBeenCalled()
+    expect(root.querySelector('.summary')?.textContent).toBe('oops')
+  } finally {
+    warnSpy.mockRestore()
+  }
 })

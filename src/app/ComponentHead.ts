@@ -1,11 +1,13 @@
 import { type IRegorContext } from '../api/types'
 import { removeNode } from '../cleanup/removeNode'
 import { callUnmounted } from '../composition/callUnmounted'
+import { warningHandler } from '../log/warnings'
 import {
   type InferPropValidationSchema,
   type PropValidationSchemaFor,
   type PropValidator,
 } from './propValidators'
+import { type PropValidationMode } from './RegorConfig'
 
 export type ContextClass<TValue extends object> = abstract new (
   ...args: never[]
@@ -136,18 +138,26 @@ export class ComponentHead<
    */
   __element: Element
 
+  /**
+   * Runtime behavior used when `validateProps(...)` encounters invalid input.
+   * Defaults to `'throw'`.
+   */
+  __propValidationMode: PropValidationMode
+
   constructor(
     props: TContext,
     element: Element,
     ctx: IRegorContext[],
     start: Comment,
     end: Comment,
+    propValidationMode: PropValidationMode,
   ) {
     this.props = props
     this.__element = element
     this.ctx = ctx
     this.start = start
     this.end = end
+    this.__propValidationMode = propValidationMode
   }
 
   /**
@@ -263,12 +273,24 @@ export class ComponentHead<
   ): asserts this is ComponentHead<
     TContext & InferPropValidationSchema<TSchema>
   > {
+    if (this.__propValidationMode === 'off') return
     const props = this.props as Record<string, unknown>
     for (const name in schema) {
       const validator: PropValidator<unknown> | undefined = schema[name]
       if (!validator) continue
       const validateProp: PropValidator<unknown> = validator
-      validateProp(props[name], name, this)
+      try {
+        validateProp(props[name], name, this)
+      } catch (error) {
+        if (this.__propValidationMode === 'warn') {
+          warningHandler.warning(
+            error instanceof Error ? error.message : error,
+            error,
+          )
+          continue
+        }
+        throw error
+      }
     }
   }
 

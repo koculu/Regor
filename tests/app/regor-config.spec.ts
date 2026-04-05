@@ -41,3 +41,14 @@ test('RegorConfig registers named component and allows updates', () => {
   expect(cfg.__directiveMap['@x']).toBeDefined()
   expect(cfg.__builtInNames.dynamic).toBe('__dyn__')
 })
+
+test('RegorConfig propValidationMode defaults to throw and can be changed', () => {
+  const cfg = new RegorConfig()
+  expect(cfg.propValidationMode).toBe('throw')
+
+  cfg.propValidationMode = 'warn'
+  expect(cfg.propValidationMode).toBe('warn')
+
+  cfg.propValidationMode = 'off'
+  expect(cfg.propValidationMode).toBe('off')
+})

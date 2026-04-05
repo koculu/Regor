@@ -113,7 +113,7 @@ This validation model is intentionally runtime-first:
 
 1. It is fully opt-in.
 2. It validates only the keys you list.
-3. It throws immediately on the first invalid prop.
+3. It follows the active `propValidationMode` config.
 4. It does not coerce values.
 5. It does not mutate `head.props`.
 
@@ -257,6 +257,29 @@ Validation is most useful when:
 2. The same component is used in many places.
 3. You want an explicit runtime guard before local state mapping.
 4. You set `head.autoProps = false` and map incoming props manually.
+
+### Validation mode
+
+Validation behavior is configured through `RegorConfig.propValidationMode`:
+
+```ts
+import { RegorConfig } from 'regor'
+
+const config = new RegorConfig()
+config.propValidationMode = 'warn'
+```
+
+Modes:
+
+1. `'throw'` (default): throws on the first invalid prop.
+2. `'warn'`: sends the validation failure to `warningHandler.warning(...)` and continues.
+3. `'off'`: skips runtime prop validation.
+
+Pass the config into `createApp(...)` to apply the mode for that app:
+
+```ts
+createApp(appContext, template, config)
+```
 
 ## How Component Inputs Are Routed
 
