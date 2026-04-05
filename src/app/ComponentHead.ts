@@ -4,6 +4,7 @@ import { callUnmounted } from '../composition/callUnmounted'
 import { warningHandler } from '../log/warnings'
 import {
   type InferPropValidationSchema,
+  PropValidationError,
   type PropValidationSchemaFor,
   type PropValidator,
 } from './propValidators'
@@ -12,6 +13,37 @@ import { type PropValidationMode } from './RegorConfig'
 export type ContextClass<TValue extends object> = abstract new (
   ...args: never[]
 ) => TValue
+
+const formatComponentValidationError = (
+  element: Element,
+  propName: string,
+  error: unknown,
+): Error => {
+  const tagName = element.tagName?.toLowerCase?.() || 'unknown'
+  const finalPropName =
+    error instanceof PropValidationError ? error.propPath : propName
+  const detail =
+    error instanceof PropValidationError
+      ? error.detail
+      : error instanceof Error
+        ? error.message
+        : String(error)
+
+  if (error instanceof Error) {
+    return new Error(
+      `Invalid prop "${finalPropName}" on <${tagName}>: ${detail}`,
+      {
+        cause: error,
+      },
+    )
+  }
+  return new Error(
+    `Invalid prop "${finalPropName}" on <${tagName}>: ${detail}`,
+    {
+      cause: error,
+    },
+  )
+}
 
 /**
  * Runtime metadata passed to a component's `context(head)` factory.
@@ -256,7 +288,8 @@ export class ComponentHead<
    * known prop names while still allowing you to validate only a subset.
    *
    * Validators typically come from `pval`, but custom user validators are also
-   * supported.
+   * supported. Custom validators may throw their own `Error`, though `pval.fail(...)`
+   * is recommended so nested validators can preserve the exact failing prop path.
    *
    * Example:
    * ```ts
@@ -264,6 +297,15 @@ export class ComponentHead<
    *   title: pval.isString,
    *   count: pval.optional(pval.isNumber),
    * })
+   * ```
+   *
+   * Example with a custom validator:
+   * ```ts
+   * const isNonEmptyString: PropValidator<string> = (value, name) => {
+   *   if (typeof value !== 'string' || value.trim() === '') {
+   *     pval.fail(name, 'expected non-empty string')
+   *   }
+   * }
    * ```
    *
    * @param schema - Validators to apply to selected incoming props.
@@ -282,14 +324,16 @@ export class ComponentHead<
       try {
         validateProp(props[name], name, this)
       } catch (error) {
+        const enrichedError = formatComponentValidationError(
+          this.__element,
+          name,
+          error,
+        )
         if (this.__propValidationMode === 'warn') {
-          warningHandler.warning(
-            error instanceof Error ? error.message : error,
-            error,
-          )
+          warningHandler.warning(enrichedError.message, enrichedError)
           continue
         }
-        throw error
+        throw enrichedError
       }
     }
   }

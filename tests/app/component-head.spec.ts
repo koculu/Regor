@@ -163,7 +163,7 @@ test('component head validateProps throws with nested prop path details', () => 
         tags: pval.arrayOf(pval.isString),
       }),
     }),
-  ).toThrow('Invalid prop "meta.tags[1]": expected string.')
+  ).toThrow('Invalid prop "meta.tags[1]" on <div>: expected string.')
 })
 
 test('component head validator utilities support class and ref validation', () => {
@@ -211,7 +211,7 @@ test('component head validateProps accepts custom user validators', () => {
 
   const isNonEmptyString: PropValidator<string> = (value, name) => {
     if (typeof value !== 'string' || value.trim() === '') {
-      throw new Error(`Invalid prop "${name}": expected non-empty string.`)
+      pval.fail(name, 'expected non-empty string')
     }
   }
 
@@ -236,7 +236,7 @@ test('component head validateProps accepts custom user validators', () => {
     badHead.validateProps({
       title: isNonEmptyString,
     }),
-  ).toThrow('Invalid prop "title": expected non-empty string.')
+  ).toThrow('Invalid prop "title" on <div>: expected non-empty string.')
 })
 
 test('component head validateProps custom validators can use head context', () => {
@@ -312,7 +312,7 @@ test('component head validateProps warns instead of throwing in warn mode', () =
     ).not.toThrow()
     expect(warnSpy).toHaveBeenCalledTimes(1)
     expect(String(warnSpy.mock.calls[0][0])).toContain(
-      'Invalid prop "count": expected number.',
+      'Invalid prop "count" on <div>: expected number.',
     )
   } finally {
     warnSpy.mockRestore()

@@ -163,6 +163,7 @@ const EditorCard = defineComponent<EditorCard>(
 8. `pval.arrayOf(validator)`
 9. `pval.shape({ ... })`
 10. `pval.refOf(validator)`
+11. `pval.fail(name, detail)`
 
 Example:
 
@@ -225,11 +226,11 @@ head.validateProps({
 Users are not limited to the built-in validators. Any function matching `PropValidator<T>` can be used:
 
 ```ts
-import { type PropValidator } from 'regor'
+import { pval, type PropValidator } from 'regor'
 
 const isNonEmptyString: PropValidator<string> = (value, name) => {
   if (typeof value !== 'string' || value.trim() === '') {
-    throw new Error(`Invalid prop "${name}": expected non-empty string.`)
+    pval.fail(name, 'expected non-empty string')
   }
 }
 
@@ -244,7 +245,7 @@ Custom validators can also use the third `head` argument:
 const startsWithParentPrefix: PropValidator<string> = (value, name, head) => {
   const ctx = head.requireContext(AppServices)
   if (typeof value !== 'string' || !value.startsWith(ctx.prefix)) {
-    throw new Error(`Invalid prop "${name}": expected prefixed value.`)
+    pval.fail(name, 'expected prefixed value')
   }
 }
 ```
