@@ -140,6 +140,32 @@ Manual `trigger(ref)` still works while paused.
 5. `entangle(a, b)` creates two-way sync and initializes `b` with `a`.
 6. `persist(ref, key)` syncs ref data with `localStorage`.
 
+## Component prop expressions
+
+For component single-prop bindings, there is an important difference between
+ref and non-ref expression results:
+
+1. If the expression resolves to a ref, the child receives a live reactive prop channel.
+2. If the expression resolves to a non-ref value, the child receives the current resolved value.
+
+Example:
+
+```html
+<Btn :disabled="busy || !pendingDeleteHostname"></Btn>
+```
+
+This passes the current boolean value.
+
+If you want the computed expression itself to stay reactive as a component prop,
+wrap it directly with `ref(...)`:
+
+```html
+<Btn :disabled="ref(busy || !pendingDeleteHostname)"></Btn>
+```
+
+That keeps the prop on the ref-based path and is a simple way to opt into live
+component-prop reactivity for computed values.
+
 ### `flatten` sample
 
 Use `flatten` when you need a plain snapshot for logging, serialization, or transport.

@@ -194,22 +194,19 @@ type TitleCard = {
   summary?: string
 }
 
-const TitleCard = defineComponent<TitleCard>(
-  html`<h3>{{ summary }}</h3>`,
-  {
-    props: ['title'],
-    context: (head) => {
-      head.validateProps({
-        title: pval.refOf(pval.isString),
-      })
+const TitleCard = defineComponent<TitleCard>(html`<h3>{{ summary }}</h3>`, {
+  props: ['title'],
+  context: (head) => {
+    head.validateProps({
+      title: pval.refOf(pval.isString),
+    })
 
-      return {
-        ...head.props,
-        summary: head.props.title(),
-      }
-    },
+    return {
+      ...head.props,
+      summary: head.props.title(),
+    }
   },
-)
+})
 ```
 
 ### Object input validation
@@ -315,6 +312,26 @@ const Card = defineComponent('<h3 r-text="title"></h3>', {
 
 If `x` is not declared in `props`, that single binding is treated as normal attribute fallthrough.
 
+Reactive behavior of single-prop bindings:
+
+1. If the binding expression resolves to a ref, the child receives a live reactive prop channel.
+2. If the binding expression resolves to a non-ref value, the child receives the current resolved value.
+
+Example:
+
+```html
+<Btn :disabled="busy || !pendingDeleteHostname"></Btn>
+```
+
+This passes the current boolean result.
+
+If you want the computed prop expression itself to stay reactive as a component
+input, wrap it with `ref(...)`:
+
+```html
+<Btn :disabled="ref(busy || !pendingDeleteHostname)"></Btn>
+```
+
 ### 2) Object component input (`:context` / `r-context`)
 
 Use:
@@ -343,6 +360,7 @@ It does not go through declared-prop resolution or `:context` object assignment.
 2. `head.autoProps = true` + `head.entangle = true`: ref-to-ref inputs are two-way entangled.
 3. `head.autoProps = true` + `head.entangle = false`: ref-to-ref inputs are initial snapshot only.
 4. Primitive/object values targeting existing component ref fields are applied to those refs.
+5. For single-prop bindings, wrapping an expression in `ref(...)` gives the child a live reactive prop source even when the expression evaluates to a non-ref.
 
 ## Slots
 
