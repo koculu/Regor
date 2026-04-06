@@ -156,7 +156,8 @@ pval.oneOf(['create', 'edit'] as const)
 pval.arrayOf(pval.isString)
 pval.shape({ title: pval.isString, count: pval.isNumber })
 pval.refOf(pval.isString)
-pval.fail('title', 'expected non-empty string')
+pval.describe('value')
+pval.fail('title', 'expected non-empty string, got string ("")')
 ```
 
 ### Dynamic bindings and refs
@@ -204,7 +205,7 @@ import { pval, type PropValidator } from 'regor'
 
 const isNonEmptyString: PropValidator<string> = (value, name) => {
   if (typeof value !== 'string' || value.trim() === '') {
-    pval.fail(name, 'expected non-empty string')
+    pval.fail(name, `expected non-empty string, ${pval.describe(value)}`)
   }
 }
 
@@ -219,7 +220,7 @@ Custom validators can also use the third `head` argument:
 const startsWithPrefix: PropValidator<string> = (value, name, head) => {
   const ctx = head.requireContext(AppServices)
   if (typeof value !== 'string' || !value.startsWith(ctx.prefix)) {
-    pval.fail(name, 'expected prefixed value')
+    pval.fail(name, `expected prefixed value, ${pval.describe(value)}`)
   }
 }
 ```

@@ -136,7 +136,7 @@ head.validateProps({
 Nested errors include the failing index:
 
 ```txt
-Invalid prop "tags[1]": expected string.
+Invalid prop "tags[1]": expected string, got number (2).
 ```
 
 ### `pval.shape({ ... })`
@@ -155,7 +155,7 @@ head.validateProps({
 Nested errors include the failing path:
 
 ```txt
-Invalid prop "meta.slug": expected string.
+Invalid prop "meta.slug": expected string, got number (2).
 ```
 
 ### `pval.refOf(validator)`
@@ -170,6 +170,21 @@ head.validateProps({
 })
 ```
 
+### `pval.describe(value)`
+
+Returns the same `got ...` description used by Regor's built-in validators.
+
+This is useful in custom validators when you want your own error details to
+match the built-in validator style, including explicit Regor ref handling.
+
+```ts
+const isPositiveNumber: PropValidator<number> = (value, name) => {
+  if (typeof value !== 'number' || value <= 0) {
+    pval.fail(name, `expected positive number, ${pval.describe(value)}`)
+  }
+}
+```
+
 ### `pval.fail(name, detail)`
 
 Throws the same structured validation failure used by Regor's built-in validators.
@@ -181,7 +196,7 @@ format the final component-aware error consistently.
 ```ts
 const isNonEmptyString: PropValidator<string> = (value, name) => {
   if (typeof value !== 'string' || value.trim() === '') {
-    pval.fail(name, 'expected non-empty string')
+    pval.fail(name, `expected non-empty string, ${pval.describe(value)}`)
   }
 }
 ```
@@ -201,7 +216,7 @@ import { pval, type PropValidator } from 'regor'
 
 const isNonEmptyString: PropValidator<string> = (value, name) => {
   if (typeof value !== 'string' || value.trim() === '') {
-    pval.fail(name, 'expected non-empty string')
+    pval.fail(name, `expected non-empty string, ${pval.describe(value)}`)
   }
 }
 ```
@@ -212,7 +227,7 @@ Custom validators also receive `head` as the third argument:
 const startsWithPrefix: PropValidator<string> = (value, name, head) => {
   const services = head.requireContext(AppServices)
   if (typeof value !== 'string' || !value.startsWith(services.prefix)) {
-    pval.fail(name, 'expected prefixed value')
+    pval.fail(name, `expected prefixed value, ${pval.describe(value)}`)
   }
 }
 ```
