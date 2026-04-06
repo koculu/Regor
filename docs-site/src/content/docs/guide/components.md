@@ -317,20 +317,45 @@ Reactive behavior of single-prop bindings:
 1. If the binding expression resolves to a ref, the child receives a live reactive prop channel.
 2. If the binding expression resolves to a non-ref value, the child receives the current resolved value.
 
-Example:
+Plain expression:
 
 ```html
 <Btn :disabled="busy || !pendingDeleteHostname"></Btn>
 ```
 
-This passes the current boolean result.
+This passes the current boolean result to the component.
 
-If you want the computed prop expression itself to stay reactive as a component
-input, wrap it with `ref(...)`:
+If you want the prop itself to stay live as parent state changes, wrap the
+expression with a ref on purpose:
 
 ```html
 <Btn :disabled="ref(busy || !pendingDeleteHostname)"></Btn>
+<Btn :disabled="sref(busy || !pendingDeleteHostname)"></Btn>
 ```
+
+Both forms keep the binding on the ref-based prop path. Use:
+
+1. `ref(...)` when deep conversion is acceptable.
+2. `sref(...)` when you want a reactive prop carrier without recursive in-place conversion.
+
+For object expressions, `sref(...)` is often the safer default:
+
+```html
+<EditorCard :item="sref({ id: selectedId, title: selectedTitle })"></EditorCard>
+```
+
+That avoids the deep recursive conversion behavior of `ref(...)` while still
+passing a reactive prop value into the component.
+
+Important caveat:
+
+```html
+<EditorCard :item="sref(selectedItem)"></EditorCard>
+```
+
+Wrapping a plain non-reactive value does not make its source reactive by
+itself. `ref(...)` and `sref(...)` only preserve reactivity when the expression
+already participates in the reactive flow.
 
 ### 2) Object component input (`:context` / `r-context`)
 

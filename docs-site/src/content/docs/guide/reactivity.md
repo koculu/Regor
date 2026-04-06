@@ -156,15 +156,36 @@ Example:
 
 This passes the current boolean value.
 
-If you want the computed expression itself to stay reactive as a component prop,
-wrap it directly with `ref(...)`:
+If you want the prop itself to stay reactive, wrap the expression with a ref on
+purpose:
 
 ```html
 <Btn :disabled="ref(busy || !pendingDeleteHostname)"></Btn>
+<Btn :disabled="sref(busy || !pendingDeleteHostname)"></Btn>
 ```
 
-That keeps the prop on the ref-based path and is a simple way to opt into live
-component-prop reactivity for computed values.
+Both forms keep the component prop on the ref-based path. Use:
+
+1. `ref(...)` when deep conversion is acceptable.
+2. `sref(...)` when you only want a reactive carrier and do not want recursive in-place conversion.
+
+For object expressions, `sref(...)` is often the safer default:
+
+```html
+<EditorCard :item="sref({ id: selectedId, title: selectedTitle })"></EditorCard>
+```
+
+This keeps the prop reactive without deep-converting the object in place.
+
+Important caveat:
+
+```html
+<EditorCard :item="sref(selectedItem)"></EditorCard>
+```
+
+Wrapping a plain non-reactive value with `ref(...)` or `sref(...)` does not
+make its source reactive. These helpers preserve reactivity only when the
+expression itself is already reactive or derived from reactive state.
 
 ### `flatten` sample
 
