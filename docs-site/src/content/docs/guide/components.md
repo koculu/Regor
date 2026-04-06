@@ -163,7 +163,8 @@ const EditorCard = defineComponent<EditorCard>(
 8. `pval.arrayOf(validator)`
 9. `pval.shape({ ... })`
 10. `pval.refOf(validator)`
-11. `pval.fail(name, detail)`
+11. `pval.describe(value)`
+12. `pval.fail(name, detail)`
 
 Example:
 
@@ -230,7 +231,7 @@ import { pval, type PropValidator } from 'regor'
 
 const isNonEmptyString: PropValidator<string> = (value, name) => {
   if (typeof value !== 'string' || value.trim() === '') {
-    pval.fail(name, 'expected non-empty string')
+    pval.fail(name, `expected non-empty string, ${pval.describe(value)}`)
   }
 }
 
@@ -245,7 +246,7 @@ Custom validators can also use the third `head` argument:
 const startsWithParentPrefix: PropValidator<string> = (value, name, head) => {
   const ctx = head.requireContext(AppServices)
   if (typeof value !== 'string' || !value.startsWith(ctx.prefix)) {
-    pval.fail(name, 'expected prefixed value')
+    pval.fail(name, `expected prefixed value, ${pval.describe(value)}`)
   }
 }
 ```

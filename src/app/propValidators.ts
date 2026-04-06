@@ -77,7 +77,7 @@ export type InferPropValidationSchema<TSchema extends Record<string, unknown>> =
  * ```ts
  * const isNonEmptyString: PropValidator<string> = (value, name) => {
  *   if (typeof value !== 'string' || value.trim() === '') {
- *     pval.fail(name, 'expected non-empty string')
+ *     pval.fail(name, `expected non-empty string, ${pval.describe(value)}`)
  *   }
  * }
  * ```
@@ -93,6 +93,9 @@ export const fail = (name: string, message: string): never => {
 const describeValue = (value: unknown): string => {
   if (value === null) return 'null'
   if (value === undefined) return 'undefined'
+  if (isRef(value)) {
+    return `ref<${describeValue(value())}>`
+  }
   if (typeof value === 'string') return 'string'
   if (typeof value === 'number') return 'number'
   if (typeof value === 'boolean') return 'boolean'
@@ -109,6 +112,84 @@ const describeValue = (value: unknown): string => {
   return ctorName && ctorName !== 'Object' ? ctorName : 'object'
 }
 
+const trimPreview = (value: string): string => {
+  return value.length > 60 ? `${value.slice(0, 57)}...` : value
+}
+
+const formatPreview = (value: unknown, depth = 0): string => {
+  const maxPreviewDepth = 1
+  const maxArrayItems = 5
+  const maxObjectEntries = 5
+
+  if (depth > maxPreviewDepth) return 'unknown'
+  if (isRef(value)) {
+    const refValue = value()
+    return `ref(${formatPreview(refValue, depth + 1)})`
+  }
+  if (typeof value === 'string') return trimPreview(JSON.stringify(value))
+  if (
+    typeof value === 'number' ||
+    typeof value === 'boolean' ||
+    typeof value === 'bigint'
+  ) {
+    return String(value)
+  }
+  if (typeof value === 'symbol') return String(value)
+  if (value === null) return 'null'
+  if (value === undefined) return 'undefined'
+  if (value instanceof Date) return value.toISOString()
+  if (value instanceof RegExp) return String(value)
+  if (isArray(value)) {
+    const items = value
+      .slice(0, maxArrayItems)
+      .map((x) => formatPreview(x, depth + 1))
+      .join(', ')
+    return value.length > maxArrayItems ? `[${items}, ...]` : `[${items}]`
+  }
+  if (isObject(value)) {
+    const entries = Object.entries(value).slice(0, maxObjectEntries)
+    if (entries.length === 0) return '{}'
+    const text = entries
+      .map(([key, entry]) => {
+        const preview = formatPreview(entry, depth + 1)
+        return `${key}: ${preview}`
+      })
+      .join(', ')
+    return Object.keys(value).length > maxObjectEntries
+      ? `{ ${text}, ... }`
+      : `{ ${text} }`
+  }
+  return 'unknown'
+}
+
+/**
+ * Describes the received runtime value in the same style used by Regor's
+ * built-in prop validators.
+ *
+ * This is useful in custom validators when you want failure messages to stay
+ * consistent with `pval.isString`, `pval.isNumber`, `pval.refOf(...)`, and the
+ * other built-ins. The description includes both a received type label and a
+ * compact preview of the value. Regor refs are shown explicitly together with
+ * their current value.
+ *
+ * Example:
+ * ```ts
+ * const isPositiveNumber: PropValidator<number> = (value, name) => {
+ *   if (typeof value !== 'number' || value <= 0) {
+ *     pval.fail(name, `expected positive number, ${pval.describe(value)}`)
+ *   }
+ * }
+ * ```
+ *
+ * @param value - Raw runtime value that failed validation.
+ * @returns A compact `got ...` description suitable for validator errors.
+ */
+export const describe = (value: unknown): string => {
+  const type = describeValue(value)
+  const preview = formatPreview(value)
+  return `got ${type} (${preview})`
+}
+
 const formatLiteral = (value: unknown): string => {
   if (typeof value === 'string') return `"${value}"`
   if (typeof value === 'number' || typeof value === 'boolean') {
@@ -123,21 +204,24 @@ const formatLiteral = (value: unknown): string => {
  * Validates that a prop is a string.
  */
 export const isString: PropValidator<string> = (value, name) => {
-  if (typeof value !== 'string') fail(name, 'expected string')
+  if (typeof value !== 'string')
+    fail(name, `expected string, ${describe(value)}`)
 }
 
 /**
  * Validates that a prop is a number.
  */
 export const isNumber: PropValidator<number> = (value, name) => {
-  if (typeof value !== 'number') fail(name, 'expected number')
+  if (typeof value !== 'number')
+    fail(name, `expected number, ${describe(value)}`)
 }
 
 /**
  * Validates that a prop is a boolean.
  */
 export const isBoolean: PropValidator<boolean> = (value, name) => {
-  if (typeof value !== 'boolean') fail(name, 'expected boolean')
+  if (typeof value !== 'boolean')
+    fail(name, `expected boolean, ${describe(value)}`)
 }
 
 /**
@@ -151,7 +235,10 @@ export const isClass = <TValue extends object>(
 ): PropValidator<TValue> => {
   return (value, name) => {
     if (!(value instanceof ctor)) {
-      fail(name, `expected instance of ${ctor.name || 'provided class'}`)
+      fail(
+        name,
+        `expected instance of ${ctor.name || 'provided class'}, ${describe(value)}`,
+      )
     }
   }
 }
@@ -190,7 +277,7 @@ export const oneOf = <const TValue extends readonly unknown[]>(
     if (values.includes(value)) return
     fail(
       name,
-      `expected one of ${values.map((x) => formatLiteral(x)).join(', ')}`,
+      `expected one of ${values.map((x) => formatLiteral(x)).join(', ')}, ${describe(value)}`,
     )
   }
 }
@@ -203,7 +290,7 @@ export const arrayOf = <TValue>(
   validator: PropValidator<TValue>,
 ): PropValidator<TValue[]> => {
   return (value, name, head) => {
-    if (!isArray(value)) fail(name, 'expected array')
+    if (!isArray(value)) fail(name, `expected array, ${describe(value)}`)
     const items = value as unknown[]
     for (let i = 0; i < items.length; ++i) {
       validator(items[i], `${name}[${i}]`, head)
@@ -219,7 +306,7 @@ export const shape = <TSchema extends ValidationSchemaLike>(
   schema: TSchema,
 ): PropValidator<InferPropValidationSchema<TSchema>> => {
   return (value, name, head) => {
-    if (!isObject(value)) fail(name, 'expected object')
+    if (!isObject(value)) fail(name, `expected object, ${describe(value)}`)
     const record = value as Record<string, unknown>
     for (const key in schema) {
       const validator: PropValidator<unknown> = schema[key]
@@ -238,9 +325,11 @@ export const refOf = <TValue>(
   validator: PropValidator<TValue>,
 ): PropValidator<AnyRef> => {
   return (value, name, head) => {
-    if (!isRef(value)) fail(name, 'expected ref')
-    const refValue = value as AnyRef
-    validator(refValue(), `${name}.value`, head)
+    if (isRef(value)) {
+      validator(value(), `${name}.value`, head)
+      return
+    }
+    fail(name, `expected ref, ${describe(value)}`)
   }
 }
 
@@ -248,8 +337,8 @@ export const refOf = <TValue>(
  * Built-in prop-validator namespace used with `head.validateProps(...)`.
  *
  * This namespace includes both ready-made validators and composition helpers.
- * Custom validators can also use `pval.fail(...)` to produce the same
- * structured failure shape as Regor's built-in validators.
+ * Custom validators can also use `pval.fail(...)` and `pval.describe(...)`
+ * to produce messages in the same style as Regor's built-in validators.
  *
  * Example:
  * ```ts
@@ -264,6 +353,7 @@ export const refOf = <TValue>(
  */
 export const pval = {
   fail,
+  describe,
   isString,
   isNumber,
   isBoolean,

@@ -138,7 +138,9 @@ test('component props validation throws before invalid component mount completes
         template: html`<ValidatedCard :count="badCount"></ValidatedCard>`,
       },
     ),
-  ).toThrow('Invalid prop "count" on <validatedcard>: expected number.')
+  ).toThrow(
+    'Invalid prop "count" on <validatedcard>: expected number, got ref<string> (ref("oops")).',
+  )
   expect(root.querySelector('.summary')).toBeNull()
 })
 
@@ -187,7 +189,7 @@ test('component props validation warns and continues mount when config mode is w
     ).not.toThrow()
     expect(warnSpy).toHaveBeenCalledTimes(1)
     expect(String(warnSpy.mock.calls[0][0])).toContain(
-      'Invalid prop "count" on <validatedcard>: expected number.',
+      'Invalid prop "count" on <validatedcard>: expected number, got string ("oops").',
     )
     expect(root.querySelector('.summary')?.textContent).toBe('oops')
   } finally {

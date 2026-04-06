@@ -166,7 +166,7 @@ import { pval, type PropValidator } from 'regor'
 
 const isNonEmptyString: PropValidator<string> = (value, name) => {
   if (typeof value !== 'string' || value.trim() === '') {
-    pval.fail(name, 'expected non-empty string')
+    pval.fail(name, `expected non-empty string, ${pval.describe(value)}`)
   }
 }
 ```

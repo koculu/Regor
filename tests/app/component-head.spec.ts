@@ -163,7 +163,9 @@ test('component head validateProps throws with nested prop path details', () => 
         tags: pval.arrayOf(pval.isString),
       }),
     }),
-  ).toThrow('Invalid prop "meta.tags[1]" on <div>: expected string.')
+  ).toThrow(
+    'Invalid prop "meta.tags[1]" on <div>: expected string, got number (2).',
+  )
 })
 
 test('component head validator utilities support class and ref validation', () => {
@@ -312,7 +314,7 @@ test('component head validateProps warns instead of throwing in warn mode', () =
     ).not.toThrow()
     expect(warnSpy).toHaveBeenCalledTimes(1)
     expect(String(warnSpy.mock.calls[0][0])).toContain(
-      'Invalid prop "count" on <div>: expected number.',
+      'Invalid prop "count" on <div>: expected number, got string ("bad").',
     )
   } finally {
     warnSpy.mockRestore()
