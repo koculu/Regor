@@ -192,6 +192,9 @@ const formatPreview = (value: unknown, depth = 0): string => {
  * @returns A compact `got ...` description suitable for validator errors.
  */
 export const describe = (value: unknown): string => {
+  if (isRef(value)) {
+    return `got ${describeValue(value)}(${formatPreview(value())})`
+  }
   const type = describeValue(value)
   const preview = formatPreview(value)
   return `got ${type} (${preview})`
@@ -203,15 +206,36 @@ const getErrorDetail = (error: unknown): string => {
   return String(error)
 }
 
-const formatOrDetail = (errors: unknown[], value: unknown): string => {
+const trimReceivedSuffix = (detail: string, value: unknown): string => {
   const received = `, ${describe(value)}.`
+  return detail.endsWith(received) ? detail.slice(0, -received.length) : detail
+}
+
+const getOrReason = (name: string, error: unknown, value: unknown): string => {
+  if (error instanceof PropValidationError) {
+    if (error.propPath === name) {
+      return trimReceivedSuffix(error.detail, value)
+    }
+    if (error.propPath === `${name}.value` && isRef(value)) {
+      const innerReason = trimReceivedSuffix(error.detail, value())
+      if (innerReason.startsWith('expected ')) {
+        return `expected ref<${innerReason.slice('expected '.length)}>`
+      }
+      return `expected ref where ${innerReason}`
+    }
+  }
+  return getErrorDetail(error)
+}
+
+const formatOrDetail = (
+  name: string,
+  errors: unknown[],
+  value: unknown,
+): string => {
   const reasons: string[] = []
 
   for (const error of errors) {
-    const detail = getErrorDetail(error)
-    const reason = detail.endsWith(received)
-      ? detail.slice(0, -received.length)
-      : detail
+    const reason = getOrReason(name, error, value)
     if (!reasons.includes(reason)) reasons.push(reason)
   }
 
@@ -309,6 +333,13 @@ export const nullable = <TValue>(
  *   value: pval.or(pval.isString, pval.isNumber),
  * })
  * ```
+ *
+ * Example with refs:
+ * ```ts
+ * head.validateProps({
+ *   value: pval.or(pval.isString, pval.refOf(pval.isString)),
+ * })
+ * ```
  */
 export const or = <TValidators extends ValidatorTuple>(
   ...validators: TValidators
@@ -323,7 +354,7 @@ export const or = <TValidators extends ValidatorTuple>(
         errors.push(error)
       }
     }
-    fail(name, formatOrDetail(errors, value))
+    fail(name, formatOrDetail(name, errors, value))
   }
 }
 

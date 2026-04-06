@@ -238,6 +238,112 @@ test('component head validator utilities support or validation', () => {
   )
 })
 
+test('component head validator utilities support or validation with ref branches', () => {
+  const host = document.createElement('div')
+  const start = document.createComment('s')
+  const end = document.createComment('e')
+  const head = new ComponentHead(
+    {
+      value: ref(1),
+    },
+    host,
+    [],
+    start,
+    end,
+    'throw',
+  )
+
+  expect(() =>
+    head.validateProps({
+      value: pval.or(pval.isString, pval.refOf(pval.isString)),
+    }),
+  ).toThrow(
+    'Invalid prop "value" on <div>: expected string or expected ref<string>, got ref<number>(1).',
+  )
+})
+
+test('component head validator utilities support or validation with alternate shapes', () => {
+  const host = document.createElement('div')
+  const start = document.createComment('s')
+  const end = document.createComment('e')
+
+  const okHead = new ComponentHead(
+    {
+      value: {
+        slug: 'post-1',
+      },
+    },
+    host,
+    [],
+    start,
+    end,
+    'throw',
+  )
+
+  expect(() =>
+    okHead.validateProps({
+      value: pval.or(
+        pval.shape({
+          slug: pval.isString,
+        }),
+        pval.shape({
+          id: pval.isNumber,
+        }),
+      ),
+    }),
+  ).not.toThrow()
+})
+
+test('component head validator utilities support nested or validation inside shapes', () => {
+  const host = document.createElement('div')
+  const start = document.createComment('s')
+  const end = document.createComment('e')
+
+  const okHead = new ComponentHead(
+    {
+      meta: {
+        owner: ref('ada'),
+      },
+    },
+    host,
+    [],
+    start,
+    end,
+    'throw',
+  )
+
+  expect(() =>
+    okHead.validateProps({
+      meta: pval.shape({
+        owner: pval.or(pval.isString, pval.refOf(pval.isString)),
+      }),
+    }),
+  ).not.toThrow()
+
+  const badHead = new ComponentHead(
+    {
+      meta: {
+        owner: ref(12),
+      },
+    },
+    host,
+    [],
+    start,
+    end,
+    'throw',
+  )
+
+  expect(() =>
+    badHead.validateProps({
+      meta: pval.shape({
+        owner: pval.or(pval.isString, pval.refOf(pval.isString)),
+      }),
+    }),
+  ).toThrow(
+    'Invalid prop "meta.owner" on <div>: expected string or expected ref<string>, got ref<number>(12).',
+  )
+})
+
 test('component head validateProps accepts custom user validators', () => {
   const host = document.createElement('div')
   const start = document.createComment('s')

@@ -161,6 +161,14 @@ pval.describe('value')
 pval.fail('title', 'expected non-empty string, got string ("")')
 ```
 
+`pval.or(...)` is useful for union-style runtime contracts:
+
+```ts
+head.validateProps({
+  value: pval.or(pval.isString, pval.refOf(pval.isString)),
+})
+```
+
 ### Dynamic bindings and refs
 
 Single-prop dynamic bindings like `:title="titleRef"` flow into component props as refs.
