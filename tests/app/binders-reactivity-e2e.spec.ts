@@ -221,6 +221,51 @@ test('e2e: :is component switching keeps prop reactivity and detaches old source
   )
 })
 
+test('e2e: component prop reactivity keeps disabled state in sync', async () => {
+  const busy = ref(false)
+  const pendingDeleteHostname = ref('host-1')
+
+  const btn = defineComponent(
+    html`<button id="btn" :disabled="disabled">Delete</button>`,
+    {
+      props: ['disabled'],
+      context: (head) => {
+        console.log('btn context', head.props)
+        return {
+          disabled: head.props.disabled,
+        }
+      },
+    },
+  )
+
+  await withApp(
+    {
+      busy,
+      pendingDeleteHostname,
+      components: { btn },
+    },
+    `<Btn :disabled="ref(busy || !pendingDeleteHostname)"></Btn>`,
+    (root) => {
+      const button = root.querySelector('button') as HTMLButtonElement | null
+      if (!button) throw new Error('missing button')
+
+      expect(button.hasAttribute('disabled')).toBe(false)
+
+      busy(true)
+      expect(button.hasAttribute('disabled')).toBe(true)
+
+      busy(false)
+      expect(button.hasAttribute('disabled')).toBe(false)
+
+      pendingDeleteHostname('')
+      expect(button.hasAttribute('disabled')).toBe(true)
+
+      pendingDeleteHostname('host-2')
+      expect(button.hasAttribute('disabled')).toBe(false)
+    },
+  )
+})
+
 test('e2e: mixed binders detach after unmount (post-unmount source churn is safe)', async () => {
   const root = document.createElement('div')
   const show = ref(true)
