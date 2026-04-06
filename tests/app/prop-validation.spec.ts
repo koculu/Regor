@@ -176,7 +176,7 @@ test('component props validation throws before invalid component mount completes
       },
     ),
   ).toThrow(
-    'Invalid prop "count" on <validatedcard>: expected number, got ref<string> (ref("oops")).',
+    'Invalid prop "count" on <validatedcard>: expected number, got ref<string>("oops").',
   )
   expect(root.querySelector('.summary')).toBeNull()
 })

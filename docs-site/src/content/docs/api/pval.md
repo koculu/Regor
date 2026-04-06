@@ -125,6 +125,20 @@ head.validateProps({
 })
 ```
 
+It also works well with ref-aware unions:
+
+```ts
+head.validateProps({
+  value: pval.or(pval.isString, pval.refOf(pval.isString)),
+})
+```
+
+Example failure:
+
+```txt
+Invalid prop "value": expected string or expected ref<string>, got ref<number>(1).
+```
+
 ### `pval.oneOf(values)`
 
 Ensures the value is one of the provided literals.
