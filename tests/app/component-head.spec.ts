@@ -344,6 +344,65 @@ test('component head validator utilities support nested or validation inside sha
   )
 })
 
+test('component head validator utilities support explicit generic shape schemas', () => {
+  type TabPaneType = {
+    tabId: number
+    title: string
+    closable?: boolean
+  }
+
+  interface TabPaneInterface {
+    tabId: number
+    title: string
+    disabled?: boolean
+  }
+
+  class TabPaneClass {
+    tabId = 0
+    title = ''
+    visible?: boolean
+  }
+
+  const host = document.createElement('div')
+  const start = document.createComment('s')
+  const end = document.createComment('e')
+  const head = new ComponentHead(
+    {
+      typePane: {
+        tabId: 1,
+        title: 'Type pane',
+      },
+      interfacePane: {
+        tabId: 2,
+        title: 'Interface pane',
+      },
+      classPane: {
+        tabId: 3,
+        title: 'Class pane',
+      },
+    },
+    host,
+    [],
+    start,
+    end,
+    'throw',
+  )
+
+  expect(() =>
+    head.validateProps({
+      typePane: pval.shape<TabPaneType>({
+        tabId: pval.isNumber,
+      }),
+      interfacePane: pval.shape<TabPaneInterface>({
+        tabId: pval.isNumber,
+      }),
+      classPane: pval.shape<TabPaneClass>({
+        tabId: pval.isNumber,
+      }),
+    }),
+  ).not.toThrow()
+})
+
 test('component head validateProps accepts custom user validators', () => {
   const host = document.createElement('div')
   const start = document.createComment('s')
