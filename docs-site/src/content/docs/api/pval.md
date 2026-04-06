@@ -113,6 +113,18 @@ head.validateProps({
 })
 ```
 
+### `pval.or(...validators)`
+
+Accepts the value when any of the provided validators succeeds.
+
+This is useful for union-style runtime contracts:
+
+```ts
+head.validateProps({
+  value: pval.or(pval.isString, pval.isNumber),
+})
+```
+
 ### `pval.oneOf(values)`
 
 Ensures the value is one of the provided literals.

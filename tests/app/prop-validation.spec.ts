@@ -103,6 +103,43 @@ test('component props validation supports dynamic ref bindings through refOf', (
   expect(root.querySelector('.summary')?.textContent).toBe('Hello')
 })
 
+test('component props validation supports or validator during mount', () => {
+  const root = document.createElement('div')
+  type FlexibleValueProps = {
+    value: string | number
+    summary?: string
+  }
+
+  const flexibleCard = defineComponent<FlexibleValueProps>(
+    html`<article class="summary">{{ summary }}</article>`,
+    {
+      props: ['value'],
+      context: (head: ComponentHead<FlexibleValueProps>) => {
+        head.validateProps({
+          value: pval.or(pval.isString, pval.isNumber),
+        })
+
+        return {
+          ...head.props,
+          summary: String(head.props.value),
+        }
+      },
+    },
+  )
+
+  createApp(
+    {
+      components: { flexibleCard },
+    },
+    {
+      element: root,
+      template: html`<FlexibleCard :value="42"></FlexibleCard>`,
+    },
+  )
+
+  expect(root.querySelector('.summary')?.textContent).toBe('42')
+})
+
 test('component props validation throws before invalid component mount completes', () => {
   const root = document.createElement('div')
   type CountProps = {

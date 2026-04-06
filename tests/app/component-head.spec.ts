@@ -196,6 +196,48 @@ test('component head validator utilities support class and ref validation', () =
   ).not.toThrow()
 })
 
+test('component head validator utilities support or validation', () => {
+  const host = document.createElement('div')
+  const start = document.createComment('s')
+  const end = document.createComment('e')
+
+  const okHead = new ComponentHead(
+    {
+      value: 42,
+    },
+    host,
+    [],
+    start,
+    end,
+    'throw',
+  )
+
+  expect(() =>
+    okHead.validateProps({
+      value: pval.or(pval.isString, pval.isNumber),
+    }),
+  ).not.toThrow()
+
+  const badHead = new ComponentHead(
+    {
+      value: true,
+    },
+    host,
+    [],
+    start,
+    end,
+    'throw',
+  )
+
+  expect(() =>
+    badHead.validateProps({
+      value: pval.or(pval.isString, pval.isNumber),
+    }),
+  ).toThrow(
+    'Invalid prop "value" on <div>: expected string or expected number, got boolean (true).',
+  )
+})
+
 test('component head validateProps accepts custom user validators', () => {
   const host = document.createElement('div')
   const start = document.createComment('s')

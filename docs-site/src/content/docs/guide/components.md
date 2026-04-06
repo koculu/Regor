@@ -159,12 +159,13 @@ const EditorCard = defineComponent<EditorCard>(
 4. `pval.isClass(SomeClass)`
 5. `pval.optional(validator)`
 6. `pval.nullable(validator)`
-7. `pval.oneOf([...])`
-8. `pval.arrayOf(validator)`
-9. `pval.shape({ ... })`
-10. `pval.refOf(validator)`
-11. `pval.describe(value)`
-12. `pval.fail(name, detail)`
+7. `pval.or(...validators)`
+8. `pval.oneOf([...])`
+9. `pval.arrayOf(validator)`
+10. `pval.shape({ ... })`
+11. `pval.refOf(validator)`
+12. `pval.describe(value)`
+13. `pval.fail(name, detail)`
 
 Example:
 
@@ -173,6 +174,7 @@ head.validateProps({
   title: pval.isString,
   count: pval.optional(pval.isNumber),
   mode: pval.oneOf(['create', 'edit'] as const),
+  value: pval.or(pval.isString, pval.isNumber),
   tags: pval.arrayOf(pval.isString),
   meta: pval.shape({
     slug: pval.isString,
