@@ -40,6 +40,13 @@ export type PropValidator<TValue = unknown> = (
 ) => asserts value is TValue
 
 type ValidationSchemaLike = Record<string, PropValidator<any>>
+type ValidatorTuple = readonly [
+  PropValidator<any>,
+  PropValidator<any>,
+  ...PropValidator<any>[],
+]
+type InferValidatorValue<TValidator> =
+  TValidator extends PropValidator<infer TValue> ? TValue : never
 
 /**
  * Validation schema shape suggested by `ComponentHead<T>.props`.
@@ -190,6 +197,29 @@ export const describe = (value: unknown): string => {
   return `got ${type} (${preview})`
 }
 
+const getErrorDetail = (error: unknown): string => {
+  if (error instanceof PropValidationError) return error.detail
+  if (error instanceof Error) return error.message
+  return String(error)
+}
+
+const formatOrDetail = (errors: unknown[], value: unknown): string => {
+  const received = `, ${describe(value)}.`
+  const reasons: string[] = []
+
+  for (const error of errors) {
+    const detail = getErrorDetail(error)
+    const reason = detail.endsWith(received)
+      ? detail.slice(0, -received.length)
+      : detail
+    if (!reasons.includes(reason)) reasons.push(reason)
+  }
+
+  if (reasons.length === 0) return describe(value)
+  if (reasons.length === 1) return `${reasons[0]}, ${describe(value)}`
+  return `${reasons.join(' or ')}, ${describe(value)}`
+}
+
 const formatLiteral = (value: unknown): string => {
   if (typeof value === 'string') return `"${value}"`
   if (typeof value === 'number' || typeof value === 'boolean') {
@@ -264,6 +294,36 @@ export const nullable = <TValue>(
   return (value, name, head) => {
     if (value === null) return
     validator(value, name, head)
+  }
+}
+
+/**
+ * Accepts the value when any of the provided validators succeeds.
+ *
+ * This is useful for runtime union-style contracts such as string-or-number or
+ * nullable object-or-ref shapes.
+ *
+ * Example:
+ * ```ts
+ * head.validateProps({
+ *   value: pval.or(pval.isString, pval.isNumber),
+ * })
+ * ```
+ */
+export const or = <TValidators extends ValidatorTuple>(
+  ...validators: TValidators
+): PropValidator<InferValidatorValue<TValidators[number]>> => {
+  return (value, name, head) => {
+    const errors: unknown[] = []
+    for (const validator of validators) {
+      try {
+        validator(value, name, head)
+        return
+      } catch (error) {
+        errors.push(error)
+      }
+    }
+    fail(name, formatOrDetail(errors, value))
   }
 }
 
@@ -360,6 +420,7 @@ export const pval = {
   isClass,
   optional,
   nullable,
+  or,
   oneOf,
   arrayOf,
   shape,

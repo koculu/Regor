@@ -152,6 +152,7 @@ pval.isBoolean
 pval.isClass(MyClass)
 pval.optional(pval.isString)
 pval.nullable(pval.isNumber)
+pval.or(pval.isString, pval.isNumber)
 pval.oneOf(['create', 'edit'] as const)
 pval.arrayOf(pval.isString)
 pval.shape({ title: pval.isString, count: pval.isNumber })
