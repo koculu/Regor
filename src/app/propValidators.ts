@@ -47,6 +47,9 @@ type ValidatorTuple = readonly [
 ]
 type InferValidatorValue<TValidator> =
   TValidator extends PropValidator<infer TValue> ? TValue : never
+type ShapeSchemaFor<TShape extends object> = {
+  [TKey in keyof TShape]?: PropValidator<TShape[TKey]>
+}
 
 /**
  * Validation schema shape suggested by `ComponentHead<T>.props`.
@@ -392,16 +395,37 @@ export const arrayOf = <TValue>(
 /**
  * Validates that a prop is an object and applies validators to selected nested
  * keys. Nested failures include dotted prop paths such as `meta.slug`.
+ *
+ * `shape(...)` supports both inferred literal schemas and explicit generic
+ * target types for editor completion:
+ *
+ * ```ts
+ * pval.shape({
+ *   tabId: pval.isNumber,
+ * })
+ *
+ * pval.shape<TabPane>({
+ *   tabId: pval.isNumber,
+ * })
+ * ```
  */
-export const shape = <TSchema extends ValidationSchemaLike>(
+export function shape<TShape extends object>(
+  schema: ShapeSchemaFor<TShape>,
+): PropValidator<TShape>
+export function shape<TSchema extends ValidationSchemaLike>(
   schema: TSchema,
-): PropValidator<InferPropValidationSchema<TSchema>> => {
+): PropValidator<InferPropValidationSchema<TSchema>>
+export function shape(
+  schema: Record<string, PropValidator<any> | undefined>,
+): PropValidator<Record<string, unknown>> {
   return (value, name, head) => {
     if (!isObject(value)) fail(name, `expected object, ${describe(value)}`)
     const record = value as Record<string, unknown>
     for (const key in schema) {
-      const validator: PropValidator<unknown> = schema[key]
-      validator(record[key], `${name}.${key}`, head)
+      const validator: PropValidator<unknown> | undefined = schema[key]
+      if (!validator) continue
+      const validateField: PropValidator<unknown> = validator
+      validateField(record[key], `${name}.${key}`, head)
     }
   }
 }
