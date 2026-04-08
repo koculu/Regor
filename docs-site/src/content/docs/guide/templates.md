@@ -82,11 +82,6 @@ Special identifiers:
 
 Regor auto-unrefs refs in expressions, so template code uses `user.name`, not `user.name()` / `.value`.
 
-For component templates, this also means omitted names can still resolve from
-outer contexts when they are not defined on the component's own context object.
-That behavior is flexible, but component authors should assign every template
-field they rely on when they want predictable component-local lookup.
-
 ## Supported Expression Syntax (Runtime)
 
 Backed by Regor’s jsep/regorEval pipeline, templates support:

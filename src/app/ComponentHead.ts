@@ -102,24 +102,36 @@ export class ComponentHead<
   ctx: IRegorContext[]
 
   /**
-   * Controls whether Regor should automatically apply incoming `head.props`
-   * values to the component context after `context(head)` returns.
+   * Controls whether Regor automatically merges parent-provided component inputs
+   * into the object returned by `context(head)`.
    *
-   * Think of it as "auto wire parent inputs into my component fields".
+   * There are two runtime data sources for a component:
+   *
+   * 1. Parent inputs:
+   *    values passed from the component host, such as `:title="abc"` or
+   *    `:context="{ ... }"`. These are exposed on `head.props`.
+   *
+   * 2. Component context:
+   *    the object returned by `context(head)`. This is the component's own local
+   *    state.
+   *
+   * `autoProps` controls the third step: how those two sources are merged.
    *
    * - `true` (default):
-   *   - If a key exists in `head.props` but does not exist on the object
-   *     returned by `context(head)`, Regor adds that key to component context.
-   *   - Existing ref fields can receive incoming values automatically.
-   *   - Ref-to-ref inputs can be entangled when `head.entangle` is enabled.
+   *   Regor automatically applies `head.props` to the component context.
+   *   If a parent input name is missing from the component context, Regor adds it.
+   *   Isolates the declared component properties,
+   *   so a component does not accidentally inherit unwanted values from its ancestors.
+   *
    * - `false`:
-   *   - Regor does not auto-apply props.
-   *   - You fully control mapping manually inside `context(head)`.
+   *   Regor does not merge `head.props` into the returned context.
+   *   The component author must map values manually from `head.props`.
+   *   Disables isolation for declared props.
    *
-   * Use `false` when you need strict custom mapping/validation/transforms
-   * before any value touches component state.
-   *
-   * "Missing key" is always checked against the returned component context object.
+   * In short:
+   * - `head.props` = what the parent passed
+   * - `context(head)` return value = what the component defines
+   * - `autoProps` = whether Regor should merge the first into the second
    *
    * Example (auto add):
    * ```ts

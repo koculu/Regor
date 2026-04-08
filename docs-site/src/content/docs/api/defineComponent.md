@@ -22,7 +22,7 @@ To define a Regor component, call the `defineComponent` function with the follow
 
 - `options` (optional): An array of strings that defines component properties or an object that allows you to configure various options for the component, such as whether to use interpolation, props, the component's default name, or the component context.
   - `context` (optional): A function that defines the Regor context for the component. This function receives a `ComponentHead` object, which you can use to specify the component's behavior and props. It should return the Regor context.
-    - `head.autoProps`: Automatically assigns properties defined in the `:context` binding to the component context. Defaults to `true`.
+    - `head.autoProps`: Automatically merges `head.props` into the returned component context. Defaults to `true`.
     - `head.entangle`: Keeps refs defined in the component context entangled with `head.props` refs. Defaults to `true`.
     - `head.enableSwitch`: Enables slot context switching to the parent. Defaults to `false`.
     - `head.onAutoPropsAssigned`: Callback invoked after auto props get assigned to the component context.
@@ -160,6 +160,8 @@ The `defineComponent` function returns a component object with the following pro
 
 - The component context is configured through the `options.context` callback, which defines the behavior and data of your component.
 - Runtime prop validation is opt-in and local to `context(head)` through `head.validateProps(...)`.
+- `head.autoProps = true` merges `head.props` into the returned component context and also keeps omitted declared prop names local by adding `undefined` only when the component did not already define that field.
+- `head.autoProps = false` disables that merge. In that mode, omitted names are not added automatically, so normal parent-context lookup can still resolve them.
 
 - The `options` parameter allows you to configure various aspects of the component, such as enabling or disabling interpolation, specifying props, setting a default name, or providing the component context.
 
