@@ -272,7 +272,7 @@ test('e2e: component prop reactivity keeps disabled state in sync', async () => 
   )
 })
 
-test('e2e: omitted optional component prop resolves from parent context when names collide', async () => {
+test('e2e: omitted optional component prop stays undefined even when parent has same name', async () => {
   const title = ref('Child title')
   const note = ref('parent note')
 
@@ -283,11 +283,15 @@ test('e2e: omitted optional component prop resolves from parent context when nam
     </article>`,
     {
       props: ['title', 'note'],
-      context: (head) => ({
-        title: head.props.title,
-        // `note` is intentionally omitted, so template lookup falls through
-        // to the parent context when the name collides.
-      }),
+      context: (head) => {
+        head.autoProps = true
+        return {
+          title: head.props.title,
+          // `note` is intentionally omitted. With auto props enabled, the
+          // declared-but-missing prop should still exist on the child context
+          // as `undefined`, so parent `note` does not leak in by name.
+        }
+      },
     },
   )
 
@@ -301,6 +305,97 @@ test('e2e: omitted optional component prop resolves from parent context when nam
     (root) => {
       const titleEl = root.querySelector('#title') as HTMLElement | null
       const noteEl = root.querySelector('#note') as HTMLElement | null
+      if (!titleEl || !noteEl) throw new Error('missing rendered note card')
+
+      expect(titleEl.textContent).toBe('Child title')
+      expect(noteEl.textContent ?? '').toBe('')
+
+      note('updated parent note')
+      expect(noteEl.textContent ?? '').toBe('')
+    },
+  )
+})
+
+test('e2e: omitted kebab-case declared prop is isolated through camelized child key', async () => {
+  const title = ref('Child title')
+  const pendingDeleteHostname = ref('parent-host')
+
+  const hostCard = defineComponent(
+    html`<article>
+      <h3 id="title-kebab" r-text="title"></h3>
+      <p id="pending-kebab" r-text="pendingDeleteHostname"></p>
+    </article>`,
+    {
+      props: ['title', 'pending-delete-hostname'],
+      context: (head) => {
+        head.autoProps = true
+        return {
+          title: head.props.title,
+          // `pendingDeleteHostname` is intentionally omitted here. The declared
+          // prop name is kebab-case, but the child template reads camelCase.
+          // The auto-props isolation path must camelize the declared prop name
+          // before materializing the missing field as `undefined`.
+        }
+      },
+    },
+  )
+
+  await withApp(
+    {
+      title,
+      pendingDeleteHostname,
+      components: { hostCard },
+    },
+    `<HostCard :title="title"></HostCard>`,
+    (root) => {
+      const titleEl = root.querySelector('#title-kebab') as HTMLElement | null
+      const pendingEl = root.querySelector(
+        '#pending-kebab',
+      ) as HTMLElement | null
+      if (!titleEl || !pendingEl) throw new Error('missing rendered host card')
+
+      expect(titleEl.textContent).toBe('Child title')
+      expect(pendingEl.textContent ?? '').toBe('')
+
+      pendingDeleteHostname('updated-parent-host')
+      expect(pendingEl.textContent ?? '').toBe('')
+    },
+  )
+})
+
+test('e2e: omitted optional component prop resolves from parent when autoProps is disabled', async () => {
+  const title = ref('Child title')
+  const note = ref('parent note')
+
+  const noteCard = defineComponent(
+    html`<article>
+      <h3 id="title-off" r-text="title"></h3>
+      <p id="note-off" r-text="note"></p>
+    </article>`,
+    {
+      props: ['title', 'note'],
+      context: (head) => {
+        head.autoProps = false
+        return {
+          title: head.props.title,
+          // `note` is intentionally omitted. With autoProps disabled, the
+          // component context never gets a local `note` field, so lookup can
+          // still fall through to the parent context.
+        }
+      },
+    },
+  )
+
+  await withApp(
+    {
+      title,
+      note,
+      components: { noteCard },
+    },
+    `<NoteCard :title="title"></NoteCard>`,
+    (root) => {
+      const titleEl = root.querySelector('#title-off') as HTMLElement | null
+      const noteEl = root.querySelector('#note-off') as HTMLElement | null
       if (!titleEl || !noteEl) throw new Error('missing rendered note card')
 
       expect(titleEl.textContent).toBe('Child title')

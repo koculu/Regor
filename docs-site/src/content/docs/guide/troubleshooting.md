@@ -99,6 +99,7 @@ Correct routing:
    attribute channel on component hosts (fallthrough), not `head.props` object assignment.
 
 If component sets `head.autoProps = false`, you must map `head.props` manually in `context(head)`.
+Also note that omitted declared prop names are not isolated automatically in that mode, so same-named parent values can still resolve through normal template lookup.
 
 ## Parent-Child Ref Sync Feels Wrong
 

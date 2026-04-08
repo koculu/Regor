@@ -121,7 +121,7 @@ export class ComponentBinder {
       const contextName = binder.__config.__builtInNames.context
       const contextAliasName = binder.__config.__builtInNames.contextAlias
       const bindName = binder.__config.__builtInNames.bind
-
+      const definedProps = registeredComponent.props?.map(camelize) ?? []
       const getProps = (
         component: HTMLElement,
         capturedContext: any[],
@@ -136,9 +136,7 @@ export class ComponentBinder {
             binder.__bind(contextDirective, component, contextAliasName)
           }
 
-          let definedProps = registeredComponent.props
-          if (!definedProps || definedProps.length === 0) return
-          definedProps = definedProps.map(camelize)
+          if (definedProps.length === 0) return
           const definedPropsByLowerCase = new Map(
             definedProps.map((definedProp) => [
               definedProp.toLowerCase(),
@@ -228,6 +226,12 @@ export class ComponentBinder {
               // Existing non-ref field is intentionally preserved as component-owned state.
             } else componentCtx[key] = propsValue
             // Key does not exist on component context yet; auto-add from inputs.
+          }
+
+          // component prop isolation when head.autoProps is enabled.
+          for (const key of definedProps) {
+            if (key in componentCtx) continue
+            componentCtx[key] = undefined
           }
           head.onAutoPropsAssigned?.()
         }

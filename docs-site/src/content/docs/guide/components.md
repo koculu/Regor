@@ -105,46 +105,6 @@ const Child = defineComponent('<div></div>', {
 })
 ```
 
-### Scope collision note
-
-Component template lookup is not fully isolated from parent contexts.
-
-If a component template reads a name that is not present on the component's own
-context object, Regor can continue resolving that name from outer contexts.
-This is flexible, but it also means omitted fields can resolve from the parent
-when names collide.
-
-Example:
-
-```ts
-const NoteCard = defineComponent(
-  html`<article>
-    <h3 r-text="title"></h3>
-    <p r-text="note"></p>
-  </article>`,
-  {
-    props: ['title', 'note'],
-    context: (head) => ({
-      title: head.props.title,
-      // `note` is omitted here
-    }),
-  },
-)
-```
-
-```html
-<NoteCard :title="title"></NoteCard>
-```
-
-If the parent context also has `note`, the component template can resolve that
-parent `note`.
-
-To avoid surprises:
-
-1. Assign every component field you intend to use in the template.
-2. For optional props, map them explicitly from `head.props`.
-3. Use `head.requireContext(...)` / `head.findContext(...)` when parent access is intentional.
-
 ## Runtime Prop Validation
 
 Regor lets component authors validate incoming props inside `context(head)`.
@@ -421,11 +381,14 @@ It does not go through declared-prop resolution or `:context` object assignment.
 
 ### autoProps and entangle behavior
 
-1. `head.autoProps = false`: component author maps from `head.props` manually.
-2. `head.autoProps = true` + `head.entangle = true`: ref-to-ref inputs are two-way entangled.
-3. `head.autoProps = true` + `head.entangle = false`: ref-to-ref inputs are initial snapshot only.
-4. Primitive/object values targeting existing component ref fields are applied to those refs.
-5. For single-prop bindings, wrapping an expression in `ref(...)` gives the child a live reactive prop source even when the expression evaluates to a non-ref.
+1. `head.autoProps = true`: Regor merges `head.props` into the returned component context.
+2. With `head.autoProps = true`, omitted declared prop names are added as local `undefined` only when the component did not already define that field.
+3. That keeps declared prop names local to the component and prevents same-named parent values from being resolved by accident.
+4. `head.autoProps = false`: component author maps from `head.props` manually, and omitted names are not isolated automatically.
+5. `head.autoProps = true` + `head.entangle = true`: ref-to-ref inputs are two-way entangled.
+6. `head.autoProps = true` + `head.entangle = false`: ref-to-ref inputs are initial snapshot only.
+7. Primitive/object values targeting existing component ref fields are applied to those refs.
+8. For single-prop bindings, wrapping an expression in `ref(...)` gives the child a live reactive prop source even when the expression evaluates to a non-ref.
 
 ## Slots
 
