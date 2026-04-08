@@ -49,6 +49,10 @@ export const singlePropDirective: Directive = {
   collectRefObj: true,
   mount: ({ parseResult, option }) => {
     if (typeof option !== 'string' || !option) return noop
+    // Component props are normalized to camelCase across the binding pipeline.
+    // This keeps `:pending-delete-hostname` in template syntax aligned with the
+    // `pendingDeleteHostname` key used by component context objects and by
+    // ComponentBinder when it matches declared props.
     const key = camelize(option)
     let currentSource: AnyRef | undefined
     let bridge: AnyRef | undefined
@@ -77,6 +81,15 @@ export const singlePropDirective: Directive = {
       const ctxKey = ctx[key]
 
       if (!isRef(value)) {
+        // Non-ref expressions are written as plain values.
+        // This keeps simple component props cheap and lets ComponentBinder
+        // consume the same normalized key regardless of whether the template
+        // used `:some-prop` or `:someProp`.
+        //
+        // If this prop was previously bridged from a ref source, writing into
+        // that bridge preserves downstream ref consumers while the source is
+        // temporarily resolving to a plain value. Otherwise the component prop
+        // is updated directly and the component receives the current snapshot.
         if (bridge && ctxKey === bridge) {
           bridge(value)
           return

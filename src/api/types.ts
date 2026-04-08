@@ -38,6 +38,11 @@ type BivariantAnyRefCall = {
 
 export type AnyRef = BivariantAnyRefCall
 
+export type RefOrValue<TValueType> =
+  | Ref<TValueType>
+  | SRef<TValueType>
+  | TValueType
+
 export type Ref<TValueType> = ((
   newValue?:
     | RefContent<TValueType>

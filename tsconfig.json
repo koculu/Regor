@@ -13,7 +13,6 @@
     "removeComments": false,
     "sourceMap": false,
     "isolatedModules": false,
-    "esModuleInterop": false,
     "noEmit": true,
     "strict": true,
     "outDir": "dist",
@@ -27,7 +26,6 @@
     "declaration": false,
     "emitDeclarationOnly": false,
     "stripInternal": true,
-    "allowSyntheticDefaultImports": false
   },
   "include": [
     "src/**/*.ts",

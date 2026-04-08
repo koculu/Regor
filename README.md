@@ -369,8 +369,8 @@ Regor provides a set of directives that allow you to enhance the behavior and ap
 - **`:key`** Provides a unique identifier for each item in a list, aiding efficient updates and rendering.
 - **`:is`** Specifies the component to dynamically render based on a value or expression.
 - **`r-teleport`** Teleports the element to anywhere in the DOM. Unlike Vue, teleport is a directive to avoid component overhead.
-- **`:props`** Vue uses v-bind for component property passing. However, this can conflict with v-bind's attribute fall-through logic. Hence, Regor defines a dedicated directive to pass properties using object syntax. It enables passing properties without defining them in the component's props contract.
-- **`:props-once`** Similar to :props but it doesn't observe entire reactive tree of the template expression. Tail reactivity still works.
+- **`:context`** Assigns an object into a component instance context, reactively. Use it for object-style component input, including fields that are not declared in the component `props` list.
+- **`r-context`** Alias of `:context` with the same behavior.
 - **`@`** Shorthand for `r-on` to bind event listeners.
 - **`:`** Shorthand for `r-bind` to bind element attributes.
 - **`.`** Shorthand for `r-bind.prop` to set properties.
