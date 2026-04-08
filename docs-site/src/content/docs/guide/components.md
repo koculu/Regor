@@ -105,6 +105,46 @@ const Child = defineComponent('<div></div>', {
 })
 ```
 
+### Scope collision note
+
+Component template lookup is not fully isolated from parent contexts.
+
+If a component template reads a name that is not present on the component's own
+context object, Regor can continue resolving that name from outer contexts.
+This is flexible, but it also means omitted fields can resolve from the parent
+when names collide.
+
+Example:
+
+```ts
+const NoteCard = defineComponent(
+  html`<article>
+    <h3 r-text="title"></h3>
+    <p r-text="note"></p>
+  </article>`,
+  {
+    props: ['title', 'note'],
+    context: (head) => ({
+      title: head.props.title,
+      // `note` is omitted here
+    }),
+  },
+)
+```
+
+```html
+<NoteCard :title="title"></NoteCard>
+```
+
+If the parent context also has `note`, the component template can resolve that
+parent `note`.
+
+To avoid surprises:
+
+1. Assign every component field you intend to use in the template.
+2. For optional props, map them explicitly from `head.props`.
+3. Use `head.requireContext(...)` / `head.findContext(...)` when parent access is intentional.
+
 ## Runtime Prop Validation
 
 Regor lets component authors validate incoming props inside `context(head)`.

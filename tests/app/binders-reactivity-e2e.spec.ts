@@ -1,6 +1,13 @@
 import { expect, test } from 'vitest'
 
-import { createApp, defineComponent, drainUnbind, html, ref } from '../../src'
+import {
+  createApp,
+  defineComponent,
+  drainUnbind,
+  html,
+  ref,
+  sref,
+} from '../../src'
 
 type KeyedLabelSource = {
   payload: string
@@ -230,7 +237,6 @@ test('e2e: component prop reactivity keeps disabled state in sync', async () => 
     {
       props: ['disabled'],
       context: (head) => {
-        console.log('btn context', head.props)
         return {
           disabled: head.props.disabled,
         }
@@ -262,6 +268,189 @@ test('e2e: component prop reactivity keeps disabled state in sync', async () => 
 
       pendingDeleteHostname('host-2')
       expect(button.hasAttribute('disabled')).toBe(false)
+    },
+  )
+})
+
+test('e2e: omitted optional component prop resolves from parent context when names collide', async () => {
+  const title = ref('Child title')
+  const note = ref('parent note')
+
+  const noteCard = defineComponent(
+    html`<article>
+      <h3 id="title" r-text="title"></h3>
+      <p id="note" r-text="note"></p>
+    </article>`,
+    {
+      props: ['title', 'note'],
+      context: (head) => ({
+        title: head.props.title,
+        // `note` is intentionally omitted, so template lookup falls through
+        // to the parent context when the name collides.
+      }),
+    },
+  )
+
+  await withApp(
+    {
+      title,
+      note,
+      components: { noteCard },
+    },
+    `<NoteCard :title="title"></NoteCard>`,
+    (root) => {
+      const titleEl = root.querySelector('#title') as HTMLElement | null
+      const noteEl = root.querySelector('#note') as HTMLElement | null
+      if (!titleEl || !noteEl) throw new Error('missing rendered note card')
+
+      expect(titleEl.textContent).toBe('Child title')
+      expect(noteEl.textContent).toBe('parent note')
+
+      note('updated parent note')
+      expect(noteEl.textContent).toBe('updated parent note')
+    },
+  )
+})
+
+test('e2e: nested :model component props keep bridge sync across replacements', async () => {
+  const selectedHost = ref({ hostname: 'alpha' })
+
+  const leafInput = defineComponent(
+    html`<input id="leaf-input" type="text" r-model="model" />`,
+    ['model'],
+  )
+  const middleInput = defineComponent(
+    html`<LeafInput :model="model"></LeafInput>`,
+    {
+      props: ['model'],
+      context: () => ({
+        components: { leafInput },
+      }),
+    },
+  )
+  const outerInput = defineComponent(
+    html`<MiddleInput :model="model"></MiddleInput>`,
+    {
+      props: ['model'],
+      context: () => ({
+        components: { middleInput },
+      }),
+    },
+  )
+
+  await withApp(
+    {
+      selectedHost,
+      components: { outerInput },
+    },
+    `<OuterInput :model="selectedHost.hostname"></OuterInput>`,
+    (root) => {
+      const input = root.querySelector('#leaf-input') as HTMLInputElement | null
+      if (!input) throw new Error('missing #leaf-input')
+
+      expect(input.value).toBe('alpha')
+
+      selectedHost().hostname('parent-alpha')
+      expect(input.value).toBe('parent-alpha')
+
+      input.value = 'child-alpha'
+      input.dispatchEvent(new Event('input'))
+      expect(selectedHost().hostname()).toBe('child-alpha')
+
+      const oldHost1 = selectedHost()
+      selectedHost(ref({ hostname: 'beta' }))
+      expect(input.value).toBe('beta')
+
+      selectedHost().hostname('parent-beta')
+      expect(input.value).toBe('parent-beta')
+
+      input.value = 'child-beta'
+      input.dispatchEvent(new Event('input'))
+      expect(selectedHost().hostname()).toBe('child-beta')
+
+      oldHost1.hostname('stale-alpha')
+      expect(input.value).toBe('child-beta')
+      expect(selectedHost().hostname()).toBe('child-beta')
+
+      const oldHost2 = selectedHost()
+      selectedHost(ref({ hostname: 'gamma' }))
+      expect(input.value).toBe('gamma')
+
+      oldHost2.hostname('stale-beta')
+      expect(input.value).toBe('gamma')
+
+      selectedHost().hostname('parent-gamma')
+      expect(input.value).toBe('parent-gamma')
+
+      input.value = 'child-gamma'
+      input.dispatchEvent(new Event('input'))
+      expect(selectedHost().hostname()).toBe('child-gamma')
+      expect(oldHost2.hostname()).toBe('stale-beta')
+    },
+  )
+})
+
+test('e2e: existing bridge keeps linked ref active when binding switches to plain value', async () => {
+  const state = sref<{ model: string | ReturnType<typeof ref<string>> }>({
+    model: ref('alpha'),
+  })
+
+  const inputField = defineComponent(
+    html`<input id="switching-input" type="text" r-model="model" />`,
+    ['model'],
+  )
+
+  await withApp(
+    {
+      state,
+      components: { inputField },
+    },
+    `<InputField :model="state.model"></InputField>`,
+    (root) => {
+      const input = root.querySelector(
+        '#switching-input',
+      ) as HTMLInputElement | null
+      if (!input) throw new Error('missing #switching-input')
+
+      expect(input.value).toBe('alpha')
+
+      const oldLiveModel = state().model as ReturnType<typeof ref<string>>
+      oldLiveModel('beta')
+      expect(input.value).toBe('beta')
+
+      state({ model: 'fallback' })
+      expect(input.value).toBe('fallback')
+      expect(oldLiveModel()).toBe('fallback')
+
+      state({ model: 'fallback-2' })
+      expect(input.value).toBe('fallback-2')
+      expect(oldLiveModel()).toBe('fallback-2')
+
+      input.value = 'child-local'
+      input.dispatchEvent(new Event('input'))
+      expect(oldLiveModel()).toBe('child-local')
+      expect(input.value).toBe('child-local')
+
+      state({ model: 'fallback-3' })
+      expect(input.value).toBe('fallback-3')
+      expect(oldLiveModel()).toBe('fallback-3')
+
+      oldLiveModel('stale-live')
+      expect(input.value).toBe('stale-live')
+
+      const nextLiveModel = ref('gamma')
+      state({ model: nextLiveModel })
+      expect(input.value).toBe('gamma')
+
+      nextLiveModel('gamma-2')
+      expect(input.value).toBe('gamma-2')
+
+      input.value = 'child-gamma'
+      input.dispatchEvent(new Event('input'))
+      expect(nextLiveModel()).toBe('child-gamma')
+
+      oldLiveModel('old-detached')
+      expect(input.value).toBe('child-gamma')
     },
   )
 })
