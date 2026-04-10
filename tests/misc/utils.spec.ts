@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 
-import { flatten, html, isRaw, markRaw, raw, ref, sref } from '../../src'
+import { flatten, html, isRaw, markRaw, raw, ref, sref, svg } from '../../src'
 
 test('flatten converts nested refs', () => {
   const obj = ref({ a: ref(1), b: { c: sref(2) } })
@@ -23,8 +23,9 @@ test('markRaw marks object as raw', () => {
   expect(isRaw({})).toBe(false)
 })
 
-test('html and raw tag helpers build strings', () => {
+test('html/raw and svg tag helpers build strings', () => {
   const value = 'world'
   expect(html`hello ${value}`).toBe('hello world')
   expect(raw`a${1}b${2}`).toBe('a1b2')
+  expect(svg`<svg><text>${value}</text></svg>`).toBe('<svg><text>world</text></svg>')
 })

@@ -411,6 +411,7 @@ These directives empower you to create dynamic and interactive user interfaces, 
 - **`persist`** Persists a given ref in local storage reactively.
 - **`html`** A tag to produce HTML string using template literals. Recommended to use with the VS-Code [`lit-html`](https://marketplace.visualstudio.com/items?itemName=bierner.lit-html) extension for formatting and highlighting.
 - **`raw`** A tag to produce HTML string, similar to `html`, but it is excluded from formatting when [`lit-html`](https://marketplace.visualstudio.com/items?itemName=bierner.lit-html) extension is installed.
+- **`svg`** A tag to produce SVG template strings with the same interpolation behavior as `html`.
 
 **Observe Functions**
 

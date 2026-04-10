@@ -55,5 +55,6 @@ const htmlString = html`<p>
 ## See Also
 
 - [raw](/api/raw)
+- [svg](/api/svg)
 
 [Back to the API list](/api/)
