@@ -70,6 +70,7 @@ Use this page as an index, then open each API page for signature details and exa
 4. [`persist`](/api/persist)
 5. [`html`](/api/html)
 6. [`raw`](/api/raw)
+7. [`svg`](/api/svg)
 
 ## Logging
 

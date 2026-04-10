@@ -19,3 +19,5 @@ export const html = (
 }
 
 export const raw = html
+
+export const svg = html
