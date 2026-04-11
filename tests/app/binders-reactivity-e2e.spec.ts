@@ -6,6 +6,7 @@ import {
   drainUnbind,
   html,
   ref,
+  type RefOrValue,
   sref,
 } from '../../src'
 
@@ -45,6 +46,11 @@ type TextStyleShowSource = {
 }
 
 type FormState = {
+  title: string
+}
+
+type TitleCard = {
+  showTitle: RefOrValue<boolean>
   title: string
 }
 
@@ -268,6 +274,62 @@ test('e2e: component prop reactivity keeps disabled state in sync', async () => 
 
       pendingDeleteHostname('host-2')
       expect(button.hasAttribute('disabled')).toBe(false)
+    },
+  )
+})
+
+test('e2e: component r-if respects literal false prop passed from app', async () => {
+  const titleCard = defineComponent<TitleCard>(
+    html`<article>
+      <h3 id="component-title" r-if="showTitle" r-text="title"></h3>
+    </article>`,
+    {
+      props: ['showTitle', 'title'],
+      context: (head) => ({
+        showTitle: head.props.showTitle,
+        title: head.props.title,
+      }),
+    },
+  )
+
+  await withApp(
+    {
+      components: { titleCard },
+    },
+    html`<TitleCard showTitle="false" title="Title"></TitleCard>`,
+    (root) => {
+      expect(root.querySelector('#component-title')).toBeNull()
+    },
+  )
+})
+
+test('e2e: component r-show respects literal false prop passed from app', async () => {
+  const titleCard = defineComponent<TitleCard>(
+    html`<article>
+      <h3 id="component-title-show" r-show="showTitle" r-text="title"></h3>
+    </article>`,
+    {
+      props: ['showTitle', 'title'],
+      context: (head) => ({
+        showTitle: head.props.showTitle,
+        title: head.props.title,
+      }),
+    },
+  )
+
+  await withApp(
+    {
+      components: { titleCard },
+    },
+    html`<TitleCard showTitle="false" title="Title"></TitleCard>`,
+    (root) => {
+      const title = root.querySelector(
+        '#component-title-show',
+      ) as HTMLElement | null
+      if (!title) throw new Error('missing #component-title-show')
+
+      expect(title.style.display).toBe('none')
+      expect(title.textContent).toBe('Title')
     },
   )
 })
@@ -690,10 +752,10 @@ test('e2e: r-model input stays linked to latest source object after replacement'
 
   await withApp(
     { form },
-    `<section>
-        <input id="title-input" r-model="form.title" />
-        <p id="title-text" r-text="form.title"></p>
-      </section>`,
+    html`<section>
+      <input id="title-input" r-model="form.title" />
+      <p id="title-text" r-text="form.title"></p>
+    </section>`,
     (root) => {
       const input = root.querySelector(
         '#title-input',

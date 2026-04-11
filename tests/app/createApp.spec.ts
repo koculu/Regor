@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest'
 
 import { createApp, html, raw, ref, RegorConfig, useScope } from '../../src'
+import { htmlEqual } from '../common/html-equal'
 
 test('hello world', () => {
   const root = document.createElement('div')
@@ -35,7 +36,8 @@ test('click counter', () => {
     root.querySelector('button')?.click()
     expect(root.querySelector('div > span')?.textContent).toBe(`${i + 1}`)
   }
-  expect(root.innerHTML).toBe(
+  htmlEqual(
+    root.innerHTML,
     raw`<div>count: <span>10</span></div><button>click me: <span>10</span></button>`,
   )
 })

@@ -80,8 +80,8 @@ export const createApp = <
     }
   }
   const appendChildren = (childNodes: NodeListOf<ChildNode>): void => {
-    for (const child of childNodes) {
-      root.appendChild(child)
+    while (childNodes.length > 0) {
+      root.appendChild(childNodes[0])
     }
   }
 

@@ -8,6 +8,7 @@ import {
   toSelector,
   unmount,
 } from '../common/common'
+import { toBoolean } from '../common/toBoolean'
 import { warning, WarningType } from '../log/warnings'
 import { type Binder } from './Binder'
 import { setSwitchOwner } from './switch'
@@ -204,7 +205,7 @@ export class IfBinder {
           unmount: () => {
             unmount(commentBegin, commentEnd)
           },
-          isTrue: () => !!value()[0],
+          isTrue: () => toBoolean(value()[0]),
           isMounted: false,
         },
         ...remainingElses,
@@ -227,7 +228,7 @@ export class IfBinder {
 
     const refresh = (): void => {
       parser.__scoped(capturedContext, () => {
-        if (value()[0]) {
+        if (toBoolean(value()[0])) {
           if (!isIfMounted) {
             mount(nodes, this.__binder, parent, commentEnd)
             isIfMounted = true
