@@ -364,6 +364,26 @@ export class ComponentBinder {
           )
         const inheritor = inheritorChildNodes[0] as HTMLElement
         if (!inheritor) return
+        const bindClassName = `${bindName}:class`
+        const bindStyleName = `${bindName}:style`
+        const mergeBinding = (
+          shortName: ':class' | ':style',
+          longName: string,
+          value: string,
+        ): void => {
+          const existingAttr = inheritor.hasAttribute(shortName)
+            ? shortName
+            : inheritor.hasAttribute(longName)
+              ? longName
+              : shortName
+          const existingValue = inheritor.getAttribute(existingAttr)
+          inheritor.setAttribute(
+            existingAttr,
+            isNullOrWhitespace(existingValue)
+              ? value
+              : `${existingValue}, ${value}`,
+          )
+        }
 
         for (const attrName of component.getAttributeNames()) {
           if (attrName === contextName || attrName === contextAliasName)
@@ -372,12 +392,16 @@ export class ComponentBinder {
           if (attrName === 'class') {
             const classTokens = toClassTokens(value)
             if (classTokens.length > 0) inheritor.classList.add(...classTokens)
+          } else if (attrName === ':class' || attrName === bindClassName) {
+            mergeBinding(':class', bindClassName, value)
           } else if (attrName === 'style') {
             const inheritorStyle = inheritor.style
             const componentStyle = component.style
             for (const s of componentStyle) {
               inheritorStyle.setProperty(s, componentStyle.getPropertyValue(s))
             }
+          } else if (attrName === ':style' || attrName === bindStyleName) {
+            mergeBinding(':style', bindStyleName, value)
           } else {
             inheritor.setAttribute(
               normalizeAttributeName(attrName, binder.__config),

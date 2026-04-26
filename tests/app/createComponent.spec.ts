@@ -706,7 +706,7 @@ test('component inheritAttrs merges class and style from host onto inheritor roo
   expect(div.style.marginTop).toBe('5px')
 })
 
-test('component attribute fallthrough host :class overrides root :class binding', () => {
+test('component attribute fallthrough merges host :class with root :class binding', () => {
   const root = document.createElement('div')
   const btn = defineComponent(
     html`<button class="btn" :class="btnClasses"><slot></slot></button>`,
@@ -736,9 +736,9 @@ test('component attribute fallthrough host :class overrides root :class binding'
   expect(button.classList.contains('btn')).toBe(true)
   expect(button.classList.contains('myBtn')).toBe(true)
   expect(button.classList.contains('myBtnActive')).toBe(true)
-  expect(button.classList.contains('btn-primary')).toBe(false)
-  expect(button.classList.contains('btn-large')).toBe(false)
-  expect(button.classList.length).toBe(3)
+  expect(button.classList.contains('btn-primary')).toBe(true)
+  expect(button.classList.contains('btn-large')).toBe(true)
+  expect(button.classList.length).toBe(5)
   expect(button.textContent?.trim()).toBe('test')
 
   myBtnClasses(
@@ -749,13 +749,13 @@ test('component attribute fallthrough host :class overrides root :class binding'
   )
 
   expect(button.classList.contains('btn')).toBe(true)
-  expect(button.classList.contains('btn-primary')).toBe(false)
-  expect(button.classList.contains('btn-large')).toBe(false)
+  expect(button.classList.contains('btn-primary')).toBe(true)
+  expect(button.classList.contains('btn-large')).toBe(true)
   expect(button.classList.contains('myBtn')).toBe(true)
   expect(button.classList.contains('myBtnActive')).toBe(false)
   expect(button.classList.contains('myBtnNext')).toBe(true)
   expect(button.classList.contains('myBtnDisabled')).toBe(true)
-  expect(button.classList.length).toBe(4)
+  expect(button.classList.length).toBe(6)
 })
 
 test('component merges host style with component :style binding from context', () => {
@@ -786,7 +786,7 @@ test('component merges host style with component :style binding from context', (
   expect(div.style.marginTop).toBe('5px')
 })
 
-test('component attribute fallthrough host :style overrides root :style binding', () => {
+test('component attribute fallthrough merges host :style with root :style binding', () => {
   const root = document.createElement('div')
   const btn = defineComponent(
     html`<button style="font-weight: 700" :style="btnStyle">
@@ -822,8 +822,9 @@ test('component attribute fallthrough host :style overrides root :style binding'
   expect(button.style.color).toBe('red')
   expect(button.style.padding).toBe('2px')
   expect(button.style.marginTop).toBe('4px')
-  expect(button.style.backgroundColor).toBe('')
-  expect(button.style.borderTopWidth).toBe('')
+  expect(button.style.backgroundColor).toBe('blue')
+  expect(button.style.borderTopWidth).toBe('2px')
+  expect(button.style.borderTopStyle).toBe('solid')
   expect(button.textContent?.trim()).toBe('test')
 
   myBtnStyle(
@@ -837,7 +838,8 @@ test('component attribute fallthrough host :style overrides root :style binding'
   expect(button.style.padding).toBe('')
   expect(button.style.marginTop).toBe('6px')
   expect(button.style.borderTopWidth).toBe('1px')
-  expect(button.style.backgroundColor).toBe('')
+  expect(button.style.borderTopStyle).toBe('solid')
+  expect(button.style.backgroundColor).toBe('blue')
 })
 
 test('component inheritAttrs ignores empty class tokens from host', () => {
