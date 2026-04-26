@@ -786,6 +786,60 @@ test('component merges host style with component :style binding from context', (
   expect(div.style.marginTop).toBe('5px')
 })
 
+test('component attribute fallthrough host :style overrides root :style binding', () => {
+  const root = document.createElement('div')
+  const btn = defineComponent(
+    html`<button style="font-weight: 700" :style="btnStyle">
+      <slot></slot>
+    </button>`,
+    {
+      context: () => ({
+        btnStyle: {
+          backgroundColor: 'blue',
+          borderTopWidth: '2px',
+          borderTopStyle: 'solid',
+        },
+      }),
+    },
+  )
+  const myBtnStyle = ref<Record<string, unknown>[]>([
+    { padding: '2px', marginTop: ref('4px') },
+  ])
+
+  createApp(
+    {
+      components: { btn },
+      myBtnStyle,
+    },
+    {
+      element: root,
+      template: html`<Btn style="color: red" :style="myBtnStyle">test</Btn>`,
+    },
+  )
+
+  const button = root.querySelector('button') as HTMLButtonElement
+  expect(button.style.fontWeight).toBe('700')
+  expect(button.style.color).toBe('red')
+  expect(button.style.padding).toBe('2px')
+  expect(button.style.marginTop).toBe('4px')
+  expect(button.style.backgroundColor).toBe('')
+  expect(button.style.borderTopWidth).toBe('')
+  expect(button.textContent?.trim()).toBe('test')
+
+  myBtnStyle(
+    ref<Record<string, unknown>[]>([
+      { marginTop: ref('6px'), borderTopWidth: '1px' },
+    ]),
+  )
+
+  expect(button.style.fontWeight).toBe('700')
+  expect(button.style.color).toBe('red')
+  expect(button.style.padding).toBe('')
+  expect(button.style.marginTop).toBe('6px')
+  expect(button.style.borderTopWidth).toBe('1px')
+  expect(button.style.backgroundColor).toBe('')
+})
+
 test('component inheritAttrs ignores empty class tokens from host', () => {
   const root = document.createElement('div')
   const boxComp = defineComponent(html`<div r-inherit class="base">box</div>`)

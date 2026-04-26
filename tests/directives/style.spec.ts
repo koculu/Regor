@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest'
 
+import { ref } from '../../src'
 import { getBindData } from '../../src/cleanup/getBindData'
 import { styleDirective } from '../../src/directives/style'
 import { updateDirective } from '../directive-test-utils'
@@ -95,6 +96,29 @@ test('style directive handles array values, null values, and prefix cache paths'
 
   updateDirective(styleDirective, fakeEl, [{ color: 'green' }])
   expect(fakeStyle.color).toBe('green')
+})
+
+test('style directive unwraps deep ref array entries and object values', () => {
+  const el = document.createElement('div')
+  const styles = ref([
+    { color: 'red', padding: '2px' },
+    { marginTop: '4px', '--gap': ref('6px') },
+  ])
+  const nextStyles = ref([{ color: 'blue' }, { '--gap': ref('8px') }])
+
+  updateDirective(styleDirective, el, [styles()])
+
+  expect(el.style.color).toBe('red')
+  expect(el.style.padding).toBe('2px')
+  expect(el.style.marginTop).toBe('4px')
+  expect(el.style.getPropertyValue('--gap')).toBe('6px')
+
+  updateDirective(styleDirective, el, [nextStyles()], [styles()])
+
+  expect(el.style.color).toBe('blue')
+  expect(el.style.padding).toBe('')
+  expect(el.style.marginTop).toBe('')
+  expect(el.style.getPropertyValue('--gap')).toBe('8px')
 })
 
 test('style directive does not rewrite cssText when string value is unchanged', () => {

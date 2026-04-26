@@ -2,6 +2,7 @@ import { type Directive } from '../api/types'
 import { getBindData } from '../cleanup/getBindData'
 import { camelize, capitalize, hyphenate } from '../common/common'
 import { isArray, isString } from '../common/is-what'
+import { unref } from '../reactivity/unref'
 
 /**
  * @internal
@@ -42,29 +43,33 @@ export const styleDirective: Directive = {
 // using the license: The MIT License (MIT)
 // Copyright (c) 2018-present, Yuxi (Evan) You
 // https://github.com/vuejs/core/blob/main/packages/runtime-dom/src/modules/style.ts
-type Style = string | Record<string, string | string[]> | null
+type Style = string | Record<string, unknown> | null
 
 const patchStyle = (el: HTMLElement, next: Style, prev: Style): void => {
+  const nextValue = unref(next) as Style
+  const prevValue = unref(prev) as Style
   const style = el.style
-  const isCssString = isString(next)
-  if (next && !isCssString) {
-    if (prev && !isString(prev)) {
-      for (const key in prev) {
-        if (next[key] == null) {
+  const isCssString = isString(nextValue)
+  if (nextValue && !isCssString) {
+    const nextMap = nextValue as Record<string, unknown>
+    if (prevValue && !isString(prevValue)) {
+      const prevMap = prevValue as Record<string, unknown>
+      for (const key in prevMap) {
+        if (unref(nextMap[key]) == null) {
           setStyle(style, key, '')
         }
       }
     }
-    for (const key in next) {
-      setStyle(style, key, next[key])
+    for (const key in nextMap) {
+      setStyle(style, key, nextMap[key])
     }
   } else {
     const currentDisplay = style.display
     if (isCssString) {
-      if (prev !== next) {
-        style.cssText = next
+      if (prevValue !== nextValue) {
+        style.cssText = nextValue
       }
-    } else if (prev) {
+    } else if (prevValue) {
       el.removeAttribute('style')
     }
     // if :show binding is active on the element, keep the display as is.
@@ -79,28 +84,29 @@ const importantRE = /\s*!important$/
 function setStyle(
   style: CSSStyleDeclaration,
   name: string,
-  val: string | string[],
+  val: unknown,
 ): void {
-  if (isArray(val)) {
-    val.forEach((v) => {
+  const value = unref(val)
+  if (isArray(value)) {
+    value.forEach((v) => {
       setStyle(style, name, v)
     })
   } else {
-    if (val == null) val = ''
+    const cssValue = value == null ? '' : String(value)
     if (name.startsWith('--')) {
       // custom property definition
-      style.setProperty(name, val)
+      style.setProperty(name, cssValue)
     } else {
       const prefixed = autoPrefix(style, name)
-      if (importantRE.test(val)) {
+      if (importantRE.test(cssValue)) {
         // !important
         style.setProperty(
           hyphenate(prefixed),
-          val.replace(importantRE, ''),
+          cssValue.replace(importantRE, ''),
           'important',
         )
       } else {
-        style[prefixed as any] = val
+        style[prefixed as any] = cssValue
       }
     }
   }
