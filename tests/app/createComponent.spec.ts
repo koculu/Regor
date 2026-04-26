@@ -758,6 +758,58 @@ test('component attribute fallthrough merges host :class with root :class bindin
   expect(button.classList.length).toBe(6)
 })
 
+test('component declared class prop still merges host class fallthrough', () => {
+  const root = document.createElement('div')
+  const btn = defineComponent(
+    html`<button class="btn" :class="btnClasses"><slot></slot></button>`,
+    {
+      props: ['class'],
+      context: () => ({
+        btnClasses: ref(['btn-primary', { 'btn-large': true }]),
+      }),
+    },
+  )
+  const myBtnClasses = ref<(string | Record<string, boolean>)[]>([
+    'myBtnActive',
+    { myBtnDisabled: false },
+  ])
+
+  createApp(
+    {
+      components: { btn },
+      myBtnClasses,
+    },
+    {
+      element: root,
+      template: html`<Btn class="myBtn" :class="myBtnClasses">test</Btn>`,
+    },
+  )
+
+  const button = root.querySelector('button') as HTMLButtonElement
+  expect(button.classList.contains('btn')).toBe(true)
+  expect(button.classList.contains('myBtn')).toBe(true)
+  expect(button.classList.contains('myBtnActive')).toBe(true)
+  expect(button.classList.contains('btn-primary')).toBe(true)
+  expect(button.classList.contains('btn-large')).toBe(true)
+  expect(button.classList.length).toBe(5)
+
+  myBtnClasses(
+    ref<(string | Record<string, boolean>)[]>([
+      'myBtnNext',
+      { myBtnDisabled: true },
+    ]),
+  )
+
+  expect(button.classList.contains('btn')).toBe(true)
+  expect(button.classList.contains('btn-primary')).toBe(true)
+  expect(button.classList.contains('btn-large')).toBe(true)
+  expect(button.classList.contains('myBtn')).toBe(true)
+  expect(button.classList.contains('myBtnActive')).toBe(false)
+  expect(button.classList.contains('myBtnNext')).toBe(true)
+  expect(button.classList.contains('myBtnDisabled')).toBe(true)
+  expect(button.classList.length).toBe(6)
+})
+
 test('component merges host style with component :style binding from context', () => {
   const root = document.createElement('div')
   const boxComp = defineComponent(html`<div :style="localStyle">box</div>`, {
@@ -826,6 +878,62 @@ test('component attribute fallthrough merges host :style with root :style bindin
   expect(button.style.borderTopWidth).toBe('2px')
   expect(button.style.borderTopStyle).toBe('solid')
   expect(button.textContent?.trim()).toBe('test')
+
+  myBtnStyle(
+    ref<Record<string, unknown>[]>([
+      { marginTop: ref('6px'), borderTopWidth: '1px' },
+    ]),
+  )
+
+  expect(button.style.fontWeight).toBe('700')
+  expect(button.style.color).toBe('red')
+  expect(button.style.padding).toBe('')
+  expect(button.style.marginTop).toBe('6px')
+  expect(button.style.borderTopWidth).toBe('1px')
+  expect(button.style.borderTopStyle).toBe('solid')
+  expect(button.style.backgroundColor).toBe('blue')
+})
+
+test('component declared style prop still merges host style fallthrough', () => {
+  const root = document.createElement('div')
+  const btn = defineComponent(
+    html`<button style="font-weight: 700" :style="btnStyle">
+      <slot></slot>
+    </button>`,
+    {
+      props: ['style'],
+      context: () => ({
+        btnStyle: {
+          backgroundColor: 'blue',
+          borderTopWidth: '2px',
+          borderTopStyle: 'solid',
+        },
+      }),
+    },
+  )
+  const myBtnStyle = ref<Record<string, unknown>[]>([
+    { padding: '2px', marginTop: ref('4px') },
+  ])
+
+  createApp(
+    {
+      components: { btn },
+      myBtnStyle,
+    },
+    {
+      element: root,
+      template: html`<Btn style="color: red" :style="myBtnStyle">test</Btn>`,
+    },
+  )
+
+  const button = root.querySelector('button') as HTMLButtonElement
+  expect(button.style.fontWeight).toBe('700')
+  expect(button.style.color).toBe('red')
+  expect(button.style.padding).toBe('2px')
+  expect(button.style.marginTop).toBe('4px')
+  expect(button.style.backgroundColor).toBe('blue')
+  expect(button.style.borderTopWidth).toBe('2px')
+  expect(button.style.borderTopStyle).toBe('solid')
 
   myBtnStyle(
     ref<Record<string, unknown>[]>([

@@ -122,9 +122,13 @@ export class ComponentBinder {
       const contextAliasName = binder.__config.__builtInNames.contextAlias
       const bindName = binder.__config.__builtInNames.bind
       const definedProps = registeredComponent.props?.map(camelize) ?? []
+      const inheritedPropAttrs: Array<{ name: string; value: string }> = []
+      const isInheritableSpecialProp = (propName: string): boolean =>
+        propName === 'class' || propName === 'style'
       const getProps = (
         component: HTMLElement,
         capturedContext: any[],
+        collectInheritedPropAttrs = false,
       ): Record<string, unknown> => {
         const props: Record<string, unknown> = {}
         const hasContext = component.hasAttribute(contextName)
@@ -149,7 +153,15 @@ export class ComponentBinder {
           ]) {
             const value = component.getAttribute(name)
             if (value === null) continue
-            props[camelize(name)] = value
+            const propName = camelize(name)
+            props[propName] = value
+            if (
+              collectInheritedPropAttrs &&
+              registeredComponent.inheritAttrs === true &&
+              isInheritableSpecialProp(propName)
+            ) {
+              inheritedPropAttrs.push({ name, value })
+            }
             component.removeAttribute(name)
           }
 
@@ -162,6 +174,16 @@ export class ComponentBinder {
             )
             if (!propName) continue
             if (name !== '.' && name !== ':' && name !== bindName) continue
+            if (
+              collectInheritedPropAttrs &&
+              name !== '.' &&
+              registeredComponent.inheritAttrs === true &&
+              isInheritableSpecialProp(propName)
+            ) {
+              const value = component.getAttribute(attrName)
+              if (value !== null)
+                inheritedPropAttrs.push({ name: attrName, value })
+            }
             binder.__bind(
               singlePropDirective,
               component,
@@ -180,7 +202,7 @@ export class ComponentBinder {
         componentCtx: IRegorContext
         head: ComponentHead<Record<string, unknown>>
       } => {
-        const props = getProps(component, capturedContext)
+        const props = getProps(component, capturedContext, true)
         const head = new ComponentHead(
           props,
           component,
@@ -385,10 +407,7 @@ export class ComponentBinder {
           )
         }
 
-        for (const attrName of component.getAttributeNames()) {
-          if (attrName === contextName || attrName === contextAliasName)
-            continue
-          const value = component.getAttribute(attrName) as string
+        const transferAttribute = (attrName: string, value: string): void => {
           if (attrName === 'class') {
             const classTokens = toClassTokens(value)
             if (classTokens.length > 0) inheritor.classList.add(...classTokens)
@@ -408,6 +427,19 @@ export class ComponentBinder {
               value,
             )
           }
+        }
+
+        for (const { name, value } of inheritedPropAttrs) {
+          component.setAttribute(name, value)
+        }
+
+        for (const attrName of component.getAttributeNames()) {
+          if (attrName === contextName || attrName === contextAliasName)
+            continue
+          transferAttribute(
+            attrName,
+            component.getAttribute(attrName) as string,
+          )
         }
       }
 
