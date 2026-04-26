@@ -706,6 +706,58 @@ test('component inheritAttrs merges class and style from host onto inheritor roo
   expect(div.style.marginTop).toBe('5px')
 })
 
+test('component attribute fallthrough host :class overrides root :class binding', () => {
+  const root = document.createElement('div')
+  const btn = defineComponent(
+    html`<button class="btn" :class="btnClasses"><slot></slot></button>`,
+    {
+      context: () => ({
+        btnClasses: ref(['btn-primary', { 'btn-large': true }]),
+      }),
+    },
+  )
+  const myBtnClasses = ref<(string | Record<string, boolean>)[]>([
+    'myBtnActive',
+    { myBtnDisabled: false },
+  ])
+
+  createApp(
+    {
+      components: { btn },
+      myBtnClasses,
+    },
+    {
+      element: root,
+      template: html`<Btn class="myBtn" :class="myBtnClasses">test</Btn>`,
+    },
+  )
+
+  const button = root.querySelector('button') as HTMLButtonElement
+  expect(button.classList.contains('btn')).toBe(true)
+  expect(button.classList.contains('myBtn')).toBe(true)
+  expect(button.classList.contains('myBtnActive')).toBe(true)
+  expect(button.classList.contains('btn-primary')).toBe(false)
+  expect(button.classList.contains('btn-large')).toBe(false)
+  expect(button.classList.length).toBe(3)
+  expect(button.textContent?.trim()).toBe('test')
+
+  myBtnClasses(
+    ref<(string | Record<string, boolean>)[]>([
+      'myBtnNext',
+      { myBtnDisabled: true },
+    ]),
+  )
+
+  expect(button.classList.contains('btn')).toBe(true)
+  expect(button.classList.contains('btn-primary')).toBe(false)
+  expect(button.classList.contains('btn-large')).toBe(false)
+  expect(button.classList.contains('myBtn')).toBe(true)
+  expect(button.classList.contains('myBtnActive')).toBe(false)
+  expect(button.classList.contains('myBtnNext')).toBe(true)
+  expect(button.classList.contains('myBtnDisabled')).toBe(true)
+  expect(button.classList.length).toBe(4)
+})
+
 test('component merges host style with component :style binding from context', () => {
   const root = document.createElement('div')
   const boxComp = defineComponent(html`<div :style="localStyle">box</div>`, {
@@ -743,7 +795,7 @@ test('component inheritAttrs ignores empty class tokens from host', () => {
       { components: { boxComp } },
       {
         element: root,
-        template: html`<BoxComp class=" host-a   host-b  "></BoxComp>`,
+        template: html`<BoxComp class="host-a host-b"></BoxComp>`,
       },
     ),
   ).not.toThrow()

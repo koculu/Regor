@@ -27,5 +27,7 @@ test('html/raw and svg tag helpers build strings', () => {
   const value = 'world'
   expect(html`hello ${value}`).toBe('hello world')
   expect(raw`a${1}b${2}`).toBe('a1b2')
-  expect(svg`<svg><text>${value}</text></svg>`).toBe('<svg><text>world</text></svg>')
+  expect(svg`<svg><text>${value}</text></svg>`).toBe(
+    '<svg><text>world</text></svg>',
+  )
 })
