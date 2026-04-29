@@ -706,6 +706,74 @@ test('component inheritAttrs merges class and style from host onto inheritor roo
   expect(div.style.marginTop).toBe('5px')
 })
 
+test('component r-inherit targets nested form control for fallthrough attrs', () => {
+  const root = document.createElement('div')
+  const formCheck = defineComponent(
+    html`<label class="form-block__check">
+      <input
+        type="checkbox"
+        :name="name"
+        :value="value"
+        :checked="checked"
+        r-inherit
+      />
+      <span>{{ label }}</span>
+    </label>`,
+    {
+      props: ['name', 'value', 'checked', 'label'],
+    },
+  )
+
+  const app = createApp(
+    {
+      components: { formCheck },
+      fieldName: ref('terms'),
+      isChecked: ref(true),
+      isDisabled: ref(false),
+    },
+    {
+      element: root,
+      template: html`<FormCheck
+        id="accept-terms"
+        class="external-check"
+        data-kind="terms"
+        aria-label="Accept terms"
+        :name="fieldName"
+        value="yes"
+        :checked="isChecked"
+        label="Accept terms"
+        :disabled="isDisabled"
+      ></FormCheck>`,
+    },
+  )
+
+  const label = root.querySelector('label') as HTMLLabelElement
+  const input = root.querySelector('input') as HTMLInputElement
+  const text = root.querySelector('span') as HTMLSpanElement
+
+  expect(label.classList.contains('form-block__check')).toBe(true)
+  expect(label.classList.contains('external-check')).toBe(false)
+  expect(label.getAttribute('id')).toBeNull()
+
+  expect(input.getAttribute('id')).toBe('accept-terms')
+  expect(input.classList.contains('external-check')).toBe(true)
+  expect(input.getAttribute('data-kind')).toBe('terms')
+  expect(input.getAttribute('aria-label')).toBe('Accept terms')
+  expect(input.getAttribute('name')).toBe('terms')
+  expect(input.value).toBe('yes')
+  expect(input.checked).toBe(true)
+  expect(input.hasAttribute('disabled')).toBe(false)
+  expect(text.textContent?.trim()).toBe('Accept terms')
+
+  app.context.fieldName('newsletter')
+  app.context.isChecked(false)
+  app.context.isDisabled(true)
+
+  expect(input.getAttribute('name')).toBe('newsletter')
+  expect(input.checked).toBe(false)
+  expect(input.hasAttribute('disabled')).toBe(true)
+})
+
 test('component attribute fallthrough merges host :class with root :class binding', () => {
   const root = document.createElement('div')
   const btn = defineComponent(
@@ -948,6 +1016,73 @@ test('component declared style prop still merges host style fallthrough', () => 
   expect(button.style.borderTopWidth).toBe('1px')
   expect(button.style.borderTopStyle).toBe('solid')
   expect(button.style.backgroundColor).toBe('blue')
+})
+
+test('component declared class and style props respect inheritAttrs false', () => {
+  const root = document.createElement('div')
+  const box = defineComponent(
+    html`<div class="base" style="font-weight: 700">
+      {{ incomingClass }}|{{ incomingStyle }}
+    </div>`,
+    {
+      inheritAttrs: false,
+      props: ['class', 'style'],
+      context: (head) => ({
+        incomingClass: head.props.class,
+        incomingStyle: head.props.style,
+      }),
+    },
+  )
+
+  createApp(
+    { components: { box } },
+    {
+      element: root,
+      template: html`<Box class="host-class" style="color: red"></Box>`,
+    },
+  )
+
+  const div = root.querySelector('div') as HTMLDivElement
+  expect(div.classList.contains('base')).toBe(true)
+  expect(div.classList.contains('host-class')).toBe(false)
+  expect(div.style.fontWeight).toBe('700')
+  expect(div.style.color).toBe('')
+  expect(div.textContent?.trim()).toBe('host-class|color: red')
+})
+
+test('component .class and .style declared props do not fall through', () => {
+  const root = document.createElement('div')
+  const box = defineComponent(
+    html`<div class="base" style="font-weight: 700">
+      {{ incomingClass }}|{{ incomingStyle.color }}
+    </div>`,
+    {
+      props: ['class', 'style'],
+      context: (head) => ({
+        incomingClass: head.props.class,
+        incomingStyle: head.props.style,
+      }),
+    },
+  )
+
+  createApp(
+    {
+      components: { box },
+      hostClass: ref('host-class'),
+      hostStyle: ref({ color: 'red' }),
+    },
+    {
+      element: root,
+      template: html`<Box .class="hostClass" .style="hostStyle"></Box>`,
+    },
+  )
+
+  const div = root.querySelector('div') as HTMLDivElement
+  expect(div.classList.contains('base')).toBe(true)
+  expect(div.classList.contains('host-class')).toBe(false)
+  expect(div.style.fontWeight).toBe('700')
+  expect(div.style.color).toBe('')
+  expect(div.textContent?.trim()).toBe('host-class|red')
 })
 
 test('component inheritAttrs ignores empty class tokens from host', () => {

@@ -377,14 +377,18 @@ export class ComponentBinder {
       componentParent.insertBefore(endOfComponent, nextSibling)
       const transferAttributesToTheComponentChild = (): void => {
         if (!registeredComponent.inheritAttrs) return
-        let inheritorChildNodes = childNodes.filter(
+        const rootElements = childNodes.filter(
           (x) => x.nodeType === Node.ELEMENT_NODE,
-        )
-        if (inheritorChildNodes.length > 1)
-          inheritorChildNodes = inheritorChildNodes.filter((x) =>
-            (x as Element).hasAttribute(this.__inherit),
-          )
-        const inheritor = inheritorChildNodes[0] as HTMLElement
+        ) as HTMLElement[]
+        const explicitInheritor = rootElements
+          .flatMap((x) => [
+            ...(x.hasAttribute(this.__inherit) ? [x] : []),
+            ...[...x.querySelectorAll<HTMLElement>(`[${this.__inherit}]`)],
+          ])
+          .at(0)
+        const inheritor =
+          explicitInheritor ??
+          (rootElements.length === 1 ? rootElements[0] : undefined)
         if (!inheritor) return
         const bindClassName = `${bindName}:class`
         const bindStyleName = `${bindName}:style`
