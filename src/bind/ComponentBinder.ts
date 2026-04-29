@@ -390,6 +390,7 @@ export class ComponentBinder {
           explicitInheritor ??
           (rootElements.length === 1 ? rootElements[0] : undefined)
         if (!inheritor) return
+        inheritor.removeAttribute(this.__inherit)
         const bindClassName = `${bindName}:class`
         const bindStyleName = `${bindName}:style`
         const mergeBinding = (
