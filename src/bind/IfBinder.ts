@@ -82,6 +82,10 @@ export class IfBinder {
   __bindAll(element: Element): boolean {
     const isIfElement = element.hasAttribute(this.__if)
     if (isIfElement) this.__bind(element as HTMLElement)
+    const isDynamicElement =
+      element.hasAttribute(this.__binder.__config.__builtInNames.is) ||
+      element.hasAttribute('is')
+    if (isDynamicElement) return isIfElement
     this.__binder.__componentBinder.__forEachBindableDescendant(
       element,
       (el) => {

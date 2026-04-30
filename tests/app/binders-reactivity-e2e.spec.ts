@@ -25,6 +25,16 @@ type ViewState = {
   rows: NameRow[]
 }
 
+type NestedListItem = {
+  id: number
+  label: string
+}
+
+type NestedListGroup = {
+  title: string
+  items: NestedListItem[]
+}
+
 type CardItem = {
   title: string
 }
@@ -184,6 +194,573 @@ test('e2e: r-if + r-for stays reactive across source replacement', async () => {
       expect(isEmpty()).toBe(false)
     },
   )
+})
+
+test('e2e: nested components keep r-for bindings reactive across item updates and source replacement', async () => {
+  const group = ref<NestedListGroup>({
+    title: 'alpha',
+    items: [
+      { id: 1, label: 'A' },
+      { id: 2, label: 'B' },
+    ],
+  })
+
+  const listRow = defineComponent(
+    html`<li class="list-row" r-text="item.label"></li>`,
+    {
+      props: ['item'],
+    },
+  )
+  const nestedList = defineComponent(
+    html`<section>
+      <h3 id="group-title" r-text="group.title"></h3>
+      <ul>
+        <ListRow r-for="item in group.items" :key="item.id" :item="item" />
+      </ul>
+    </section>`,
+    {
+      props: ['group'],
+      context: () => ({
+        components: { listRow },
+      }),
+    },
+  )
+  const nestedBoard = defineComponent(
+    html`<NestedList :group="group"></NestedList>`,
+    {
+      props: ['group'],
+      context: () => ({
+        components: { nestedList },
+      }),
+    },
+  )
+
+  await withApp(
+    {
+      group,
+      components: { nestedBoard },
+    },
+    `<NestedBoard :group="group"></NestedBoard>`,
+    (root) => {
+      const labels = () =>
+        [...root.querySelectorAll('.list-row')].map((x) => x.textContent)
+      const title = () => root.querySelector('#group-title')?.textContent
+
+      expect(title()).toBe('alpha')
+      expect(labels()).toStrictEqual(['A', 'B'])
+
+      group().items()[0]().label('A2')
+      expect(labels()).toStrictEqual(['A2', 'B'])
+
+      group()
+        .items()
+        .push(ref<NestedListItem>({ id: 3, label: 'C' }))
+      expect(labels()).toStrictEqual(['A2', 'B', 'C'])
+
+      const oldItems = group().items
+      group().items([
+        ...group().items(),
+        ref<NestedListItem>({ id: 4, label: 'D' }),
+        ref<NestedListItem>({ id: 5, label: 'E' }),
+      ])
+      expect(labels()).toStrictEqual(['A2', 'B', 'C', 'D', 'E'])
+
+      const oldGroup = group()
+      group(
+        ref<NestedListGroup>({
+          title: 'beta',
+          items: [
+            { id: 10, label: 'X' },
+            { id: 11, label: 'Y' },
+          ],
+        }),
+      )
+
+      expect(title()).toBe('beta')
+      expect(labels()).toStrictEqual(['X', 'Y'])
+
+      group().items()[1]().label('Y2')
+      expect(labels()).toStrictEqual(['X', 'Y2'])
+
+      group().items([
+        ...group().items(),
+        ref<NestedListItem>({ id: 12, label: 'Z' }),
+        ref<NestedListItem>({ id: 13, label: 'W' }),
+      ])
+      expect(labels()).toStrictEqual(['X', 'Y2', 'Z', 'W'])
+
+      // Old array and old parent source must be detached after replacement.
+      oldItems([ref<NestedListItem>({ id: 99, label: 'stale-array' })])
+      oldGroup.title('stale-alpha')
+      oldGroup.items()[0]().label('stale-A2')
+      oldGroup.items().push(ref<NestedListItem>({ id: 99, label: 'stale-C' }))
+      expect(title()).toBe('beta')
+      expect(labels()).toStrictEqual(['X', 'Y2', 'Z', 'W'])
+    },
+  )
+})
+
+test('e2e: r-for stays reactive through slot content in component with :is root', async () => {
+  const items = ref(['A', 'B'])
+  const container = ref<string | null>(null)
+
+  const grid = defineComponent(
+    html`<div :is="container ?? 'div'" class="grid">
+      <slot></slot>
+    </div>`,
+    {
+      props: ['container'],
+      context: (head) => ({
+        container: head.props.container,
+      }),
+    },
+  )
+
+  await withApp(
+    {
+      items,
+      container,
+      components: { grid },
+    },
+    `<main>
+        <Grid
+          r-for="item, #i in items"
+          :key="item + '-' + i"
+          :container="container"
+        >
+          <span class="cell">{{ item }}</span>
+        </Grid>
+      </main>`,
+    (root) => {
+      const texts = () =>
+        [...root.querySelectorAll('.grid .cell')].map((x) => x.textContent)
+      const tags = () =>
+        [...root.querySelectorAll('.grid')].map((x) => x.tagName)
+
+      expect(tags()).toStrictEqual(['DIV', 'DIV'])
+      expect(texts()).toStrictEqual(['A', 'B'])
+
+      items([...items(), ref('C'), ref('D')])
+      expect(texts()).toStrictEqual(['A', 'B', 'C', 'D'])
+
+      items([ref('X')])
+      expect(texts()).toStrictEqual(['X'])
+      items([...items(), ref('Y')])
+      expect(tags()).toStrictEqual(['DIV', 'DIV'])
+      expect(texts()).toStrictEqual(['X', 'Y'])
+    },
+  )
+})
+
+test('e2e: r-for through component with :is root keeps nested slot component props reactive after array replacement', async () => {
+  const rows = ref([
+    { id: 1, label: 'A' },
+    { id: 2, label: 'B' },
+  ])
+  const container = ref<string | null>(null)
+
+  const cell = defineComponent(
+    html`<span class="cell" r-text="label"></span>`,
+    {
+      props: ['label'],
+    },
+  )
+  const grid = defineComponent(
+    html`<div :is="container ?? 'div'" class="grid">
+      <slot></slot>
+    </div>`,
+    {
+      props: ['container'],
+      context: (head) => ({
+        container: head.props.container,
+        components: { cell },
+      }),
+    },
+  )
+
+  await withApp(
+    {
+      rows,
+      container,
+      components: { grid },
+    },
+    `<main>
+        <Grid
+          r-for="row in rows"
+          :key="row.id"
+          :container="container"
+        >
+          <Cell :label="row.label"></Cell>
+        </Grid>
+      </main>`,
+    (root) => {
+      const labels = () =>
+        [...root.querySelectorAll('.grid .cell')].map((x) => x.textContent)
+
+      expect(labels()).toStrictEqual(['A', 'B'])
+
+      rows([...rows(), ref({ id: 3, label: 'C' }), ref({ id: 4, label: 'D' })])
+      expect(labels()).toStrictEqual(['A', 'B', 'C', 'D'])
+
+      rows()[1]().label('B2')
+      expect(labels()).toStrictEqual(['A', 'B2', 'C', 'D'])
+
+      rows([ref({ id: 10, label: 'X' }), ref({ id: 11, label: 'Y' })])
+      expect(labels()).toStrictEqual(['X', 'Y'])
+
+      rows()[0]().label('X2')
+      expect(labels()).toStrictEqual(['X2', 'Y'])
+    },
+  )
+})
+
+test('e2e: unkeyed r-for through component with :is root stays reactive after array replacement', async () => {
+  const items = ref(['A', 'B'])
+  const container = ref<string | null>(null)
+
+  const grid = defineComponent(
+    html`<div :is="container ?? 'div'" class="grid">
+      <slot></slot>
+    </div>`,
+    {
+      props: ['container'],
+      context: (head) => ({
+        container: head.props.container,
+      }),
+    },
+  )
+
+  await withApp(
+    {
+      items,
+      container,
+      components: { grid },
+    },
+    `<main>
+        <Grid r-for="item in items" :container="container">
+          <span class="cell">{{ item }}</span>
+        </Grid>
+      </main>`,
+    (root) => {
+      const texts = () =>
+        [...root.querySelectorAll('.grid .cell')].map((x) => x.textContent)
+
+      expect(texts()).toStrictEqual(['A', 'B'])
+
+      items([...items(), ref('C'), ref('D')])
+      expect(texts()).toStrictEqual(['A', 'B', 'C', 'D'])
+
+      items([ref('X'), ref('Y')])
+      expect(texts()).toStrictEqual(['X', 'Y'])
+
+      items()[0]('X2')
+      expect(texts()).toStrictEqual(['X2', 'Y'])
+    },
+  )
+})
+
+test('e2e: r-for through component with :is root survives container tag switches', async () => {
+  const items = ref(['A', 'B'])
+  const container = ref<string | null>(null)
+
+  const grid = defineComponent(
+    html`<div :is="container ?? 'div'" class="grid">
+      <slot></slot>
+    </div>`,
+    {
+      props: ['container'],
+      context: (head) => ({
+        container: head.props.container,
+      }),
+    },
+  )
+
+  await withApp(
+    {
+      items,
+      container,
+      components: { grid },
+    },
+    `<main>
+        <Grid r-for="item in items" :container="container">
+          <span class="cell">{{ item }}</span>
+        </Grid>
+      </main>`,
+    (root) => {
+      const texts = () =>
+        [...root.querySelectorAll('.grid .cell')].map((x) => x.textContent)
+      const tags = () =>
+        [...root.querySelectorAll('.grid')].map((x) => x.tagName)
+
+      expect(tags()).toStrictEqual(['DIV', 'DIV'])
+      expect(texts()).toStrictEqual(['A', 'B'])
+
+      container('section')
+      expect(tags()).toStrictEqual(['SECTION', 'SECTION'])
+      expect(texts()).toStrictEqual(['A', 'B'])
+
+      items([...items(), ref('C')])
+      expect(tags()).toStrictEqual(['SECTION', 'SECTION', 'SECTION'])
+      expect(texts()).toStrictEqual(['A', 'B', 'C'])
+    },
+  )
+})
+
+test('e2e: nested Grid components keep inner r-for reactive with :is root', async () => {
+  const items = ref(['A', 'B'])
+  const container = ref<string | null>(null)
+
+  const grid = defineComponent(
+    html`<div :is="container ?? 'div'" class="grid">
+      <slot></slot>
+    </div>`,
+    {
+      props: ['container'],
+      context: (head) => ({
+        container: head.props.container,
+      }),
+    },
+  )
+
+  await withApp(
+    {
+      items,
+      container,
+      components: { grid },
+    },
+    `<Grid :container="container">
+        <Grid r-for="item in items" :container="container">
+          <span class="cell">{{ item }}</span>
+        </Grid>
+      </Grid>`,
+    (root) => {
+      const texts = () =>
+        [...root.querySelectorAll('.grid .cell')].map((x) => x.textContent)
+      const gridCount = () => root.querySelectorAll('.grid').length
+
+      expect(gridCount()).toBe(3)
+      expect(texts()).toStrictEqual(['A', 'B'])
+
+      items()[0]('A2')
+      expect(texts()).toStrictEqual(['A2', 'B'])
+
+      items([...items(), ref('C'), ref('D')])
+      const htmlAfterAppend = root.innerHTML
+      expect(texts(), htmlAfterAppend).toStrictEqual(['A2', 'B', 'C', 'D'])
+      expect(gridCount()).toBe(5)
+
+      items([ref('X')])
+      expect(gridCount()).toBe(2)
+      expect(texts()).toStrictEqual(['X'])
+
+      items()[0]('X2')
+      expect(texts()).toStrictEqual(['X2'])
+    },
+  )
+})
+
+test('e2e: 3 nested Grid components keep inner r-for reactive with :is root', async () => {
+  const items = ref(['A', 'B'])
+  const container = ref<string | null>(null)
+
+  const grid = defineComponent(
+    html`<div :is="container ?? 'div'" class="grid">
+      <slot></slot>
+    </div>`,
+    {
+      props: ['container'],
+      context: (head) => ({
+        container: head.props.container,
+      }),
+    },
+  )
+
+  await withApp(
+    {
+      items,
+      container,
+      components: { grid },
+    },
+    `<Grid :container="container">
+        <Grid :container="container">
+          <Grid r-for="item in items" :container="container">
+            <span class="cell">{{ item }}</span>
+          </Grid>
+        </Grid>
+      </Grid>`,
+    (root) => {
+      const texts = () =>
+        [...root.querySelectorAll('.grid .cell')].map((x) => x.textContent)
+      const gridCount = () => root.querySelectorAll('.grid').length
+
+      expect(gridCount()).toBe(4)
+      expect(texts()).toStrictEqual(['A', 'B'])
+
+      items()[0]('A2')
+      expect(texts()).toStrictEqual(['A2', 'B'])
+
+      items([...items(), ref('C'), ref('D')])
+      const htmlAfterAppend = root.innerHTML
+      expect(texts(), htmlAfterAppend).toStrictEqual(['A2', 'B', 'C', 'D'])
+      expect(gridCount()).toBe(6)
+
+      items([ref('X')])
+      expect(gridCount()).toBe(3)
+      expect(texts()).toStrictEqual(['X'])
+
+      items()[0]('X2')
+      expect(texts()).toStrictEqual(['X2'])
+    },
+  )
+})
+
+test('e2e: 4 nested Grid components keep inner r-for reactive with :is root', async () => {
+  const items = ref(['A', 'B'])
+  const container = ref<string | null>(null)
+
+  const grid = defineComponent(
+    html`<div :is="container ?? 'div'" class="grid">
+      <slot></slot>
+    </div>`,
+    {
+      props: ['container'],
+      context: (head) => ({
+        container: head.props.container,
+      }),
+    },
+  )
+
+  await withApp(
+    {
+      items,
+      container,
+      components: { grid },
+    },
+    `<Grid :container="container">
+        <Grid :container="container">
+          <Grid :container="container">
+            <Grid r-for="item in items" :container="container">
+              <span class="cell">{{ item }}</span>
+            </Grid>
+          </Grid>
+        </Grid>
+      </Grid>`,
+    (root) => {
+      const texts = () =>
+        [...root.querySelectorAll('.grid .cell')].map((x) => x.textContent)
+      const gridCount = () => root.querySelectorAll('.grid').length
+
+      expect(gridCount()).toBe(5)
+      expect(texts()).toStrictEqual(['A', 'B'])
+
+      items()[0]('A2')
+      expect(texts()).toStrictEqual(['A2', 'B'])
+
+      items([...items(), ref('C'), ref('D')])
+      const htmlAfterAppend = root.innerHTML
+      expect(texts(), htmlAfterAppend).toStrictEqual(['A2', 'B', 'C', 'D'])
+      expect(gridCount()).toBe(7)
+
+      items([ref('X')])
+      expect(gridCount()).toBe(4)
+      expect(texts()).toStrictEqual(['X'])
+
+      items()[0]('X2')
+      expect(texts()).toStrictEqual(['X2'])
+    },
+  )
+})
+
+test('e2e: nested Grid components survive container tag switch with :is root', async () => {
+  const items = ref(['A', 'B'])
+  const container = ref<string | null>(null)
+
+  const grid = defineComponent(
+    html`<div :is="container ?? 'div'" class="grid">
+      <slot></slot>
+    </div>`,
+    {
+      props: ['container'],
+      context: (head) => ({
+        container: head.props.container,
+      }),
+    },
+  )
+
+  await withApp(
+    {
+      items,
+      container,
+      components: { grid },
+    },
+    `<Grid :container="container">
+        <Grid r-for="item in items" :container="container">
+          <span class="cell">{{ item }}</span>
+        </Grid>
+      </Grid>`,
+    (root) => {
+      const texts = () =>
+        [...root.querySelectorAll('.grid .cell')].map((x) => x.textContent)
+      const tags = () =>
+        [...root.querySelectorAll('.grid')].map((x) => x.tagName)
+
+      expect(tags()).toStrictEqual(['DIV', 'DIV', 'DIV'])
+      expect(texts()).toStrictEqual(['A', 'B'])
+
+      container('section')
+      expect(tags()).toStrictEqual(['SECTION', 'SECTION', 'SECTION'])
+      expect(texts()).toStrictEqual(['A', 'B'])
+
+      items([...items(), ref('C')])
+      expect(tags()).toStrictEqual(['SECTION', 'SECTION', 'SECTION', 'SECTION'])
+      expect(texts()).toStrictEqual(['A', 'B', 'C'])
+    },
+  )
+})
+
+test('e2e: detached :is region ignores source churn before deferred unbind flush', async () => {
+  const root = document.createElement('div')
+  const show = ref(true)
+  const container = ref<string | null>(null)
+
+  const grid = defineComponent(
+    html`<div :is="container ?? 'div'" class="grid">
+      <slot></slot>
+    </div>`,
+    {
+      props: ['container'],
+      context: (head) => ({
+        container: head.props.container,
+      }),
+    },
+  )
+
+  const app = createApp(
+    {
+      show,
+      container,
+      components: { grid },
+    },
+    {
+      element: root,
+      template: html`<main>
+        <Grid r-if="show" :container="container">
+          <span class="cell">A</span>
+        </Grid>
+      </main>`,
+    },
+  )
+
+  expect(root.querySelectorAll('.grid').length).toBe(1)
+
+  show(false)
+  expect(root.querySelectorAll('.grid').length).toBe(0)
+
+  expect(() => container('section')).not.toThrow()
+  expect(root.querySelectorAll('.grid').length).toBe(0)
+
+  app.unmount()
+  await drainUnbind()
 })
 
 test('e2e: :is component switching keeps prop reactivity and detaches old sources', async () => {

@@ -104,7 +104,7 @@ export class DynamicBinder {
   }
 
   __bindToExpression(el: HTMLElement, expression: string): void {
-    const { nodes, parent, commentBegin, commentEnd } = this.__createRegion(
+    const { nodes, commentBegin, commentEnd } = this.__createRegion(
       el,
       ` => ${expression} `,
     )
@@ -138,13 +138,16 @@ export class DynamicBinder {
         }
         if (mounted.name === name) return
         unmount(commentBegin, commentEnd)
+        const currentParent = (commentEnd.parentNode ??
+          commentBegin.parentNode) as HTMLElement | null
+        if (!currentParent) return
         const componentElement = document.createElement(name)
         for (const attr of el.getAttributeNames()) {
           if (attr === this.__is) continue
           componentElement.setAttribute(attr, el.getAttribute(attr) as string)
         }
         mount(componentChildNodes, componentElement)
-        parent.insertBefore(componentElement, commentEnd)
+        currentParent.insertBefore(componentElement, commentEnd)
         this.__binder.__bindDefault(componentElement)
         mounted.name = name
       })
