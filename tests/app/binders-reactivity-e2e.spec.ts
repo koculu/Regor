@@ -4,6 +4,7 @@ import {
   createApp,
   defineComponent,
   drainUnbind,
+  flatten,
   html,
   ref,
   type RefOrValue,
@@ -761,6 +762,82 @@ test('e2e: detached :is region ignores source churn before deferred unbind flush
 
   app.unmount()
   await drainUnbind()
+})
+
+test('e2e: named template slot keeps r-if Grid action handlers reactive with :is root', async () => {
+  const calls: string[] = []
+  const container = ref<string | null>(null)
+  const modal = ref({
+    id: 'confirm',
+    body: 'Proceed?',
+    actions: [
+      {
+        label: 'Run',
+        runAction: (source: RefOrValue<{ body: string }>) => {
+          const body = flatten(source).body
+          calls.push(`run:${body}`)
+        },
+      },
+    ],
+  })
+
+  const grid = defineComponent(
+    html`<div :is="container ?? 'div'" class="grid">
+      <slot></slot>
+    </div>`,
+    {
+      props: ['container'],
+      context: (head) => ({
+        container: head.props.container,
+      }),
+    },
+  )
+  const modalComponent = defineComponent(
+    html`<section class="modal" :id="id">
+      <div class="modal-body">
+        <slot></slot>
+      </div>
+      <footer class="modal-footer">
+        <slot name="footer"></slot>
+      </footer>
+    </section>`,
+    {
+      props: ['id'],
+    },
+  )
+
+  await withApp(
+    {
+      modal,
+      actions: modal().actions,
+      container,
+      components: { grid, modal: modalComponent },
+    },
+    `<Modal :id="modal.id">
+        <p class="body">{{ modal.body }}</p>
+        <template name="footer">
+          <Grid r-if="modal.actions.length > 0" :container="container">
+            <button
+              r-for="action in actions"
+              type="button"
+              @click="action.runAction(modal)"
+            >
+              {{ action.label }}
+            </button>
+          </Grid>
+        </template>
+      </Modal>`,
+    (root) => {
+      const button = root.querySelector('button') as HTMLButtonElement | null
+      if (!button) throw new Error('missing modal action button')
+
+      expect(root.querySelector('.body')?.textContent).toBe('Proceed?')
+      expect(button.textContent?.trim()).toBe('Run')
+
+      button.click()
+      expect(calls).toStrictEqual(['run:Proceed?'])
+    },
+  )
 })
 
 test('e2e: :is component switching keeps prop reactivity and detaches old sources', async () => {

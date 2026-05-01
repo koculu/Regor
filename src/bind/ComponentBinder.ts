@@ -491,6 +491,11 @@ export class ComponentBinder {
     ].join(',')
   }
 
+  __isComponentHost(element: Element): boolean {
+    const selector = this.__getComponentSelector()
+    return !isNullOrWhitespace(selector) && element.matches?.(selector)
+  }
+
   __collectTopLevelComponentHosts(
     root: Element,
     selector: string,
@@ -514,12 +519,15 @@ export class ComponentBinder {
     root: Element,
     action: (element: HTMLElement) => void,
   ): void {
+    const binder = this.__binder
     const selector = this.__getComponentSelector()
+    const isName = binder.__config.__builtInNames.is
     const stack = this.__getChildElements(root).reverse()
     while (stack.length > 0) {
       const current = stack.pop() as HTMLElement
       action(current)
       if (!isNullOrWhitespace(selector) && current.matches(selector)) continue
+      if (current.hasAttribute(isName) || current.hasAttribute('is')) continue
       stack.push(...this.__getChildElements(current).reverse())
     }
   }

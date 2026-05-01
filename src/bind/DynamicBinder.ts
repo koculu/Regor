@@ -32,6 +32,8 @@ export class DynamicBinder {
     const isComponentElement = element.hasAttribute(this.__is)
     if (isComponentElement || element.hasAttribute('is'))
       this.__bind(element as HTMLElement)
+    if (this.__binder.__componentBinder.__isComponentHost(element))
+      return isComponentElement
     this.__binder.__componentBinder.__forEachBindableDescendant(
       element,
       (el) => {

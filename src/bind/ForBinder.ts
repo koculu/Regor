@@ -46,6 +46,8 @@ export class ForBinder {
       element.hasAttribute(this.__binder.__config.__builtInNames.is) ||
       element.hasAttribute('is')
     if (isDynamicElement) return isForElement
+    if (this.__binder.__componentBinder.__isComponentHost(element))
+      return isForElement
     this.__binder.__componentBinder.__forEachBindableDescendant(
       element,
       (el) => {
