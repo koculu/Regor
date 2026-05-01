@@ -162,6 +162,20 @@ export type ObserveCallback<TValueType> = (
   eventSource?: unknown,
 ) => void
 
+/**
+ * Declares custom event names emitted by a component.
+ *
+ * This metadata is intentionally part of Regor's public type surface so tooling
+ * such as the VS Code extension can discover a component's supported emitted
+ * events from its definition.
+ *
+ * Keep this exported even though Regor runtime behavior does not currently
+ * depend on it directly.
+ */
+export type Emits<T extends string> = {
+  names: T[]
+}
+
 export type StopObserving = () => void
 
 export declare interface IRegorContext extends Record<string, unknown> {

@@ -4,6 +4,7 @@ export type {
   Component,
   ComputedRef,
   Directive,
+  Emits,
   FlattenRef,
   IRegorContext,
   IsLazy,
