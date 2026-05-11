@@ -3,6 +3,7 @@ import { expect, test } from 'vitest'
 import { singlePropDirective } from '../../src/directives/single-prop'
 import { ref } from '../../src/reactivity/ref'
 import { sref } from '../../src/reactivity/sref'
+import { unref } from '../../src/reactivity/unref'
 import { bindDirective } from '../directive-test-utils'
 
 const makeParseResult = (
@@ -68,7 +69,7 @@ test('single-prop assigns non-ref values into plain target', () => {
     { runInitialUpdate: true, observeValueRef: true },
   )
 
-  expect(ctx.model).toBe(7)
+  expect(unref(ctx.model)).toBe(7)
   unbind()
 })
 

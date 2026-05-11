@@ -81,10 +81,7 @@ export const singlePropDirective: Directive = {
       const ctxKey = ctx[key]
 
       if (!isRef(value)) {
-        // Non-ref expressions are written as plain values.
-        // This keeps simple component props cheap and lets ComponentBinder
-        // consume the same normalized key regardless of whether the template
-        // used `:some-prop` or `:someProp`.
+        // Non-ref expressions are converted to ref by default. This preserves reactivity on component bindings.
         //
         // If this prop was previously bridged from a ref source, writing into
         // that bridge preserves downstream ref consumers while the source is
@@ -99,7 +96,7 @@ export const singlePropDirective: Directive = {
           ctxKey(value)
           return
         }
-        ctx[key] = value
+        ctx[key] = ref(value)
         return
       }
 

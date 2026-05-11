@@ -910,7 +910,7 @@ test('e2e: component prop reactivity keeps disabled state in sync', async () => 
       pendingDeleteHostname,
       components: { btn },
     },
-    `<Btn :disabled="ref(busy || !pendingDeleteHostname)"></Btn>`,
+    `<Btn :disabled="busy || !pendingDeleteHostname"></Btn>`,
     (root) => {
       const button = root.querySelector('button') as HTMLButtonElement | null
       if (!button) throw new Error('missing button')

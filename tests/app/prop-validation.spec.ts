@@ -2,13 +2,16 @@ import { expect, test, vi } from 'vitest'
 
 import {
   ComponentHead,
+  computed,
   createApp,
   defineComponent,
   html,
   pval,
   type Ref,
   ref,
+  RefOrValue,
   RegorConfig,
+  unref,
 } from '../../src'
 import { warningHandler } from '../../src/log/warnings'
 
@@ -106,8 +109,8 @@ test('component props validation supports dynamic ref bindings through refOf', (
 test('component props validation supports or validator during mount', () => {
   const root = document.createElement('div')
   type FlexibleValueProps = {
-    value: string | number
-    summary?: string
+    value: RefOrValue<string | number>
+    summary?: RefOrValue<string>
   }
 
   const flexibleCard = defineComponent<FlexibleValueProps>(
@@ -116,12 +119,12 @@ test('component props validation supports or validator during mount', () => {
       props: ['value'],
       context: (head: ComponentHead<FlexibleValueProps>) => {
         head.validateProps({
-          value: pval.or(pval.isString, pval.isNumber),
+          value: pval.or(pval.refOf(pval.isString), pval.refOf(pval.isNumber)),
         })
 
         return {
           ...head.props,
-          summary: String(head.props.value),
+          summary: computed(() => String(unref(head.props.value))),
         }
       },
     },

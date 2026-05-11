@@ -140,53 +140,6 @@ Manual `trigger(ref)` still works while paused.
 5. `entangle(a, b)` creates two-way sync and initializes `b` with `a`.
 6. `persist(ref, key)` syncs ref data with `localStorage`.
 
-## Component prop expressions
-
-For component single-prop bindings, there is an important difference between
-ref and non-ref expression results:
-
-1. If the expression resolves to a ref, the child receives a live reactive prop channel.
-2. If the expression resolves to a non-ref value, the child receives the current resolved value.
-
-Example:
-
-```html
-<Btn :disabled="busy || !pendingDeleteHostname"></Btn>
-```
-
-This passes the current boolean value.
-
-If you want the prop itself to stay reactive, wrap the expression with a ref on
-purpose:
-
-```html
-<Btn :disabled="ref(busy || !pendingDeleteHostname)"></Btn>
-<Btn :disabled="sref(busy || !pendingDeleteHostname)"></Btn>
-```
-
-Both forms keep the component prop on the ref-based path. Use:
-
-1. `ref(...)` when deep conversion is acceptable.
-2. `sref(...)` when you only want a reactive carrier and do not want recursive in-place conversion.
-
-For object expressions, `sref(...)` is often the safer default:
-
-```html
-<EditorCard :item="sref({ id: selectedId, title: selectedTitle })"></EditorCard>
-```
-
-This keeps the prop reactive without deep-converting the object in place.
-
-Important caveat:
-
-```html
-<EditorCard :item="sref(selectedItem)"></EditorCard>
-```
-
-Wrapping a plain non-reactive value with `ref(...)` or `sref(...)` does not
-make its source reactive. These helpers preserve reactivity only when the
-expression itself is already reactive or derived from reactive state.
-
 ### `flatten` sample
 
 Use `flatten` when you need a plain snapshot for logging, serialization, or transport.
