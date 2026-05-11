@@ -2,7 +2,7 @@ import { type AnyRef, type Directive, type Unbinder } from '../api/types'
 import { camelize } from '../common/common'
 import { entangle } from '../reactivity/entangle'
 import { isRef } from '../reactivity/isRef'
-import { ref } from '../reactivity/ref'
+import { sref } from '../reactivity/sref'
 
 /**
  * Bridge strategy for `:prop="someRefPath"` bindings
@@ -37,7 +37,7 @@ const markModelBridge = (value: AnyRef): void => {
   ;(value as unknown as Record<symbol, unknown>)[modelBridgeSymbol] = 1
 }
 const createModelBridge = (source: AnyRef): AnyRef => {
-  const bridge = ref(source()) as unknown as AnyRef
+  const bridge = sref(source()) as unknown as AnyRef
   markModelBridge(bridge)
   return bridge
 }
@@ -81,7 +81,7 @@ export const singlePropDirective: Directive = {
       const ctxKey = ctx[key]
 
       if (!isRef(value)) {
-        // Non-ref expressions are converted to ref by default. This preserves reactivity on component bindings.
+        // Non-ref expressions are converted to sref by default. This preserves reactivity on component bindings.
         //
         // If this prop was previously bridged from a ref source, writing into
         // that bridge preserves downstream ref consumers while the source is
@@ -96,7 +96,7 @@ export const singlePropDirective: Directive = {
           ctxKey(value)
           return
         }
-        ctx[key] = ref(value)
+        ctx[key] = sref(value)
         return
       }
 
