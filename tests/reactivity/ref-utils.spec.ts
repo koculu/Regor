@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest'
 
 import {
+  computed,
   entangle,
   isDeepRef,
   isRef,
@@ -89,4 +90,42 @@ test('entangle syncs ref values', () => {
   stop()
   a.value = 5
   expect(b.value).toBe(4)
+})
+
+test('entangle syncs one way from computed refs', () => {
+  const source = ref(1)
+  const doubled = computed(() => source() * 2)
+  const target = ref(0)
+
+  const stop = entangle(doubled, target)
+  expect(target()).toBe(2)
+
+  source(3)
+  expect(target()).toBe(6)
+
+  target(10)
+  expect(doubled()).toBe(6)
+
+  stop()
+  source(4)
+  expect(target()).toBe(10)
+})
+
+test('entangle syncs one way from computed refs when argument order is reversed', () => {
+  const source = ref(2)
+  const tripled = computed(() => source() * 3)
+  const target = ref(0)
+
+  const stop = entangle(target, tripled)
+  expect(target()).toBe(6)
+
+  source(4)
+  expect(target()).toBe(12)
+
+  target(20)
+  expect(tripled()).toBe(12)
+
+  stop()
+  source(5)
+  expect(target()).toBe(20)
 })

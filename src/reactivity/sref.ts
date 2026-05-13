@@ -164,7 +164,6 @@ export const sref = <TValueType>(
     }
     return refObj._value
   }
-  ;(srefFunction as any)[srefSymbol] = 1
 
   defineRefValue(srefFunction as any, false)
 

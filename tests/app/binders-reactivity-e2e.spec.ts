@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest'
 
 import {
+  computed,
   createApp,
   defineComponent,
   drainUnbind,
@@ -63,6 +64,12 @@ type FormState = {
 type TitleCard = {
   showTitle: RefOrValue<boolean>
   title: string
+}
+
+type ProfileSource = {
+  first: string
+  last: string
+  visits: number
 }
 
 const withApp = async (
@@ -928,6 +935,99 @@ test('e2e: component prop reactivity keeps disabled state in sync', async () => 
 
       pendingDeleteHostname('host-2')
       expect(button.hasAttribute('disabled')).toBe(false)
+    },
+  )
+})
+
+test('e2e: computed value passed through sub components stays reactive', async () => {
+  const profile = ref<ProfileSource>({
+    first: 'Ada',
+    last: 'Lovelace',
+    visits: 1,
+  })
+  const summary = computed(
+    () => `${profile().first()} ${profile().last()} #${profile().visits()}`,
+  )
+
+  const leafBadge = defineComponent(
+    html`<strong class="leaf-badge" :title="label" r-text="label"></strong>`,
+    {
+      props: ['label'],
+      context: (head) => ({
+        label: head.props.label,
+      }),
+    },
+  )
+  const middleBadge = defineComponent(
+    html`<span class="middle-badge">
+      <LeafBadge :label="label"></LeafBadge>
+    </span>`,
+    {
+      props: ['label'],
+      context: (head) => ({
+        label: head.props.label,
+        components: { leafBadge },
+      }),
+    },
+  )
+  const profileCard = defineComponent(
+    html`<article class="profile-card">
+      <MiddleBadge :label="label"></MiddleBadge>
+    </article>`,
+    {
+      props: ['label'],
+      context: (head) => ({
+        label: head.props.label,
+        components: { middleBadge },
+      }),
+    },
+  )
+
+  await withApp(
+    {
+      summary,
+      profile,
+      components: { profileCard },
+    },
+    `<ProfileCard :label="summary"></ProfileCard>`,
+    (root) => {
+      const badge = () =>
+        root.querySelector('.leaf-badge') as HTMLElement | null
+      const text = () => badge()?.textContent
+      const title = () => badge()?.getAttribute('title')
+
+      expect(text()).toBe('Ada Lovelace #1')
+      expect(title()).toBe('Ada Lovelace #1')
+
+      profile().visits(2)
+      expect(text()).toBe('Ada Lovelace #2')
+      expect(title()).toBe('Ada Lovelace #2')
+
+      profile().first('Grace')
+      profile().last('Hopper')
+      expect(text()).toBe('Grace Hopper #2')
+      expect(title()).toBe('Grace Hopper #2')
+
+      const oldProfile = profile()
+      profile(
+        ref<ProfileSource>({
+          first: 'Katherine',
+          last: 'Johnson',
+          visits: 3,
+        }),
+      )
+      expect(text()).toBe('Katherine Johnson #3')
+      expect(title()).toBe('Katherine Johnson #3')
+
+      profile().visits(4)
+      expect(text()).toBe('Katherine Johnson #4')
+      expect(title()).toBe('Katherine Johnson #4')
+
+      oldProfile.first('Stale')
+      oldProfile.last('Source')
+      oldProfile.visits(99)
+      expect(text()).toBe('Katherine Johnson #4')
+      expect(title()).toBe('Katherine Johnson #4')
     },
   )
 })

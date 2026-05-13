@@ -3,6 +3,7 @@ import { type RegorConfig } from '../app/RegorConfig'
 import { type Binder } from '../bind/Binder'
 import { isElseNode } from '../bind/IfBinder'
 import { removeNode } from '../cleanup/removeNode'
+import { srefSymbol } from '../reactivity/refSymbols'
 
 /**
  * @internal
@@ -125,6 +126,9 @@ const readonlyRefValueDescriptor: PropertyDescriptor = {
  * @internal
  */
 export const defineRefValue = (result: AnyRef, isReadOnly: boolean): void => {
+  ;(result as unknown as Record<symbol, unknown>)[srefSymbol] = isReadOnly
+    ? 2
+    : 1
   Object.defineProperty(
     result,
     'value',
