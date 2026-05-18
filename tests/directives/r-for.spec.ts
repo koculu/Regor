@@ -508,6 +508,98 @@ test('should support r-for on table custom row and cell components', () => {
   ])
 })
 
+test('should preserve dynamic row component style binding with r-for', () => {
+  const root = document.createElement('div')
+
+  const rowRenderer = defineComponent(
+    html`<tr :style="rowStyle">
+      <td>{{ index }}</td>
+      <td>{{ item.name }}</td>
+    </tr>`,
+    { props: ['item', 'index', 'rowStyle'] },
+  )
+  const visibleRows = ref([
+    { item: { name: 'Alice' }, index: 0 },
+    { item: { name: 'Bob' }, index: 1 },
+  ])
+  const hostTable = defineComponent(
+    html`<table>
+      <tr
+        :is="rowComponent"
+        :item="row.item"
+        :index="row.index"
+        :rowStyle="{height: '123px'}"
+        r-for="row in visibleRows"
+      ></tr>
+    </table>`,
+    {
+      context: () => ({
+        rowComponent: 'rowRenderer',
+        visibleRows,
+      }),
+    },
+  )
+
+  const showTable = ref(true)
+  const wrapperApp = defineComponent(
+    html`<section>
+      <div r-if="showTable">
+        <slot></slot>
+      </div>
+    </section>`,
+    {
+      context: () => ({
+        showTable,
+      }),
+    },
+  )
+
+  createApp(
+    {
+      components: {
+        hostTable,
+        wrapperApp,
+        rowRenderer,
+      },
+    },
+    {
+      element: root,
+      template: html`<WrapperApp>
+        <HostTable></HostTable>
+      </WrapperApp>`,
+    },
+  )
+  visibleRows(
+    ref([
+      { item: { name: 'Alice' }, index: 0 },
+      { item: { name: 'Bob' }, index: 1 },
+      { item: { name: 'Cem' }, index: 2 },
+    ]),
+  )
+  const getRows = () =>
+    [...root.querySelectorAll('tr')] as HTMLTableRowElement[]
+  const getCellText = () =>
+    [...root.querySelectorAll('td')].map((x) => x.textContent?.trim())
+  const expectRenderedRows = () => {
+    const rows = getRows()
+    expect(rows.length).toBe(3)
+    expect(getCellText()).toStrictEqual(['0', 'Alice', '1', 'Bob', '2', 'Cem'])
+    expect(rows.map((row) => row.style.height)).toStrictEqual([
+      '123px',
+      '123px',
+      '123px',
+    ])
+  }
+
+  expectRenderedRows()
+
+  showTable(false)
+  expect(getRows().length).toBe(0)
+
+  showTable(true)
+  expectRenderedRows()
+})
+
 test('should support table usage with th and td as components', () => {
   const root = document.createElement('div')
 
@@ -580,7 +672,7 @@ test('should support table usage with th and td as components', () => {
   ])
 })
 
-test('should support table usage with thead th components (expected to fail for now)', () => {
+test('should support table usage with thead th components', () => {
   const root = document.createElement('div')
 
   const tableHeadCell = defineComponent(
@@ -642,7 +734,7 @@ test('should support table usage with thead th components (expected to fail for 
   expect(getCellText()).toStrictEqual(['Alice', '25', 'Bob', '30'])
 })
 
-test('should support simple table usage without thead/tbody (expected to fail for now)', () => {
+test('should support simple table usage without thead/tbody', () => {
   const root = document.createElement('div')
 
   const tableHeadCell = defineComponent(
