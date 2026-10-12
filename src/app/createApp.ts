@@ -16,6 +16,7 @@ import { callUnmounted } from '../composition/callUnmounted'
 import { isScope } from '../composition/useScope'
 import { ErrorType, getError } from '../log/errors'
 import { Parser } from '../parser/Parser'
+import { prepareContext } from './prepareContext'
 import { preprocess } from './preprocess-template'
 import { RegorConfig } from './RegorConfig'
 import { toFragment } from './toFragment'
@@ -89,11 +90,13 @@ export const createApp = <
     const element = document
       .createRange()
       .createContextualFragment(preprocess(template.template))
+    prepareContext(element, config)
     cleanRoot()
     appendChildren(element.childNodes)
     template.element = element
   } else if (template.json) {
     const element = toFragment(template.json, template.isSVG, config)
+    prepareContext(element, config)
     cleanRoot()
     appendChildren(element.childNodes)
   }

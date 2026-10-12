@@ -1,50 +1,63 @@
 ---
 title: :context Directive
-description: "Pass multiple reactive fields into a component through object-style context input."
+description: "Set component properties or use an object as the context for an element and its children."
 ---
 
-`:context` assigns an object into a component instance context, reactively.
-`r-context` is an alias with the same behavior.
+On a component, `:context` updates its properties from an object, including properties that are not declared in `props`.
 
-Use it when you want to pass multiple values to a component in one place, including fields that are not declared in `props`.
+On other tags, it uses the object as the context for that element and its children.
+
+`r-context` is the default alias and works the same way.
 
 <Panel class="guide-orientation" tone="neutral" variant="flat" bodyClass="p-3">
   <Flex wrap="true" class="gap-2"><Badge tone="accent" variant="surface">:context / r-context</Badge><Badge tone="neutral" variant="surface">Composition</Badge></Flex>
-  <p>Pass multiple reactive fields into a component through object-style context input.</p>
+  <p>Set component properties or use an object as the context for an element and its children.</p>
 </Panel>
 
 ## Try it live
 
-<section class="guide-example" aria-label="An object crosses the boundary">
-  <div class="guide-example-heading"><strong>An object crosses the boundary</strong><Badge tone="accent" variant="surface">Live Regor</Badge></div>
+<section class="guide-example" aria-label="Set component properties">
+  <div class="guide-example-heading"><strong>Set component properties</strong><Badge tone="accent" variant="surface">Live Regor</Badge></div>
   <Tabs group="directive-context" selectedTab="context-preview" ariaLabel="context directive example" tone="neutral" variant="none" tabVariant="underline">
     <TabPane id="context-preview" label="Live preview"><div id="directive-demo" data-example="context"><DirectiveContext/></div><noscript><p class="guide-example-note">Enable JavaScript to try the controls. This preview is rendered at build time.</p></noscript></TabPane>
     <TabPane id="context-source" label="context.ts"><import-codeblock src="./demos/context.ts"/></TabPane>
     <TabPane id="context-mount" label="browser.ts"><import-codeblock src="./demos/browser.ts"/></TabPane>
   </Tabs>
-  <p class="guide-example-note">Edit the parent title and permissions. Object-style input updates the child context.</p>
+  <p class="guide-example-note">Edit the title and permissions to update the component.</p>
 </section>
 
-## What it does
+## Using `:context` on components
 
 ```html
 <MyComponent :context="{ title: pageTitle, theme: activeTheme }"></MyComponent>
 <MyComponent r-context="{ title: pageTitle, theme: activeTheme }"></MyComponent>
 ```
 
-In the component, `title` and `theme` become available as component context fields (or update existing ref fields when applicable).  
-When `pageTitle` or `activeTheme` changes, the component values are updated.
+The component can use `title` and `theme`. When `pageTitle` or `activeTheme` changes, the corresponding component properties update.
 
-## When to use `:context`
+## Using `:context` on normal tags
 
-Use `:context` for object-style component input.
-`r-context` is equivalent and can be used interchangeably.
+Use `:context="user"` to write `name` instead of `user.name` on that element and inside it. `r-context` works the same way.
 
-Use `:prop-name="value"` or `r-bind:prop-name="value"` (same single-prop binding behavior) when the prop is declared in the component `props` list.
+```html
+<div :context="user">
+  <span>{{ name }}</span>
+</div>
+```
 
-Use object-form attribute binding (`r-bind="{...}"` or `:="{...}"`) for normal host attribute fallthrough, not for component context assignment.
+Here, `name` means `user.name`. Elements outside the `div` keep their own context.
 
-## Example
+The object is chosen once when the element is bound. Its ref properties remain reactive.
+
+## Choosing a binding
+
+Use `:context` to set several component properties at once or to avoid repeating an object name in child bindings.
+
+Use `:prop-name="value"` or `r-bind:prop-name="value"` to bind a single property declared in the component's `props` list.
+
+Use `r-bind="{...}"` or `:="{...}"` to set element attributes.
+
+## Combining `:context` with declared props
 
 ```html
 <UserCard
@@ -71,7 +84,7 @@ In this example:
 
 [Back to the directives](/directives/)
 
-<AlertBox class="guide-callout" tone="accent" variant="surface" title="Context input differs from host attributes"><p>Use :context for fields in a component context. Object-form r-bind targets host attributes instead.</p></AlertBox>
+<AlertBox class="guide-callout" tone="accent" variant="surface" title="Context and attributes"><p>Use :context for component properties or to choose the context for an element. Use r-bind to set attributes.</p></AlertBox>
 
 <ExpandablePanel class="guide-callout" title="Keep exploring" description="Select components dynamically." tone="neutral" variant="flat"><p><a href="/directives/is/">Select components dynamically</a>, or return to the <a href="/directives/">directive map</a>.</p></ExpandablePanel>
 

@@ -8,6 +8,7 @@ import { interpolate } from '../bind/interpolation'
 import { isHTMLElement } from '../common/common'
 import { isArray, isString } from '../common/is-what'
 import { ErrorType, getError } from '../log/errors'
+import { prepareContext } from './prepareContext'
 import { preprocess } from './preprocess-template'
 import { RegorConfig } from './RegorConfig'
 import { toFragment } from './toFragment'
@@ -95,6 +96,7 @@ export const defineComponent = <
     const json = toJsonTemplate(nodes as Element[])
     template.element = toFragment(json, true, options.config)
   }
+  prepareContext(template.element, options.config)
   return {
     context,
     template: template.element,

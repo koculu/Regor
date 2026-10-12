@@ -32,6 +32,7 @@ export class ForBinderFastPath {
     const config = binder.__config
     const builtInNames = config.__builtInNames
     const blockedBuiltIns = new Set<string>([
+      '_rcontext',
       builtInNames.for,
       builtInNames.if,
       builtInNames.else,

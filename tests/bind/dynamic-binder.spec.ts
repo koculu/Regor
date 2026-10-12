@@ -1,8 +1,43 @@
 import { expect, test } from 'vitest'
 
-import { createApp, defineComponent, html, ref, RegorConfig } from '../../src'
+import {
+  createApp,
+  defineComponent,
+  drainUnbind,
+  html,
+  ref,
+  RegorConfig,
+} from '../../src'
 import { Binder } from '../../src/bind/Binder'
 import { Parser } from '../../src/parser/Parser'
+
+test.each([':context', 'r-context'])(
+  'dynamic context host pushes %s only while binding its native tag',
+  async (attribute) => {
+    const root = document.createElement('div')
+    const label = ref('scoped')
+    const context = { local: { label }, label: 'outer', div: 'article' }
+    const app = createApp(context, {
+      element: root,
+      template: `<div ${attribute}="local" class="scope"><span r-text="label"></span></div><b r-text="label"></b>`,
+    })
+    try {
+      const host = root.querySelector('.scope')
+      expect(host?.tagName).toBe('DIV')
+      expect(host?.querySelector('span')?.textContent).toBe('scoped')
+      expect(host?.hasAttribute(attribute)).toBe(false)
+      expect(host?.hasAttribute('context')).toBe(false)
+      expect(host?.hasAttribute('_rcontext')).toBe(false)
+      label('updated')
+      expect(host?.querySelector('span')?.textContent).toBe('updated')
+      expect(root.querySelector('b')?.textContent).toBe('outer')
+      expect(context.label).toBe('outer')
+    } finally {
+      app.unbind()
+      await drainUnbind()
+    }
+  },
+)
 
 test('dynamic binder transitions between components and unmounts invalid values', () => {
   const root = document.createElement('div')

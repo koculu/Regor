@@ -1,7 +1,7 @@
 {
   "name": "regor",
-  "version": "1.7.3",
-  "description": "A modern UI framework for web and desktop applications, inspired by Vue's concepts and powered by simplicity and flexibility.",
+  "version": "1.7.4",
+  "description": "A reactive UI library for TypeScript and JavaScript. Connect state to HTML and SVG with direct DOM updates.",
   "author": "Ahmed Yasin Koculu",
   "license": "MIT",
   "type": "module",
