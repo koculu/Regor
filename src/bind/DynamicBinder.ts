@@ -44,6 +44,15 @@ export class DynamicBinder {
   }
 
   __bind(el: HTMLElement): void {
+    if (
+      el.hasAttribute('_rcontext') &&
+      this.__binder.__componentBinder.__isComponentHost(el)
+    ) {
+      el.removeAttribute(this.__is)
+      el.removeAttribute('_rcontext')
+      this.__binder.__componentBinder.__bindAll(el)
+      return
+    }
     let expression = el.getAttribute(this.__is)
     if (!expression) {
       expression = el.getAttribute('is')
@@ -69,6 +78,8 @@ export class DynamicBinder {
       el.removeAttribute('is')
     }
     el.removeAttribute(this.__is)
+    // The context marker identifies a literal tag supplied by template preparation.
+    if (el.hasAttribute('_rcontext')) expression = `'${expression}'`
     this.__bindToExpression(el, expression)
   }
 
@@ -114,6 +125,20 @@ export class DynamicBinder {
     const value = parseResult.value
     const parser = this.__binder.__parser
     const capturedContext = parser.__capture()
+    const names = this.__binder.__config.__builtInNames
+    let context: unknown
+    if (el.hasAttribute('_rcontext')) {
+      const contextExpression =
+        el.getAttribute(names.context) ?? el.getAttribute(names.contextAlias)
+      if (contextExpression !== null) {
+        context = parser
+          .__parse(contextExpression, undefined, undefined, true, true)
+          .value()[0]
+      }
+      el.removeAttribute(names.context)
+      el.removeAttribute(names.contextAlias)
+      el.removeAttribute('_rcontext')
+    }
 
     const mounted = { name: '' }
 
@@ -122,6 +147,7 @@ export class DynamicBinder {
       : [...nodes[0].childNodes]
     const refresh = (): void => {
       parser.__scoped(capturedContext, () => {
+        if (isObject(context)) parser.__push(context)
         let name = value()[0] as string
         if (isObject(name)) {
           if (!name.name) {
