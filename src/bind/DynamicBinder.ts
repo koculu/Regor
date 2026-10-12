@@ -2,13 +2,14 @@ import { type StopObserving } from '../api/types'
 import { addUnbinder } from '../cleanup/addUnbinder'
 import { removeNode } from '../cleanup/removeNode'
 import { getNodes, isTemplate, unmount } from '../common/common'
+import { createElement, svgNamespace } from '../common/createElement'
 import { isNullOrWhitespace, isObject, isString } from '../common/is-what'
 import { type Binder } from './Binder'
 import { setSwitchOwner } from './switch'
 
 const noopStopObserving: StopObserving = () => {}
 
-const mount = (nodes: ChildNode[], parent: HTMLElement): void => {
+const mount = (nodes: ChildNode[], parent: Element): void => {
   for (const x of nodes) {
     const node = x.cloneNode(true)
     parent.appendChild(node)
@@ -59,11 +60,14 @@ export class DynamicBinder {
       if (!expression) return
       if (!expression.startsWith('regor:')) {
         if (!expression.startsWith('r-')) return
-        const staticName = expression.slice(2).trim().toLowerCase()
+        const staticName = expression.slice(2).trim()
         if (!staticName) return
         const parent = el.parentNode
         if (!parent) return
-        const nativeElement = document.createElement(staticName)
+        const nativeElement = createElement(
+          staticName,
+          el.namespaceURI === svgNamespace,
+        )
         for (const attr of el.getAttributeNames()) {
           if (attr === 'is') continue
           nativeElement.setAttribute(attr, el.getAttribute(attr) as string)
@@ -169,7 +173,10 @@ export class DynamicBinder {
         const currentParent = (commentEnd.parentNode ??
           commentBegin.parentNode) as HTMLElement | null
         if (!currentParent) return
-        const componentElement = document.createElement(name)
+        const componentElement = createElement(
+          name,
+          el.namespaceURI === svgNamespace,
+        )
         for (const attr of el.getAttributeNames()) {
           if (attr === this.__is) continue
           componentElement.setAttribute(attr, el.getAttribute(attr) as string)
