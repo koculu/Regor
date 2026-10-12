@@ -10,20 +10,22 @@ on:
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
-    env:
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     permissions:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: '22'
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org'
-          always-auth: true
+          package-manager-cache: false
+
+      - name: Update npm for trusted publishing
+        run: |
+          npm install -g npm@latest
+          npm --version
 
       - name: Enable Corepack & activate Yarn latest
         run: |
@@ -44,6 +46,4 @@ jobs:
         run: yarn build
 
       - name: Publish to npm
-        run: yarn npm publish --access public
-        env:
-           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public
