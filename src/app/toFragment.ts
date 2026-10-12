@@ -1,23 +1,8 @@
 import { type JSONTemplate } from '../api/types'
 import { RegorConfig } from '../app/RegorConfig'
 import { isTemplate, normalizeAttributeName } from '../common/common'
+import { createElement } from '../common/createElement'
 import { isArray } from '../common/is-what'
-
-const svgTags =
-  'svg,animate,animateMotion,animateTransform,circle,clipPath,color-profile,' +
-  'defs,desc,discard,ellipse,feBlend,feColorMatrix,feComponentTransfer,' +
-  'feComposite,feConvolveMatrix,feDiffuseLighting,feDisplacementMap,' +
-  'feDistantLight,feDropShadow,feFlood,feFuncA,feFuncB,feFuncG,feFuncR,' +
-  'feGaussianBlur,feImage,feMerge,feMergeNode,feMorphology,feOffset,' +
-  'fePointLight,feSpecularLighting,feSpotLight,feTile,feTurbulence,filter,' +
-  'foreignObject,g,hatch,hatchpath,image,line,linearGradient,marker,mask,' +
-  'mesh,meshgradient,meshpatch,meshrow,metadata,mpath,path,pattern,' +
-  'polygon,polyline,radialGradient,rect,set,solidcolor,stop,switch,symbol,' +
-  'text,textPath,title,tspan,unknown,use,view'
-
-const svgSet = new Set<string>(svgTags.toUpperCase().split(','))
-
-const svgNamespace = 'http://www.w3.org/2000/svg'
 
 const appendChild = (parent: Node, el: Node): void => {
   if (isTemplate(parent)) parent.content.appendChild(el)
@@ -32,10 +17,7 @@ const render = (
 ): void => {
   const tag = json.t
   if (tag) {
-    const el =
-      isSVG && svgSet.has(tag.toUpperCase())
-        ? document.createElementNS(svgNamespace, tag.toLowerCase())
-        : document.createElement(tag)
+    const el = createElement(tag, isSVG)
     const attributes = json.a
     if (attributes) {
       for (const attr of Object.entries(attributes)) {
