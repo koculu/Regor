@@ -141,6 +141,6 @@ class RegorApp {
   }
 
   __bind(): void {
-    this.__binder.__bindDefault(this.__root)
+    this.__binder.__dynamicBinder.__bindRoot(this.__root)
   }
 }
