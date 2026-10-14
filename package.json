@@ -1,6 +1,6 @@
 {
   "name": "regor",
-  "version": "1.7.4",
+  "version": "1.7.5",
   "description": "A reactive UI library for TypeScript and JavaScript. Connect state to HTML and SVG with direct DOM updates.",
   "author": "Ahmed Yasin Koculu",
   "license": "MIT",

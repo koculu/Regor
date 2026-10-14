@@ -99,6 +99,8 @@ export const createApp = <
     prepareContext(element, config)
     cleanRoot()
     appendChildren(element.childNodes)
+  } else {
+    prepareContext(root, config)
   }
 
   if (config.useInterpolation) interpolate(root, config)
