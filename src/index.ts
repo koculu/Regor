@@ -1,3 +1,5 @@
+import './runtime'
+
 export type {
   AnyRef,
   BindData,
