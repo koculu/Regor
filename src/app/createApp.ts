@@ -99,6 +99,8 @@ export const createApp = <
     prepareContext(element, config)
     cleanRoot()
     appendChildren(element.childNodes)
+  } else {
+    prepareContext(root, config)
   }
 
   if (config.useInterpolation) interpolate(root, config)
@@ -139,6 +141,6 @@ class RegorApp {
   }
 
   __bind(): void {
-    this.__binder.__bindDefault(this.__root)
+    this.__binder.__dynamicBinder.__bindRoot(this.__root)
   }
 }

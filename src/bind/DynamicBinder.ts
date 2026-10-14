@@ -10,9 +10,10 @@ import { setSwitchOwner } from './switch'
 const noopStopObserving: StopObserving = () => {}
 
 const mount = (nodes: ChildNode[], parent: Element): void => {
+  const target = isTemplate(parent) ? parent.content : parent
   for (const x of nodes) {
     const node = x.cloneNode(true)
-    parent.appendChild(node)
+    target.appendChild(node)
   }
 }
 
@@ -27,6 +28,50 @@ export class DynamicBinder {
   constructor(binder: Binder) {
     this.__binder = binder
     this.__is = binder.__config.__builtInNames.is
+  }
+
+  __isContextHost(element: Element): boolean {
+    return (
+      element.hasAttribute('_rcontext') &&
+      !this.__binder.__componentBinder.__isComponentHost(element)
+    )
+  }
+
+  __readContext(element: Element): unknown {
+    const names = this.__binder.__config.__builtInNames
+    const expression =
+      element.getAttribute(names.context) ??
+      element.getAttribute(names.contextAlias)
+    const context =
+      expression === null
+        ? undefined
+        : this.__binder.__parser
+            .__parse(expression, undefined, undefined, true, true)
+            .value()[0]
+    element.removeAttribute(names.context)
+    element.removeAttribute(names.contextAlias)
+    element.removeAttribute('_rcontext')
+    return context
+  }
+
+  __bindRoot(element: Element): void {
+    const binder = this.__binder
+    const names = binder.__config.__builtInNames
+    if (
+      element.hasAttribute(binder.__pre) ||
+      element.hasAttribute(this.__is) ||
+      element.hasAttribute('is') ||
+      (!element.hasAttribute(names.context) &&
+        !element.hasAttribute(names.contextAlias)) ||
+      binder.__componentBinder.__isComponentHost(element)
+    ) {
+      binder.__bindDefault(element)
+      return
+    }
+    const context = this.__readContext(element)
+    // This parser belongs to the app, so the root scope is its base context.
+    if (isObject(context)) binder.__parser.__push(context)
+    binder.__bindDefault(element)
   }
 
   __bindAll(element: Element): boolean {
@@ -129,20 +174,9 @@ export class DynamicBinder {
     const value = parseResult.value
     const parser = this.__binder.__parser
     const capturedContext = parser.__capture()
-    const names = this.__binder.__config.__builtInNames
-    let context: unknown
-    if (el.hasAttribute('_rcontext')) {
-      const contextExpression =
-        el.getAttribute(names.context) ?? el.getAttribute(names.contextAlias)
-      if (contextExpression !== null) {
-        context = parser
-          .__parse(contextExpression, undefined, undefined, true, true)
-          .value()[0]
-      }
-      el.removeAttribute(names.context)
-      el.removeAttribute(names.contextAlias)
-      el.removeAttribute('_rcontext')
-    }
+    const context = el.hasAttribute('_rcontext')
+      ? this.__readContext(el)
+      : undefined
 
     const mounted = { name: '' }
 

@@ -37,8 +37,14 @@ const topBarTemplate = html`<input
               rel="noopener"
               ><Icon name="tabler:brand-github"
             /></a>
-            <a class="topbar__icon" href="https://purestack.studio" target="_blank" rel="noopener" aria-label="PureStack Studio website">
-              <Icon name="tabler:stack-2"/>
+            <a
+              class="topbar__icon"
+              href="https://purestack.studio"
+              target="_blank"
+              rel="noopener"
+              aria-label="PureStack Studio website"
+            >
+              <Icon name="tabler:stack-2" />
             </a>
           </slot>
           <SignIn

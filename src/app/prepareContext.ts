@@ -10,6 +10,10 @@ export const prepareContext = (
   const root = isTemplate(template) ? template.content : template
   const selector = `${toSelector(names.context)},${toSelector(names.contextAlias)},template`
   for (const element of root.querySelectorAll?.(selector) ?? []) {
+    let ancestor: Element | null = element
+    while (ancestor && !ancestor.hasAttribute(names.pre))
+      ancestor = ancestor.parentElement
+    if (ancestor) continue
     if (isTemplate(element)) {
       prepareContext(element.content, config)
       if (

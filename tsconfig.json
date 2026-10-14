@@ -9,6 +9,7 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
     "noImplicitAny": true,
     "removeComments": false,
     "sourceMap": false,

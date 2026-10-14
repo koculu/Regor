@@ -80,7 +80,9 @@ export class IfBinder {
   }
 
   __bindAll(element: Element): boolean {
-    const isIfElement = element.hasAttribute(this.__if)
+    const isIfElement =
+      element.hasAttribute(this.__if) &&
+      !this.__binder.__dynamicBinder.__isContextHost(element)
     if (isIfElement) this.__bind(element as HTMLElement)
     const isDynamicElement =
       element.hasAttribute(this.__binder.__config.__builtInNames.is) ||
@@ -109,6 +111,7 @@ export class IfBinder {
 
   __bind(el: HTMLElement): void {
     if (
+      this.__binder.__dynamicBinder.__isContextHost(el) ||
       el.hasAttribute(this.__pre) ||
       this.__isProcessedOrMark(el) ||
       // if elements should only be mounted after for's are mounted.

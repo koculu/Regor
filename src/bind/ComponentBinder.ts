@@ -508,6 +508,7 @@ export class ComponentBinder {
     const stack = this.__getChildElements(root).reverse()
     while (stack.length > 0) {
       const current = stack.pop() as HTMLElement
+      if (current.hasAttribute(this.__binder.__pre)) continue
       if (current.matches(selector)) {
         result.push(current)
         continue
@@ -527,6 +528,7 @@ export class ComponentBinder {
     const stack = this.__getChildElements(root).reverse()
     while (stack.length > 0) {
       const current = stack.pop() as HTMLElement
+      if (current.hasAttribute(binder.__pre)) continue
       action(current)
       if (!isNullOrWhitespace(selector) && current.matches(selector)) continue
       if (current.hasAttribute(isName) || current.hasAttribute('is')) continue

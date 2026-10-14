@@ -1,6 +1,6 @@
 {
   "name": "regor",
-  "version": "1.7.4",
+  "version": "1.7.5",
   "description": "A reactive UI library for TypeScript and JavaScript. Connect state to HTML and SVG with direct DOM updates.",
   "author": "Ahmed Yasin Koculu",
   "license": "MIT",
@@ -26,7 +26,11 @@
   "files": [
     "dist"
   ],
-  "sideEffects": false,
+  "sideEffects": [
+    "./src/index.ts",
+    "./src/runtime.ts",
+    "./dist/*.js"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/PureStackStudio/Regor.git"
